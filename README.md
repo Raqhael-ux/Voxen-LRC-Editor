@@ -73,6 +73,14 @@ Syncs lyrics **word-by-word** for precise timing.
 
 ---
 
+## Demo :
+<video src="https://github.com/user-attachments/assets/f709faf8-92d8-4de0-995d-fc0000465591" 
+       controls 
+       width="200">
+</video>
+
+App Used: [Metrolist](https://github.com/mostafaalagamy/Metrolist)
+
 ## 💡 Notes
 
 * Designed to be minimal, fast, and distraction-free
