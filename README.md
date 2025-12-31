@@ -19,8 +19,8 @@ If you don’t want to download the HTML file, you can use the web version inste
 ## Screenshots :
 
 <div style="display: flex; gap: 10px;">
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877183695487038/Screenshot_20251231-1855082.png?ex=695652c9&is=69550149&hm=022a040f9e988aed04b892a76984826ea0eb16214475e6b1b0cb5d426c6b51d5" alt="Android" width="200"/>
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877366990504078/PC.png?ex=695652f5&is=69550175&hm=fcb14f14980690163b0d3db0b91e9bc09d516d5d10440950118362cbe3d81473" alt="Windows" width="740"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877183695487038/Screenshot_20251231-1855082.png?ex=695652c9&is=69550149&hm=022a040f9e988aed04b892a76984826ea0eb16214475e6b1b0cb5d426c6b51d5" alt="Android" width="150"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877366990504078/PC.png?ex=695652f5&is=69550175&hm=fcb14f14980690163b0d3db0b91e9bc09d516d5d10440950118362cbe3d81473" alt="Windows" width="560"/>
 </div>
 
 ---
