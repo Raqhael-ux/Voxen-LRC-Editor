@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen V5 (Unified)</title>
+    <title>Voxen V5.5</title>
     <style>
         :root {
             /* Theme Colors */
@@ -25,6 +25,12 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-body);
@@ -34,7 +40,7 @@
             height: 100vh;
             display: flex;
             justify-content: center;
-            overflow: hidden; /* Prevent body scroll */
+            overflow: hidden; 
         }
 
         /* --- Main Container --- */
@@ -92,15 +98,34 @@
 
         .input-group { margin-bottom: 1.2rem; }
         
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem; 
+        }
+
         label { 
             display: block; 
-            margin-bottom: 0.4rem; 
             color: var(--text-muted); 
             font-size: 0.75rem; 
             font-weight: 700; 
+            margin: 0;
         }
+
+        .expand-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            padding: 1px 6px;
+            cursor: pointer;
+            transition: var(--trans);
+        }
+        .expand-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
         
-        textarea, input, select {
+        textarea, input[type="text"], input[type="number"], select {
             width: 100%;
             background: var(--bg-input);
             border: 2px solid transparent;
@@ -109,6 +134,48 @@
             border-radius: 8px;
             font-family: inherit;
             transition: var(--trans);
+        }
+
+        /* Styled File Upload */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            height: 45px;
+            margin-bottom: 10px;
+        }
+        .file-upload-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .file-upload-label {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed var(--text-muted);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: var(--trans);
+            z-index: 1;
+        }
+        .file-upload-input:hover + .file-upload-label {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+            color: var(--primary-light);
+        }
+        .file-upload-label span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
         }
 
         textarea { height: 80px; resize: none; font-family: 'Courier New', monospace; font-size: 0.85rem; }
@@ -151,6 +218,7 @@
         }
         .btn:active { transform: scale(0.98); }
         .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--primary-light); color: var(--primary-light); }
         .btn-secondary { background: var(--bg-input); color: var(--text-main); }
         
         #mobile-close-sidebar { display: none; }
@@ -191,7 +259,7 @@
 
         .top-left-controls { display: flex; gap: 10px; align-items: center; }
 
-        #mobile-open-settings, #edit-mode-toggle {
+        .header-btn {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             color: var(--text-muted);
@@ -201,7 +269,10 @@
             cursor: pointer;
             transition: var(--trans);
             display: flex; align-items: center; gap: 6px;
+            height: 36px;
         }
+        
+        .header-btn:hover { background: rgba(255,255,255,0.1); color: white; }
         
         #edit-mode-toggle.active {
             background: var(--warning);
@@ -214,7 +285,6 @@
         .lyrics-list {
             flex: 1;
             overflow-y: auto;
-            /* Added lots of bottom padding to account for the new dock */
             padding: 80px 1rem 220px 1rem; 
             scroll-behavior: smooth;
         }
@@ -261,30 +331,39 @@
             opacity: 0.7;
         }
 
-        .line-content-wrapper { flex: 1; }
+        .line-content-wrapper {
+    flex: 1;
+    margin-left: 12px;
+    margin-right: 70px; /* Reserve space for the buttons so text doesn't overlap */
+}
 
-        .line-text {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            outline: none;
-            padding: 4px;
-            border-radius: 4px;
-            min-height: 1.5rem;
-        }
+ .line-text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--text-main);
+    padding: 4px 8px;
+    border: 1px solid transparent; /* Reserve border space always */
+    border-radius: 4px;
+}
         
         .line-text[contenteditable="true"] { border: 1px dashed var(--text-muted); cursor: text; }
-        .line-text[contenteditable="true"]:focus { background: rgba(0,0,0,0.2); border-color: var(--warning); }
-
-        .line-actions {
-            display: none; 
-            flex-direction: column;
-            gap: 4px;
-            margin-left: 8px;
-        }
-        .app-container.is-editing .line-actions { display: flex; }
+        .line-text[contenteditable="true"] {
+    background: rgba(0,0,0,0.2);
+    border-color: var(--primary); 
+    outline: none;
+}
+       .line-actions {
+    display: none; /* Hidden by default */
+    position: absolute; /* Float on top */
+    right: 10px;        /* Stick to the right */
+    top: 50%;
+    transform: translateY(-50%); /* Perfect vertical center */
+    flex-direction: row;
+    gap: 6px;
+    z-index: 10; /* Ensure clickable */
+}
+ .app-container.is-editing .line-actions { display: flex; }
+.app-container.is-editing #btn-add-top { display: inline-block !important; }
 
         .action-btn {
             background: rgba(255,255,255,0.1);
@@ -319,10 +398,10 @@
         .app-container:not(.is-editing) .word-span:hover { background: rgba(255,255,255,0.1); }
 
 
-        /* --- Floating Word Context UI (Position updated) --- */
+        /* Floating Word Context UI */
         #word-context-ui {
             position: fixed;
-            bottom: 200px; /* Moved up significantly to avoid dock */
+            bottom: 200px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: rgba(15, 23, 42, 0.95);
@@ -344,7 +423,7 @@
         .ctx-curr { color: var(--text-muted); font-weight: 800; font-size: 1.2rem; transform: scale(1.1); opacity: 0.6; }
 
 
-        /* --- NEW Unified Control Dock --- */
+        /* --- Unified Control Dock --- */
         .control-dock {
             position: fixed;
             bottom: 24px;
@@ -382,31 +461,56 @@
 
         input[type=range] {
             -webkit-appearance: none;
-            flex: 1;
             background: transparent;
+            cursor: pointer;
             padding: 0; margin: 0; border: none;
         }
-        input[type=range]:focus { outline: none; background: transparent; }
-        
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer;
-            background: var(--bg-input); border-radius: 3px;
-        }
-        input[type=range]::-moz-range-track {
-            width: 100%; height: 6px; cursor: pointer;
-            background: var(--bg-input); border-radius: 3px;
+        input[type=range]:focus { outline: none; }
+
+        .seek-slider {
+            flex: 1;
+            width: 100%;       
+            height: 6px;       
+            border-radius: 4px;
         }
 
-        input[type=range]::-webkit-slider-thumb {
-            height: 16px; width: 16px; border-radius: 50%;
-            background: var(--primary); cursor: pointer;
-            -webkit-appearance: none; margin-top: -5px;
+        .seek-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+        .seek-slider::-moz-range-track { width: 100%; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+
+        .seek-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px; 
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -5px; 
             box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
             transition: transform 0.1s;
         }
-        input[type=range]::-webkit-slider-thumb:active { transform: scale(1.3); }
+        .seek-slider::-webkit-slider-thumb:active { transform: scale(1.3); }
 
-        /* Dock Row 2: Controls */
+        .vol-slider {
+            width: 100px;
+            height: 6px;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            border-radius: 4px;
+            margin: 0;
+        }
+
+        .vol-slider::-webkit-slider-runnable-track { width: 100px; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+        .vol-slider::-moz-range-track { width: 100px; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+
+        .vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px; 
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -5px; 
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+            transition: transform 0.1s;
+        }
+        .vol-slider::-webkit-slider-thumb:active { transform: scale(1.3); }
+
         .dock-row-controls {
             display: flex;
             align-items: center;
@@ -419,7 +523,6 @@
             gap: 16px;
             flex: 1;
             justify-content: center;
-            /* Adjust padding to balance the big Sync button on the right */
             padding-right: 20px; 
         }
 
@@ -446,18 +549,9 @@
         }
         .play-btn:hover { background: white; transform: scale(1.05); }
 
-        /* Speed Menu */
-        .speed-wrapper { position: relative; }
-        .speed-toggle-btn {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            width: auto;
-            padding: 0 8px;
-        }
-        .speed-toggle-btn:hover { color: var(--primary-light); }
+        .popup-wrapper { position: relative; }
         
-        .speed-popup {
+        .dock-popup {
             position: absolute;
             bottom: 140%;
             left: 50%;
@@ -474,25 +568,27 @@
             transition: var(--trans);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 101;
-            min-width: 80px;
         }
-        .speed-popup.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-        
+        .dock-popup.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+        .speed-toggle-btn { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); width: auto; padding: 0 8px; }
+        .speed-toggle-btn:hover { color: var(--primary-light); }
+        .speed-popup { min-width: 80px; }
         .speed-option {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            text-align: center;
-            transition: var(--trans);
+            background: transparent; border: none; color: var(--text-muted); padding: 8px 12px;
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-align: center; transition: var(--trans);
         }
         .speed-option:hover { background: rgba(255,255,255,0.05); color: white; }
         .speed-option.selected { background: var(--primary); color: white; }
 
-        /* Sync Button inside Dock */
+        .volume-popup {
+            height: 140px;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .dock-sync-btn {
             background: var(--secondary);
             color: #0f172a;
@@ -512,6 +608,47 @@
         .dock-sync-btn span { font-size: 1.4rem; }
         .dock-sync-btn div { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* --- Modals (Offset + Expanded Text) --- */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: var(--trans);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .base-modal {
+            background: var(--bg-card); border-radius: 16px;
+            padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .offset-modal { width: 340px; }
+        .expanded-text-modal { width: 800px; max-width: 90%; height: 80vh; display:flex; flex-direction:column; }
+
+        .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
+        
+        .offset-grid { display: flex; gap: 8px; margin-bottom: 20px; }
+        .offset-col { flex: 1; }
+        .offset-col label { font-size: 0.7rem; text-align: center; }
+
+        /* Expanded specific */
+        .expanded-textarea {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+        }
+        .expanded-textarea:focus { border-color: var(--primary); outline: none; }
+
         /* --- Mobile Responsive --- */
         @media (max-width: 900px) {
             body { padding: 0; height: 100vh; }
@@ -528,10 +665,12 @@
             .top-info-bar { padding: 0.6rem 1rem; }
             .editor-area { height: 100%; width: 100%; }
 
+            .header-btn .btn-text { display: none; }
+            .header-btn { padding: 6px 10px; font-size: 1rem; } 
+
             .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; }
             .action-btn { width: 40px; height: 30px; }
             
-            /* Mobile Dock Adjustments */
             .control-dock { 
                 width: 92%; 
                 bottom: 16px; 
@@ -546,8 +685,7 @@
                 padding: 0 16px;
                 height: 48px;
             }
-            .dock-sync-btn div { display: none; } /* Hide text, keep icon on small screens if needed, or keep short text */
-            .dock-sync-btn div { display: block; font-size: 0.8rem; } /* Actually keep text but smaller */
+            .dock-sync-btn div { display: block; font-size: 0.8rem; } 
         }
     </style>
 </head>
@@ -558,7 +696,7 @@
     <div class="sidebar" id="sidebar">
         <div class="brand">
             <div style="display:flex; align-items:center; gap:8px;">
-                <span>⚡</span> Voxen
+                <span>⚡</span> Voxen V5.3
             </div>
             <button id="mobile-close-sidebar" onclick="toggleSettings(false)">✕</button>
         </div>
@@ -566,21 +704,29 @@
         <div id="sidebar-content">
             <div class="section-title">Media & Project</div>
             
-            <div class="input-group">
-                <label>Audio File (Swap Anytime)</label>
-                <input type="file" id="audio-file" accept="audio/*">
+            <label>Audio File</label>
+            <div class="file-upload-wrapper">
+                <input type="file" id="audio-file" accept="audio/*" class="file-upload-input">
+                <div class="file-upload-label" id="audio-file-label">
+                    <span>🎵 Select Audio File...</span>
+                </div>
             </div>
 
             <div style="display:flex; gap:8px; margin-bottom:1.5rem;">
-                <button class="btn btn-secondary" onclick="document.getElementById('project-upload').click()">📂 Load Project</button>
-                <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project</button>
-                <input type="file" id="project-upload" accept=".vxn" style="display:none" onchange="loadProject(this)">
+                <div class="file-upload-wrapper" style="margin:0;">
+                    <input type="file" id="project-upload" accept=".vxn" class="file-upload-input" onchange="loadProject(this)">
+                    <div class="file-upload-label"><span>📂 Load Project</span></div>
+                </div>
+                <button class="btn btn-secondary" style="height:45px;" onclick="saveProject()">💾 Save</button>
             </div>
 
             <div class="section-title">New Session</div>
 
             <div class="input-group">
-                <label>Paste Lyrics (Reset)</label>
+                <div class="label-row">
+                    <label>Paste Lyrics (Reset)</label>
+                    <button class="expand-btn" onclick="openExpandModal('raw')">⤢</button>
+                </div>
                 <textarea id="raw-lyrics" placeholder="Line 1...&#10;Line 2..."></textarea>
             </div>
 
@@ -606,8 +752,11 @@
             </div>
 
             <div class="input-group">
-                <label>Export LRC</label>
-                <textarea id="export-output" readonly style="height: 60px; font-family: monospace;"></textarea>
+                <div class="label-row">
+                    <label>Export / Import LRC</label>
+                    <button class="expand-btn" onclick="openExpandModal('lrc')">⤢</button>
+                </div>
+                <textarea id="export-output" placeholder="Paste LRC here to import..." style="height: 60px; font-family: monospace;"></textarea>
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
                     <button class="btn btn-outline" style="flex:1" onclick="generateLRC()">Update</button>
                     <button class="btn" style="flex:1" onclick="downloadLRC()">Download</button>
@@ -619,8 +768,18 @@
     <div class="editor-area">
         <div class="top-info-bar">
             <div class="top-left-controls">
-                <button id="mobile-open-settings" onclick="toggleSettings(true)">⚙ Settings</button>
-                <button id="edit-mode-toggle" onclick="toggleEditMode()">✎ Edit Text</button>
+                <button id="mobile-open-settings" class="header-btn" onclick="toggleSettings(true)">
+                    ⚙ <span class="btn-text">Settings</span>
+                </button>
+                <button id="edit-mode-toggle" class="header-btn" onclick="toggleEditMode()">
+                    ✎ <span class="btn-text">Edit Text</span>
+                </button>
+                <button id="btn-add-top" class="header-btn" style="margin-left: 0px; display: none;" onclick="addLineAtTop()">
+                    + Line
+                </button>
+                <button class="header-btn" onclick="openOffsetModal()">
+                    ⏱ <span class="btn-text">Offset Tool</span>
+                </button>
             </div>
             
             <div id="time-display" class="time-display">00:00.00</div>
@@ -632,8 +791,8 @@
             <div style="text-align: center; color: var(--text-muted); margin-top: 3rem; padding: 1rem;">
                 <p><strong>Ready to Sync</strong></p>
                 <p>1. Open Settings (Top Left).</p>
-                <p>2. Load Audio.</p>
-                <p>3. "Create New" OR "Load Project".</p>
+                <p>2. Select Audio File.</p>
+                <p>3. "Create New" OR "Load Project" OR "Expand LRC" to import.</p>
             </div>
         </div>
 
@@ -646,21 +805,29 @@
         <div class="control-dock">
             <div class="dock-row-slider">
                 <span class="seek-time" id="curr-time-lbl">0:00</span>
-                <input type="range" id="seek-slider" value="0" min="0" max="100" step="0.1">
+                <input type="range" id="seek-slider" class="seek-slider" value="0" min="0" max="100" step="0.1">
                 <span class="seek-time" id="dur-time-lbl">0:00</span>
             </div>
 
             <div class="dock-row-controls">
                 
                 <div class="player-controls">
-                    <div class="speed-wrapper">
+                    <div class="popup-wrapper">
                         <button class="control-btn speed-toggle-btn" id="speed-btn" onclick="toggleSpeedMenu()">1.0x</button>
-                        <div class="speed-popup" id="speed-popup">
+                        <div class="dock-popup speed-popup" id="speed-popup">
                             <button class="speed-option" onclick="setSpeed(0.5)">0.5x</button>
                             <button class="speed-option" onclick="setSpeed(0.75)">0.75x</button>
                             <button class="speed-option selected" onclick="setSpeed(1.0)">1.0x</button>
                             <button class="speed-option" onclick="setSpeed(1.25)">1.25x</button>
                             <button class="speed-option" onclick="setSpeed(1.5)">1.5x</button>
+                        </div>
+                    </div>
+
+                    <div class="popup-wrapper volume-wrapper">
+                        <button class="control-btn" id="vol-btn" onclick="toggleVolumeMenu()">ᯤ</button>
+                        <div class="dock-popup volume-popup" id="volume-popup">
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" 
+                                   class="vol-slider" oninput="updateVolume(this.value)">
                         </div>
                     </div>
 
@@ -676,7 +843,48 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="modal-overlay" id="offset-modal">
+    <div class="base-modal offset-modal">
+        <div class="modal-title">Bulk Offset Timestamp</div>
+        <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top:-10px;">
+            Shift all synced lines forward (positive) or backward (negative).
+        </p>
+        
+        <div class="offset-grid">
+            <div class="offset-col">
+                <label>Min</label>
+                <input type="number" id="off-min" value="0" placeholder="0">
+            </div>
+            <div class="offset-col">
+                <label>Sec</label>
+                <input type="number" id="off-sec" value="0" placeholder="0">
+            </div>
+            <div class="offset-col">
+                <label>Ms</label>
+                <input type="number" id="off-ms" value="0" placeholder="0">
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" onclick="closeOffsetModal()">Cancel</button>
+            <button class="btn" onclick="applyOffset()">Apply Offset</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="expand-modal">
+    <div class="base-modal expanded-text-modal">
+        <div class="modal-title" id="expand-modal-title">Edit Text</div>
+        <textarea id="expand-textarea" class="expanded-textarea" spellcheck="false"></textarea>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" style="flex:0.5" onclick="closeExpandModal()">Cancel</button>
+            <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;">
+                </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -693,6 +901,7 @@
 
     let currentFileName = "lyrics"; 
     let isDraggingSlider = false;
+    let currentModalType = ''; // 'raw' or 'lrc'
 
     // --- DOM Elements ---
     const appContainer = document.getElementById('app-container');
@@ -700,15 +909,29 @@
     const lyricsContainer = document.getElementById('lyrics-container');
     const timeDisplay = document.getElementById('time-display');
     const exportOutput = document.getElementById('export-output');
+    const rawLyricsInput = document.getElementById('raw-lyrics');
     const offsetInput = document.getElementById('offset-val');
     const sidebar = document.getElementById('sidebar');
     const playBtn = document.getElementById('play-pause-btn');
+    
+    // Popups
     const speedBtn = document.getElementById('speed-btn');
     const speedPopup = document.getElementById('speed-popup');
+    const volumePopup = document.getElementById('volume-popup');
+    const volumeSlider = document.getElementById('volume-slider');
+    
+    // Modals
+    const offsetModal = document.getElementById('offset-modal');
+    const expandModal = document.getElementById('expand-modal');
+    const expandTextarea = document.getElementById('expand-textarea');
+    const expandTitle = document.getElementById('expand-modal-title');
+    const expandActions = document.getElementById('expand-modal-actions');
+
     const wordContextUI = document.getElementById('word-context-ui');
     const ctxPrev = document.getElementById('ctx-prev-word');
     const ctxNext = document.getElementById('ctx-next-word');
     const editToggle = document.getElementById('edit-mode-toggle');
+    const editToggleText = editToggle.querySelector('.btn-text');
     
     const seekSlider = document.getElementById('seek-slider');
     const currTimeLbl = document.getElementById('curr-time-lbl');
@@ -724,21 +947,32 @@
         state.isEditMode = !state.isEditMode;
         if (state.isEditMode) {
             editToggle.classList.add('active');
-            editToggle.textContent = "✔ Done";
+            editToggleText.textContent = "Done";
             appContainer.classList.add('is-editing');
             wordContextUI.classList.remove('visible'); 
         } else {
             editToggle.classList.remove('active');
-            editToggle.textContent = "✎ Edit Text";
+            editToggleText.textContent = "Edit Text";
             appContainer.classList.remove('is-editing');
         }
         renderEditor(); 
         if(!state.isEditMode) updateVisuals();
     }
 
-    // --- Speed Menu Logic (New) ---
+    // --- Popups (Speed & Volume) ---
     function toggleSpeedMenu() {
         speedPopup.classList.toggle('active');
+        volumePopup.classList.remove('active'); // Close other
+    }
+
+    function toggleVolumeMenu() {
+        volumePopup.classList.toggle('active');
+        speedPopup.classList.remove('active'); // Close other
+    }
+
+    function updateVolume(val) {
+        audioPlayer.volume = val;
+        updateRangeFill(volumeSlider);
     }
 
     function setSpeed(val) {
@@ -746,7 +980,6 @@
         audioPlayer.playbackRate = val;
         speedBtn.textContent = val + "x";
         
-        // Update selection UI
         document.querySelectorAll('.speed-option').forEach(btn => {
             btn.classList.remove('selected');
             if(parseFloat(btn.innerText) === val) btn.classList.add('selected');
@@ -755,44 +988,59 @@
         speedPopup.classList.remove('active');
     }
 
-    // Close speed menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.speed-wrapper')) {
+        if (!e.target.closest('.popup-wrapper')) {
             speedPopup.classList.remove('active');
+            volumePopup.classList.remove('active');
         }
     });
 
-    // --- Audio Handling & Auto-Naming ---
+    // --- File Input ---
     document.getElementById('audio-file').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             audioPlayer.src = URL.createObjectURL(file);
             currentFileName = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById('audio-file-label').innerHTML = `<span>🎵 ${file.name}</span>`;
         }
     });
 
-    // --- Slider Logic ---
+    // --- Slider Fill ---
+    function updateRangeFill(slider) {
+        const min = slider.min || 0;
+        const max = slider.max || 100;
+        const val = slider.value;
+        const percent = (val - min) * 100 / (max - min);
+        slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, var(--bg-input) ${percent}%, var(--bg-input) 100%)`;
+    }
+    updateRangeFill(volumeSlider);
+
+    // --- Playback Slider ---
     audioPlayer.addEventListener('loadedmetadata', () => {
         seekSlider.max = audioPlayer.duration;
         durTimeLbl.textContent = formatSimpleTime(audioPlayer.duration);
+        updateRangeFill(seekSlider);
     });
 
     audioPlayer.addEventListener('timeupdate', () => {
         if (!isDraggingSlider) {
             seekSlider.value = audioPlayer.currentTime;
             currTimeLbl.textContent = formatSimpleTime(audioPlayer.currentTime);
+            updateRangeFill(seekSlider);
         }
     });
 
     seekSlider.addEventListener('input', () => {
         isDraggingSlider = true;
         currTimeLbl.textContent = formatSimpleTime(seekSlider.value);
+        updateRangeFill(seekSlider);
     });
 
     seekSlider.addEventListener('change', () => {
         audioPlayer.currentTime = seekSlider.value;
         isDraggingSlider = false;
         if(audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+        updateRangeFill(seekSlider);
     });
 
     function formatSimpleTime(s) {
@@ -802,6 +1050,7 @@
         return `${m}:${sec}`;
     }
 
+    // --- Playback ---
     function togglePlay() {
         if (audioPlayer.paused) audioPlayer.play();
         else audioPlayer.pause();
@@ -810,6 +1059,7 @@
     function seekAudio(seconds) {
         audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime + seconds);
         if(audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+        updateRangeFill(seekSlider);
     }
 
     audioPlayer.addEventListener('play', () => {
@@ -833,7 +1083,7 @@
 
     // --- Core Logic ---
     function initializeEditor() {
-        const rawText = document.getElementById('raw-lyrics').value;
+        const rawText = rawLyricsInput.value;
         if (!rawText.trim()) return alert("Please enter lyrics first.");
         
         toggleSettings(false);
@@ -860,7 +1110,7 @@
 
     function resetEditUI() {
         editToggle.classList.remove('active');
-        editToggle.textContent = "✎ Edit Text";
+        editToggleText.textContent = "Edit Text";
         appContainer.classList.remove('is-editing');
     }
 
@@ -897,7 +1147,6 @@
                 state.currentIndex = 0; 
                 state.currentWordIndex = 0;
                 
-                // Update Radio UI
                 if(state.mode === 'line') document.getElementById('mode-line').checked = true;
                 else document.getElementById('mode-word').checked = true;
 
@@ -905,13 +1154,185 @@
                 resetEditUI();
                 renderEditor();
                 updateVisuals();
-                alert("Project loaded! If the audio isn't loaded, please select the audio first in the Settings before loading a project.");
+                alert("Project loaded!");
             } catch(err) {
                 alert("Error loading project file: " + err);
             }
         };
         reader.readAsText(file);
-        input.value = ""; // Reset input
+        input.value = "";
+    }
+
+    // --- EXPANDABLE MODAL LOGIC ---
+    function openExpandModal(type) {
+        currentModalType = type;
+        expandModal.classList.add('active');
+        expandActions.innerHTML = ''; // Clear old buttons
+
+        if (type === 'raw') {
+            expandTitle.textContent = "Edit Raw Lyrics";
+            expandTextarea.value = rawLyricsInput.value;
+            expandTextarea.placeholder = "Line 1...\nLine 2...";
+            
+            // Button: Save
+            const btnSave = document.createElement('button');
+            btnSave.className = 'btn';
+            btnSave.textContent = "Update Input";
+            btnSave.onclick = () => {
+                rawLyricsInput.value = expandTextarea.value;
+                closeExpandModal();
+            };
+            expandActions.appendChild(btnSave);
+        } 
+        else if (type === 'lrc') {
+            expandTitle.textContent = "Edit / Import LRC";
+            // If empty, user might want to paste. If populated, we show current state.
+            // If the main textarea has content, use that. If not, generate it.
+            if(exportOutput.value.trim()) {
+                expandTextarea.value = exportOutput.value;
+            } else {
+                generateLRC(); // fills exportOutput
+                expandTextarea.value = exportOutput.value;
+            }
+            expandTextarea.placeholder = "[00:12.50]Paste your LRC content here to import...";
+
+            // Button 1: Copy
+            const btnCopy = document.createElement('button');
+            btnCopy.className = 'btn btn-outline';
+            btnCopy.textContent = "Copy";
+            btnCopy.onclick = () => {
+                expandTextarea.select();
+                document.execCommand('copy');
+                btnCopy.textContent = "Copied!";
+                setTimeout(() => btnCopy.textContent = "Copy", 1500);
+            };
+
+            // Button 2: Import
+            const btnImport = document.createElement('button');
+            btnImport.className = 'btn';
+            btnImport.innerHTML = "📥 Load to Editor";
+            btnImport.onclick = () => {
+                parseAndLoadLRC(expandTextarea.value);
+                closeExpandModal();
+            };
+
+            expandActions.appendChild(btnCopy);
+            expandActions.appendChild(btnImport);
+        }
+    }
+
+    function closeExpandModal() {
+        expandModal.classList.remove('active');
+    }
+
+// --- LRC PARSING LOGIC (FIXED) ---
+    function parseAndLoadLRC(lrcText) {
+        if (!lrcText.trim()) return;
+
+        const lines = lrcText.split('\n');
+        const newLyrics = [];
+        
+        // Regex for standard line: [mm:ss.xx] or [mm:ss]
+        const timeRegex = /\[(\d{2}):(\d{2}(?:\.\d+)?)\](.*)/;
+        // Regex for Voxen's custom word tag line: <word:s:e|...>
+        const wordTagLineRegex = /^<(.+)>$/;
+
+        let hasWordData = false;
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if(!trimmed) return;
+
+            const timeMatch = trimmed.match(timeRegex);
+            
+            if (timeMatch) {
+                // 1. It's a standard Lyric line
+                const min = parseInt(timeMatch[1]);
+                const sec = parseFloat(timeMatch[2]);
+                const text = timeMatch[3].trim();
+                const totalTime = (min * 60) + sec;
+                
+                newLyrics.push({
+                    text: text,
+                    time: totalTime,
+                    // Initialize with simple parse, will be overwritten if tags exist next
+                    words: parseWords(text) 
+                });
+            } else {
+                // 2. Check if it's the Word-Level Metadata line
+                const wordMatch = trimmed.match(wordTagLineRegex);
+                
+                if (wordMatch && newLyrics.length > 0) {
+                    // This metadata belongs to the *last* pushed lyric line
+                    const rawData = wordMatch[1]; // content inside <>
+                    const segments = rawData.split('|');
+                    const lastLyric = newLyrics[newLyrics.length - 1];
+
+                    // Rebuild words array from this data to restore sync
+                    const newWords = segments.map(seg => {
+                        // Format: text:start:end
+                        // We pop from the end to safely handle words that might contain colons
+                        const parts = seg.split(':');
+                        
+                        let s = null, e = null;
+                        let wText = parts[0];
+
+                        if (parts.length >= 3) {
+                            const eStr = parts.pop();
+                            const sStr = parts.pop();
+                            wText = parts.join(':'); // Rejoin remaining parts as text
+                            
+                            s = sStr ? parseFloat(sStr) : null;
+                            e = eStr ? parseFloat(eStr) : null;
+                        }
+                        
+                        return { text: wText, start: s, end: e };
+                    });
+
+                    lastLyric.words = newWords;
+                    hasWordData = true;
+                } 
+                else if (!trimmed.startsWith('[') && !trimmed.startsWith('<')) {
+                    // 3. Plain text line fallback (no timestamp)
+                     newLyrics.push({
+                        text: trimmed,
+                        time: null,
+                        words: parseWords(trimmed)
+                    });
+                }
+            }
+        });
+
+        if (newLyrics.length === 0) {
+            alert("No valid LRC timestamps found.");
+            return;
+        }
+
+        // Apply to state
+        state.lyrics = newLyrics;
+        
+        // IMPORTANT: Auto-switch mode based on data found
+        if (hasWordData) {
+            state.mode = 'word';
+            document.getElementById('mode-word').checked = true;
+        } else {
+            state.mode = 'line';
+            document.getElementById('mode-line').checked = true;
+        }
+        
+        state.currentIndex = 0;
+        state.currentWordIndex = 0;
+
+        toggleSettings(false);
+        resetEditUI();
+        renderEditor();
+        updateVisuals();
+        
+        // Update the inputs
+        rawLyricsInput.value = newLyrics.map(l => l.text).join('\n');
+        exportOutput.value = lrcText;
+        
+        alert(`Imported ${newLyrics.length} lines successfully! Mode set to: ${state.mode.toUpperCase()} Make sure to load the audio before importing!`);
     }
 
     // --- Rendering ---
@@ -986,26 +1407,33 @@
             contentWrapper.appendChild(content);
             row.appendChild(contentWrapper);
 
-            // Actions
-            const actions = document.createElement('div');
-            actions.className = 'line-actions';
-            
-            const btnAdd = document.createElement('button');
-            btnAdd.className = 'action-btn';
-            btnAdd.innerHTML = '+';
-            btnAdd.onclick = (e) => { e.stopPropagation(); addLine(index); };
-            
-            const btnDel = document.createElement('button');
-            btnDel.className = 'action-btn btn-del';
-            btnDel.innerHTML = '×';
-            btnDel.onclick = (e) => { e.stopPropagation(); deleteLine(index); };
+         // Actions
+        const actions = document.createElement('div');
+        actions.className = 'line-actions';
+        
+        const btnAdd = document.createElement('button');
+        btnAdd.className = 'action-btn';
+        btnAdd.innerHTML = '+';
+        btnAdd.onclick = (e) => { e.stopPropagation(); addLine(index); };
+        
+        const btnDel = document.createElement('button');
+        btnDel.className = 'action-btn btn-del';
+        btnDel.innerHTML = '×';
+        btnDel.onclick = (e) => { e.stopPropagation(); deleteLine(index); };
 
-            actions.appendChild(btnAdd);
-            actions.appendChild(btnDel);
-            row.appendChild(actions);
+        actions.appendChild(btnAdd);
+        actions.appendChild(btnDel);
+        row.appendChild(actions);
 
-            lyricsContainer.appendChild(row);
-        });
+        lyricsContainer.appendChild(row);
+    });
+}
+
+    function addLineAtTop() {
+        const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
+        state.lyrics.unshift(newItem);
+        state.currentIndex++;
+        renderEditor();
     }
 
     // --- Line Operations ---
@@ -1042,7 +1470,6 @@
             syncWord(state.currentIndex, state.currentWordIndex, time);
         }
         
-        // Always scroll to center active line on sync
         scrollToActive();
         updateVisuals();
     }
@@ -1082,6 +1509,40 @@
         generateLRC();
     }
 
+    // --- Bulk Offset Logic ---
+    function openOffsetModal() { offsetModal.classList.add('active'); }
+    function closeOffsetModal() { 
+        offsetModal.classList.remove('active'); 
+        document.getElementById('off-min').value = 0;
+        document.getElementById('off-sec').value = 0;
+        document.getElementById('off-ms').value = 0;
+    }
+
+    function applyOffset() {
+        const mins = parseInt(document.getElementById('off-min').value) || 0;
+        const secs = parseInt(document.getElementById('off-sec').value) || 0;
+        const ms = parseInt(document.getElementById('off-ms').value) || 0;
+
+        const totalOffsetSeconds = (mins * 60) + secs + (ms / 1000);
+        if (totalOffsetSeconds === 0) return closeOffsetModal();
+
+        state.lyrics.forEach(line => {
+            if(line.time !== null) line.time = Math.max(0, line.time + totalOffsetSeconds);
+            if(line.words) {
+                line.words.forEach(w => {
+                    if(w.start !== null) w.start = Math.max(0, w.start + totalOffsetSeconds);
+                    if(w.end !== null) w.end = Math.max(0, w.end + totalOffsetSeconds);
+                });
+            }
+        });
+
+        renderEditor();
+        updateVisuals();
+        generateLRC();
+        closeOffsetModal();
+        alert(`Offset of ${totalOffsetSeconds}s applied.`);
+    }
+
     function scrollToActive() {
         const el = document.getElementById(`line-${state.currentIndex}`);
         if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1090,20 +1551,14 @@
     function updateVisuals() {
         if(state.isEditMode) return;
 
-        // Highlight active line
         document.querySelectorAll('.lyric-line').forEach((el, idx) => {
-            if(idx === state.currentIndex) {
-                el.classList.add('active');
-            } else {
-                el.classList.remove('active');
-            }
+            if(idx === state.currentIndex) el.classList.add('active');
+            else el.classList.remove('active');
         });
 
-        // Highlight active word
         if (state.mode === 'word') {
             document.querySelectorAll('.word-span').forEach(el => el.classList.remove('active-word'));
             
-            // Mark synced
             state.lyrics.forEach((l, lI) => l.words.forEach((w, wI) => {
                 const span = document.getElementById(`word-${lI}-${wI}`);
                 if(span) {
@@ -1112,7 +1567,6 @@
                 }
             }));
 
-            // Mark current target
             const currentSpan = document.getElementById(`word-${state.currentIndex}-${state.currentWordIndex}`);
             if(currentSpan) currentSpan.classList.add('active-word');
             
@@ -1185,14 +1639,16 @@
 
     // --- Keyboard Control ---
     document.addEventListener('keydown', (e) => {
-        if(e.target.isContentEditable) return; 
-        if(e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'radio')) return;
+        // Prevent shortcuts when typing in inputs/textareas
+        if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
         
         if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
         if(e.code === 'Enter') { e.preventDefault(); triggerSync(); }
         if(e.code === 'ArrowLeft') { e.preventDefault(); seekAudio(-5); }
         if(e.code === 'ArrowRight') { e.preventDefault(); seekAudio(5); }
     });
+
+    updateRangeFill(seekSlider);
 </script>
 
 </body>
