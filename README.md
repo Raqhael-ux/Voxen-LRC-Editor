@@ -19,8 +19,8 @@ If you don’t want to download the HTML file, you can use the web version inste
 ## Screenshots :
 
 <div style="display: flex; gap: 10px;">
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877183695487038/Screenshot_20251231-1855082.png?ex=695652c9&is=69550149&hm=022a040f9e988aed04b892a76984826ea0eb16214475e6b1b0cb5d426c6b51d5" alt="Android" width="150"/>
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1455877366990504078/PC.png?ex=695652f5&is=69550175&hm=fcb14f14980690163b0d3db0b91e9bc09d516d5d10440950118362cbe3d81473" alt="Windows" width="560"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456175876952821992/Screenshot_20260101-1441572.png?ex=695768f7&is=69561777&hm=60654e1624c397c0d43417c3f72418dbb735fa4e08954cb872bf68f3bf582485" alt="Android" width="150"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456174371545551030/image.png?ex=69576790&is=69561610&hm=d13db4089a49ec4d5fd95b46c7d13151378ae1d12c2c7e636277d2a5244344d2" alt="Windows" width="560"/>
 </div>
 
 ---
@@ -40,9 +40,10 @@ If you don’t want to download the HTML file, you can use the web version inste
 
 ## 🚧 Planned Features
 
-* Bulk offset modification
-* Improved lyrics text editor
-* Built-in preview mode (maybe 👀)
+* ~~Bulk offset modification~~
+* ~~Improved lyrics text editor~~
+* ~~Import LRC~~
+* Built-in preview mode (maybe)
 
 ---
 
