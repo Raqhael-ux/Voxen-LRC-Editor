@@ -19,9 +19,17 @@ If you don’t want to download the HTML file, you can use the web version inste
 ## Screenshots :
 
 <div style="display: flex; gap: 10px;">
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456175876952821992/Screenshot_20260101-1441572.png?ex=695768f7&is=69561777&hm=60654e1624c397c0d43417c3f72418dbb735fa4e08954cb872bf68f3bf582485" alt="Android" width="150"/>
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456174371545551030/image.png?ex=69576790&is=69561610&hm=d13db4089a49ec4d5fd95b46c7d13151378ae1d12c2c7e636277d2a5244344d2" alt="Windows" width="560"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456953559663902884/Screenshot_20260103-1812282.png?ex=695a3d3d&is=6958ebbd&hm=81445e244075e2be7cd4600e0c6aa4cb09351c7c6b1ff43b9a510ad8b044ed35" alt="Android" width="150"/>
+  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456949499695202418/image.png?ex=695a3975&is=6958e7f5&hm=2a365b9f2e80dfded3d4d393b10d925aaad3808c3b626189d86055bfa85b4153" alt="Windows" width="560"/>
 </div>
+
+---
+
+## 🎊 V6 Is Here!
+* 🖌️ Website design overhaul!
+* 📱 Made mobile view look like an app
+* 👁️ Implemetned Preview mode (w/ Glow Animations)
+* ⚙️ A lot of tweaks!
 
 ---
 
@@ -35,6 +43,7 @@ If you don’t want to download the HTML file, you can use the web version inste
 * 📤 **Export to LRC** format
 * 📁 **Import & export projects** as JSON
 * ⏱️ **Reaction Offset** support for timing adjustments
+* 👁️ **Preview Mode** Preview your LRC File
 
 ---
 
@@ -43,7 +52,7 @@ If you don’t want to download the HTML file, you can use the web version inste
 * ~~Bulk offset modification~~
 * ~~Improved lyrics text editor~~
 * ~~Import LRC~~
-* Built-in preview mode (maybe)
+* ~~Built-in preview mode (maybe)~~
 
 ---
 
