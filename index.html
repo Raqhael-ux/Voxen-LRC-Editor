@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen</title>
+    <title>Voxen v5.9 (60FPS)</title>
     <style>
         :root {
             /* Theme Colors */
@@ -79,7 +79,7 @@
             backdrop-filter: blur(10px);
         }
         
-        /* Disabled Area Styling */
+        /* NEW: Disabled Area Styling */
         .disabled-area {
             opacity: 0.3;
             pointer-events: none;
@@ -149,11 +149,12 @@
             transition: var(--trans);
         }
 
+        /* --- UPDATED: Rounded Settings Slider --- */
         #glow-speed-slider {
             -webkit-appearance: none;
             height: 14px;
             background-color:rgba(15, 23, 42, 0.603);
-            border-radius: 50px;
+            border-radius: 50px; /* Fully rounded pill shape */
             overflow: hidden;
             cursor: pointer;
         }
@@ -164,7 +165,7 @@
             width: 14px;
             border-radius: 0px;
             background: #fff;
-            box-shadow: -400px 0 0 400px var(--primary);
+            box-shadow: -400px 0 0 400px var(--primary); /* Fill trick */
             cursor: pointer;
         }
 
@@ -247,14 +248,14 @@
             font-weight: 700;
             color: var(--secondary);
             text-align: center;
-            will-change: content;
+            will-change: content; /* Hint for browser optimization */
         }
 
         .top-left-controls { display: flex; gap: 10px; align-items: center; }
         
         .mobile-header-right { display: none; } 
         .mobile-dock-controls { display: none; }
-        .mobile-header-left { display: none; }
+        .mobile-header-left { display: none; } /* Hidden now as moved to dock */
 
         .header-btn {
             background: #0f172a00;
@@ -269,6 +270,7 @@
         .header-btn:hover { background: rgba(255,255,255,0.1); color: white; }
         
         #edit-mode-toggle.active { background: var(--warning); color: #0f172a; font-weight: bold; }
+        /* Fix for mobile Edit button highlight */
         #edit-mode-toggle-mobile.active { background: var(--warning) !important; color: #0f172a !important; font-weight: bold; }
 
         /* Preview Button State */
@@ -285,6 +287,7 @@
             overflow-y: auto;
             padding: 80px 1rem 220px 1rem; 
             scroll-behavior: smooth;
+            /* Performance: Create a new layer */
             transform: translateZ(0);
         }
 
@@ -293,8 +296,9 @@
             padding: 0.8rem; margin-bottom: 0.5rem; margin-left: 1.0rem;
             border-radius: 8px; border-left: 4px solid transparent;
             background: rgba(255,255,255,0.02);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Optimized transition */
             position: relative;
+            /* Performance */
             will-change: opacity, transform;
         }
 
@@ -308,6 +312,7 @@
         .app-container.is-preview .lyric-line {
             opacity: 0.2; 
             transform: scale(0.99);
+            /* Removed Blur for performance on Mobile */
             /* filter: blur(0.5px); */ 
         }
         
@@ -376,7 +381,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-weight: bold;
         }
         
-        /* Karaoke Effect: WHITE GLOW*/
+        /* Karaoke Effect: WHITE GLOW (Requested Change) */
         .word-span.preview-glow {
             color: #ffffff !important;
             text-shadow: 0 0 12px rgba(82, 192, 255, 0.959), 0 0 25px rgba(255, 255, 255, 0.3);
@@ -538,9 +543,10 @@
             
             #mobile-close-sidebar { display: block; background: none; border: none; color: white; font-size: 1.5rem; }
             
+            /* Header Display Enabled for Timer */
             .top-info-bar { 
                 display: flex !important; 
-                justify-content: flex-end;
+                justify-content: flex-end; /* UPDATED: Force align right for preview button */
                 height: 60px; 
                 background: transparent; 
                 pointer-events: none; 
@@ -552,7 +558,7 @@
                 display: flex;
                 pointer-events: auto;
                 margin-right: -20px;
-                z-index: 60;
+                z-index: 60; /* Ensure on top */
             }
 
             .time-display {
@@ -572,6 +578,7 @@
 
             .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; right: 10px; gap: 4px; }
 
+            /* Updated Mobile Dock Controls to include Settings */
             .mobile-dock-controls {
                 display: flex; align-items: center; justify-content: center;
                 gap: 3px; width: 100%; padding: 0 5px; box-sizing: border-box;
@@ -601,7 +608,7 @@
             }
 
             .fullscreen-btn:active {
-                background: #394b75:
+                background: #394b75;
             }
 
             #mobile-preview-btn {
@@ -628,8 +635,9 @@
                 z-index: 100;
             }
 
+            /* UPDATED: Move Word Context UI UP above the dock on mobile */
             #word-context-ui {
-                bottom: 280px; 
+                bottom: 300px; 
                 width: 90%;
                 justify-content: center;
             }
@@ -844,7 +852,7 @@
                 <button id="edit-mode-toggle-mobile" class="header-btn" onclick="toggleEditMode()">✎</button>
                 <button id="edit-offset-btn" class="header-btn" onclick="openOffsetModal()">⏱</button>
                 <button id="mobile-preview-btn" class="header-btn" onclick="togglePreviewMode()">
-                    👁
+                    ▷
                 </button>
                 <button class="sync-btn" id="main-sync-btn-mobile" onclick="triggerSync()"><div>+</div></button>
               </div>
@@ -990,7 +998,7 @@
             wordContextUI.classList.remove('visible'); 
             cleanupGlowEffects();
             
-            // --- START 60FPS LOOP ---
+            // --- NEW: START 60FPS LOOP ---
             requestAnimationFrame(animatePreviewFrame);
             
         } else {
@@ -1010,7 +1018,7 @@ function updateGlowSpeed(el) {
     // Update the text label
     document.getElementById('glow-speed-val').textContent = val + "s";
     // FIX: Update the visual slider fill color
-    // updateRangeFill(el); //
+    // updateRangeFill(el); // Removed here as this specific slider uses box-shadow trick
 }
  
     function cleanupGlowEffects() {
@@ -1060,7 +1068,7 @@ function updateGlowSpeed(el) {
             currentFileName = file.name.replace(/\.[^/.]+$/, "");
             document.getElementById('audio-file-label').innerHTML = `<span>🎵 ${file.name}</span>`;
             
-            // UNLOCK UI
+            // NEW: UNLOCK UI
             document.getElementById('workflow-sections').classList.remove('disabled-area');
         }
     });
@@ -1074,6 +1082,7 @@ function updateGlowSpeed(el) {
         slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, var(--bg-input) ${percent}%, var(--bg-input) 100%)`;
     }
     updateRangeFill(volumeSlider);
+    // Removed general fill for glow-slider to use specific pill styling
 
     // --- Playback Slider ---
     audioPlayer.addEventListener('loadedmetadata', () => {
@@ -1295,7 +1304,7 @@ function updateGlowSpeed(el) {
                 if(state.mode === 'line') document.getElementById('mode-line').checked = true;
                 else document.getElementById('mode-word').checked = true;
 
-                // UNLOCK UI
+                // NEW: UNLOCK UI
                 document.getElementById('workflow-sections').classList.remove('disabled-area');
 
                 toggleSettings(false);
@@ -1361,10 +1370,12 @@ function updateGlowSpeed(el) {
 
     function closeExpandModal() { expandModal.classList.remove('active'); }
     
-    // Copy/Load Buttons in Sidebar
+    // NEW: Copy/Load Buttons in Sidebar
     function copyLRC() {
         exportOutput.select();
         document.execCommand('copy');
+        // Simple visual feedback could be added here if desired, 
+        // e.g. changing the button text momentarily.
         alert("LRC copied to clipboard!");
     }
     
@@ -1620,8 +1631,10 @@ function updateGlowSpeed(el) {
         if(el) {
             // Check if Mobile
             if(window.innerWidth <= 900) {
+                 // Calculate position to be 35% from top (visually above center)
                  const container = lyricsContainer;
                  const elTop = el.offsetTop; 
+                 // We want the element's top to be at 35% of container height
                  const targetPos = elTop - (container.clientHeight * 0.20);
                  
                  container.scrollTo({ top: targetPos, behavior: 'smooth' });
