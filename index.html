@@ -3,32 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen V5.5</title>
+    <title>Voxen</title>
     <style>
         :root {
             /* Theme Colors */
-            --bg-body: #0f172a;       /* Dark Navy */
-            --bg-card: #1e293b;       /* Slate */
-            --bg-input: #334155;
-            --primary: #6366f1;       /* Indigo */
+            --bg-body: #0c1120f2;       /* Dark Navy */
+            --bg-card: #242d42f2;       /* Slate */
+            --bg-input: #323a4d;
+            --primary: #676bd6;       /* Indigo */
             --primary-light: #818cf8;
-            --secondary: #14b8a6;     /* Teal */
+            --secondary: #66b1ee;     /* Teal */
             --danger: #ef4444;        /* Red */
             --warning: #f59e0b;       /* Amber */
             --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
+            --text-muted: #a4b5cc;
             
-            --border-radius: 16px;
+            --border-radius: 32px;
             --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
             --trans: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* DYNAMIC GLOW SPEED */
+            --glow-speed: 0.1s; 
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         /* Custom Scrollbars */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-body); }
-        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 4px; }
+        ::-webkit-scrollbar { width: 5px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(255, 255, 255, 0.15); 
+            border-radius: 4px; 
+            border: 0px solid var(--bg-body); 
+        }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         body {
@@ -53,23 +60,31 @@
             box-shadow: var(--shadow);
             display: flex;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 0px solid rgba(255,255,255,0.05);
             position: relative;
         }
 
         /* --- Sidebar (Settings) --- */
         .sidebar {
-            width: 320px;
-            background-color: rgba(15, 23, 42, 0.95);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            margin: 0px;
+            width: 380px;
+            background-color: #1c2436;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem;
+            padding: 2.0rem;
             overflow-y: auto;
             flex-shrink: 0;
             z-index: 200;
             transition: var(--trans);
             backdrop-filter: blur(10px);
+        }
+        
+        /* Disabled Area Styling */
+        .disabled-area {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: opacity 0.4s ease, filter 0.4s ease;
+            user-select: none;
         }
 
         .brand {
@@ -89,42 +104,40 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 1.5rem;
+            margin-top: 2.0rem;
             margin-bottom: 0.8rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 4px;
+            padding-bottom: 10px;
         }
-        .section-title:first-of-type { margin-top: 0; }
+        .section-title:first-of-type { margin-top: 0.5rem; }
 
         .input-group { margin-bottom: 1.2rem; }
-        
-        .label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.4rem; 
-        }
+        .label-row, .label-row2 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
 
         label { 
-            display: block; 
-            color: var(--text-muted); 
-            font-size: 0.75rem; 
-            font-weight: 700; 
-            margin: 0;
+            display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; margin: 0;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
         }
 
         .expand-btn {
-            background: transparent;
-            border: 1px solid var(--text-muted);
-            color: var(--text-muted);
-            border-radius: 4px;
-            font-size: 0.7rem;
-            padding: 1px 6px;
+            background-color: var(--bg-card);
+            color: rgb(183, 185, 209);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            padding: 1px 5px;
             cursor: pointer;
             transition: var(--trans);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .expand-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
-        
+        .expand-btn:hover { background-color: var(--primary-light); transform: translateY(-1px); }
+
         textarea, input[type="text"], input[type="number"], select {
             width: 100%;
             background: var(--bg-input);
@@ -136,91 +149,75 @@
             transition: var(--trans);
         }
 
-        /* Styled File Upload */
-        .file-upload-wrapper {
-            position: relative;
-            width: 100%;
-            height: 45px;
-            margin-bottom: 10px;
-        }
-        .file-upload-input {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
+        #glow-speed-slider {
+            -webkit-appearance: none;
+            height: 14px;
+            background-color:rgba(15, 23, 42, 0.603);
+            border-radius: 50px;
+            overflow: hidden;
             cursor: pointer;
-            z-index: 2;
         }
+        
+        #glow-speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 25px;
+            width: 14px;
+            border-radius: 0px;
+            background: #fff;
+            box-shadow: -400px 0 0 400px var(--primary);
+            cursor: pointer;
+        }
+
+        /* Styled File Upload */
+        .file-upload-wrapper { position: relative; width: 100%; height: 65px; margin-bottom: 10px; }
+        .load-project-wrapper { position: relative; width: 100%; height: 45px; margin-bottom: 10px; }
+        .file-upload-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
         .file-upload-label {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.05);
-            border: 1px dashed var(--text-muted);
+            border: 1.5px dashed var(--text-muted);
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            transition: var(--trans);
-            z-index: 1;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: var(--text-muted); font-size: 0.85rem; transition: var(--trans); z-index: 1;
         }
         .file-upload-input:hover + .file-upload-label {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: var(--primary);
-            color: var(--primary-light);
+            background: rgba(99, 102, 241, 0.1); border-color: var(--primary); color: var(--primary-light);
         }
-        .file-upload-label span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 90%;
-        }
-
-        textarea { height: 80px; resize: none; font-family: 'Courier New', monospace; font-size: 0.85rem; }
-        textarea:focus, input:focus { outline: none; border-color: var(--primary); background: #1e293b; }
+        
+        textarea { height: 200px; resize: none; font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        textarea:focus, input:focus { outline: none; border-color: var(--primary); background: #242c3ff2; }
 
         /* Mode Toggle */
-        .mode-toggle {
-            display: flex;
-            background: var(--bg-input);
-            padding: 4px;
-            border-radius: 8px;
-        }
+        .mode-toggle { display: flex; background: var(--bg-input); padding: 4px; border-radius: 8px; }
         .mode-toggle label {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            margin: 0;
-            cursor: pointer;
-            border-radius: 6px;
-            color: var(--text-muted);
-            transition: var(--trans);
+            flex: 1; text-align: center; padding: 16px; margin: 0; cursor: pointer;
+            border-radius: 6px; color: var(--text-muted); transition: var(--trans);
         }
         input[type="radio"] { display: none; }
-        input[type="radio"]:checked + label {
-            background-color: var(--primary);
-            color: white;
-        }
+        input[type="radio"]:checked + label { background-color: var(--primary); color: white; }
 
         .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            transition: var(--trans);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background-color: var(--primary); color: white; border: none; padding: 1.0rem;
+            border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;
+            transition: var(--trans); display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+
         .btn:active { transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
-        .btn-outline:hover { border-color: var(--primary-light); color: var(--primary-light); }
+        .btn-outline { background: #323a4d44; border: 0px solid var(--text-muted); color: var(--text-muted); }
         .btn-secondary { background: var(--bg-input); color: var(--text-main); }
+
+        .btn:hover {
+            background: #a9b1ff;
+        }
         
+        .btn-secondary:hover {
+            background: #4a5570;
+        }
+        
+        .btn-outline:hover {
+            background: #4a557044;
+        }
+
         #mobile-close-sidebar { display: none; }
 
         /* --- Editor Area --- */
@@ -236,18 +233,12 @@
         /* Top Bar */
         .top-info-bar {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(30, 41, 59, 0.95);
+            top: 0; left: 0px; width: 100%;
+            background: rgba(30, 41, 59, 0.5);
             backdrop-filter: blur(10px);
-            padding: 0.8rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 50;
-            height: 60px;
+            padding: 0.5rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 50; height: 80px;
         }
         
         .time-display {
@@ -255,30 +246,37 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--secondary);
+            text-align: center;
+            will-change: content;
         }
 
         .top-left-controls { display: flex; gap: 10px; align-items: center; }
+        
+        .mobile-header-right { display: none; } 
+        .mobile-dock-controls { display: none; }
+        .mobile-header-left { display: none; }
 
         .header-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #0f172a00;
             color: var(--text-muted);
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.85rem;
             cursor: pointer;
             transition: var(--trans);
-            display: flex; align-items: center; gap: 6px;
-            height: 36px;
+            display: flex; align-items: center; gap: 6px; height: 40px; border: none;
         }
-        
         .header-btn:hover { background: rgba(255,255,255,0.1); color: white; }
         
-        #edit-mode-toggle.active {
-            background: var(--warning);
-            color: #0f172a;
-            border-color: var(--warning);
-            font-weight: bold;
+        #edit-mode-toggle.active { background: var(--warning); color: #0f172a; font-weight: bold; }
+        #edit-mode-toggle-mobile.active { background: var(--warning) !important; color: #0f172a !important; font-weight: bold; }
+
+        /* Preview Button State */
+        #preview-btn.active, #mobile-preview-btn.active { 
+            background: var(--secondary); 
+            color: #0f172a; 
+            font-weight: bold; 
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.4); 
         }
 
         /* Lyrics List */
@@ -287,18 +285,17 @@
             overflow-y: auto;
             padding: 80px 1rem 220px 1rem; 
             scroll-behavior: smooth;
+            transform: translateZ(0);
         }
 
         .lyric-line {
-            display: flex;
-            align-items: flex-start;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            border-left: 4px solid transparent;
+            display: flex; align-items: flex-start;
+            padding: 0.8rem; margin-bottom: 0.5rem; margin-left: 1.0rem;
+            border-radius: 8px; border-left: 4px solid transparent;
             background: rgba(255,255,255,0.02);
-            transition: var(--trans);
+            transition: opacity 0.3s ease, transform 0.3s ease;
             position: relative;
+            will-change: opacity, transform;
         }
 
         .lyric-line.active {
@@ -307,114 +304,97 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
+        /* --- Preview Mode: Focus Styles --- */
+        .app-container.is-preview .lyric-line {
+            opacity: 0.2; 
+            transform: scale(0.99);
+            /* filter: blur(0.5px); */ 
+        }
+        
+        .app-container.is-preview .lyric-line.active {
+            opacity: 1; 
+            transform: scale(1.02);
+            background: rgba(99, 102, 241, 0.2);
+            border-left-color: var(--secondary);
+            z-index: 10;
+        }
+
         .app-container.is-editing .lyric-line {
             border-left-color: var(--warning);
             background: rgba(245, 158, 11, 0.05);
         }
         .app-container.is-editing .lyric-line .timestamp-input { opacity: 0.3; }
 
-        .line-meta {
-            display: flex;
-            align-items: center;
-            margin-right: 12px;
-            margin-top: 4px; 
-        }
+        .line-meta { display: flex; align-items: center; margin-right: 12px; margin-top: 4px; }
 
         .timestamp-input {
-            background: transparent;
-            border: none;
-            color: var(--secondary);
-            font-family: monospace;
-            font-size: 0.8rem;
-            width: 60px;
-            padding: 0;
-            opacity: 0.7;
+            background: transparent; border: none; color: var(--secondary);
+            font-family: monospace; font-size: 0.8rem; width: 60px; padding: 0; opacity: 0.7;
         }
 
-        .line-content-wrapper {
-    flex: 1;
-    margin-left: 12px;
-    margin-right: 70px; /* Reserve space for the buttons so text doesn't overlap */
-}
+        .line-content-wrapper { flex: 1; margin-left: 12px; margin-right: 65px; }
 
- .line-text {
-    font-size: 1.05rem;
-    line-height: 1.5;
-    color: var(--text-main);
-    padding: 4px 8px;
-    border: 1px solid transparent; /* Reserve border space always */
-    border-radius: 4px;
-}
+        .line-text {
+            font-size: 1.05rem; line-height: 2.0; color: var(--text-main);
+            padding: 4px 4px; border: 1px solid transparent; border-radius: 4px;
+        }
         
-        .line-text[contenteditable="true"] { border: 1px dashed var(--text-muted); cursor: text; }
-        .line-text[contenteditable="true"] {
-    background: rgba(0,0,0,0.2);
-    border-color: var(--primary); 
-    outline: none;
-}
-       .line-actions {
-    display: none; /* Hidden by default */
-    position: absolute; /* Float on top */
-    right: 10px;        /* Stick to the right */
-    top: 50%;
-    transform: translateY(-50%); /* Perfect vertical center */
-    flex-direction: row;
-    gap: 6px;
-    z-index: 10; /* Ensure clickable */
-}
- .app-container.is-editing .line-actions { display: flex; }
-.app-container.is-editing #btn-add-top { display: inline-block !important; }
+        .line-text[contenteditable="true"] { 
+            background: rgba(0,0,0,0.2); border-color: var(--primary); outline: none; cursor: text;
+        }
+
+        .line-actions {
+            display: none; position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%); flex-direction: row; gap: 6px; z-index: 10;
+        }
+        .app-container.is-editing .line-actions { display: flex; }
+        .app-container.is-editing #btn-add-top { display: inline-block !important; }
 
         .action-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: var(--text-muted);
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px;
+            background: rgba(255,255,255,0.1); border: none; color: var(--text-muted);
+            width: 24px; height: 24px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
         }
         .action-btn:hover { background: var(--primary); color: white; }
         .action-btn.btn-del:hover { background: var(--danger); }
 
         /* Word Mode */
         .word-span {
-            padding: 2px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            user-select: none;
+            padding: 0px 6px; border-radius: 4px; cursor: pointer;
+            border-bottom: 0px solid transparent; user-select: none;
+            margin-bottom: 8px;
+            /* DYNAMIC TRANSITION SPEED */
+            transition: color var(--glow-speed) ease-out, 
+                        background var(--glow-speed) ease-out,
+                        text-shadow var(--glow-speed) ease-out,
+                        transform var(--glow-speed) ease-out;
+            display: inline-block;
         }
         .word-span.synced { color: var(--secondary); background: rgba(20, 184, 166, 0.1); }
         .word-span.active-word { 
-            background: var(--primary); 
-            color: white; 
-            transform: scale(1.1); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            background: var(--primary); color: white; transform: scale(1.1); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-weight: bold;
+        }
+        
+        /* Karaoke Effect: WHITE GLOW*/
+        .word-span.preview-glow {
+            color: #ffffff !important;
+            text-shadow: 0 0 12px rgba(82, 192, 255, 0.959), 0 0 25px rgba(255, 255, 255, 0.3);
+            /* transform: scale(1.15); */
             font-weight: bold;
         }
-        .app-container:not(.is-editing) .word-span:hover { background: rgba(255,255,255,0.1); }
 
+        .app-container:not(.is-editing) .word-span:hover { background: rgba(255,255,255,0.1); }
 
         /* Floating Word Context UI */
         #word-context-ui {
-            position: fixed;
-            bottom: 200px;
-            left: 50%;
+            position: fixed; bottom: 200px; left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--primary);
-            padding: 10px 20px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--trans);
-            z-index: 90;
+            background: rgba(15, 23, 42, 0.418);
+            border: 2px solid var(--primary); padding: 10px 20px; border-radius: 12px;
+            display: flex; align-items: center; gap: 15px; opacity: 0;
+            backdrop-filter: blur(16px);
+            pointer-events: none; transition: var(--trans); z-index: 90;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         #word-context-ui.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -422,197 +402,100 @@
         .ctx-arrow { color: var(--text-muted); }
         .ctx-curr { color: var(--text-muted); font-weight: 800; font-size: 1.2rem; transform: scale(1.1); opacity: 0.6; }
 
-
         /* --- Unified Control Dock --- */
         .control-dock {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 95%;
-            max-width: 650px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(16px);
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            z-index: 100;
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 650px;
+            background: #171e30; backdrop-filter: blur(16px);
+            border-radius: 24px; border: 0px solid rgba(255,255,255,0.1);
+            padding:20px 20px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 0px 24px rgba(0, 0, 0, 0.233); z-index: 200;
         }
 
         /* Dock Row 1: Slider */
-        .dock-row-slider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-        }
+        .dock-row-slider2 { display: flex; align-items: center; gap: 50px; width: 100%; }
+        .seek-time { font-family: monospace; font-size: 0.75rem; color: var(--text-muted); min-width: 40px; text-align: center; }
+        #dur-time-lbl { margin-left:auto; }
 
-        .seek-time { 
-            font-family: monospace; 
-            font-size: 0.75rem; 
-            color: var(--text-muted); 
-            min-width: 40px; 
-            text-align: center; 
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-            cursor: pointer;
-            padding: 0; margin: 0; border: none;
-        }
+        input[type=range] { -webkit-appearance: none; background: transparent; cursor: pointer; padding: 0; margin: 0; border: none; }
         input[type=range]:focus { outline: none; }
 
-        .seek-slider {
-            flex: 1;
-            width: 100%;       
-            height: 6px;       
-            border-radius: 4px;
-        }
-
+        .seek-slider { flex: 1; width: 100%; height: 6px; border-radius: 4px; }
         .seek-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
-        .seek-slider::-moz-range-track { width: 100%; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
-
         .seek-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px; width: 16px; 
-            border-radius: 50%;
-            background: var(--primary);
-            margin-top: -5px; 
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-            transition: transform 0.1s;
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--primary); margin-top: -5px; 
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); transition: transform 0.1s;
         }
         .seek-slider::-webkit-slider-thumb:active { transform: scale(1.3); }
 
         .vol-slider {
-            width: 100px;
-            height: 6px;
-            transform: rotate(-90deg);
-            transform-origin: center;
-            border-radius: 4px;
-            margin: 0;
+            width: 100px; height: 6px; transform: rotate(-90deg);
+            transform-origin: center; border-radius: 4px; margin: 0;
         }
-
         .vol-slider::-webkit-slider-runnable-track { width: 100px; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
-        .vol-slider::-moz-range-track { width: 100px; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
-
         .vol-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px; width: 16px; 
-            border-radius: 50%;
-            background: var(--primary);
-            margin-top: -5px; 
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-            transition: transform 0.1s;
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--primary); margin-top: -5px;
         }
-        .vol-slider::-webkit-slider-thumb:active { transform: scale(1.3); }
 
-        .dock-row-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .dock-row-controls { display: flex; position: relative; align-items: center; justify-content: center; }
 
         .player-controls {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex: 1;
-            justify-content: center;
-            padding-right: 20px; 
+            display: flex; align-items: center; gap: 4px; flex: 1;
+            justify-content: center; padding-right: 0px; 
         }
 
         .control-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
+            background: transparent; border: none; color: var(--text-main);
+            width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: var(--trans);
-            font-size: 1.2rem;
+            transition: var(--trans); font-size: 1.2rem;
+            background: rgba(110, 173, 255, 0);
         }
         .control-btn:hover { background: rgba(255,255,255,0.1); }
         .control-btn:active { transform: scale(0.9); }
         
         .play-btn { 
-            background: var(--text-main); 
-            color: var(--bg-body); 
-            width: 48px; height: 48px; 
-            font-size: 1.4rem; 
-            border-radius: 50%;
+            background: var(--text-main); color: var(--bg-body); 
+            width: 60px; height: 60px; font-size: 1.4rem; border-radius: 15px;
         }
         .play-btn:hover { background: white; transform: scale(1.05); }
 
         .popup-wrapper { position: relative; }
         
         .dock-popup {
-            position: absolute;
-            bottom: 140%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--trans);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 101;
+            position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 6px; display: flex; flex-direction: column;
+            gap: 4px; opacity: 0; pointer-events: none; transition: var(--trans);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 101;
         }
         .dock-popup.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
 
         .speed-toggle-btn { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); width: auto; padding: 0 8px; }
-        .speed-toggle-btn:hover { color: var(--primary-light); }
-        .speed-popup { min-width: 80px; }
         .speed-option {
             background: transparent; border: none; color: var(--text-muted); padding: 8px 12px;
-            border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-align: center; transition: var(--trans);
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-align: center;
         }
-        .speed-option:hover { background: rgba(255,255,255,0.05); color: white; }
         .speed-option.selected { background: var(--primary); color: white; }
-
-        .volume-popup {
-            height: 140px;
-            width: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .volume-popup { height: 140px; width: 50px; display: flex; align-items: center; justify-content: center; }
 
         .dock-sync-btn {
-            background: var(--secondary);
-            color: #0f172a;
-            border: none;
-            font-weight: 800;
-            height: 54px;
-            padding: 0 24px;
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3);
-            transition: transform 0.1s;
+            background: var(--secondary); color: #0f172a; border: none; font-weight: 800;
+            height: 54px; padding: 0 24px; border-radius: 16px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 0px 0px rgba(20, 184, 166, 0.3); transition: transform 0.1s;
         }
         .dock-sync-btn:active { transform: scale(0.95); }
         .dock-sync-btn span { font-size: 1.4rem; }
         .dock-sync-btn div { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- Modals (Offset + Expanded Text) --- */
+        /* --- Modals --- */
         .modal-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            z-index: 500;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 500;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: var(--trans);
         }
@@ -623,31 +506,23 @@
             padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
-
         .offset-modal { width: 340px; }
         .expanded-text-modal { width: 800px; max-width: 90%; height: 80vh; display:flex; flex-direction:column; }
-
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
         
         .offset-grid { display: flex; gap: 8px; margin-bottom: 20px; }
         .offset-col { flex: 1; }
-        .offset-col label { font-size: 0.7rem; text-align: center; }
+        .offset-col label { font-size: 0.7rem; text-align: center; display:block; }
 
-        /* Expanded specific */
         .expanded-textarea {
-            flex: 1;
-            background: #0f172a;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-main);
-            padding: 1rem;
-            font-family: 'Courier New', monospace;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
+            flex: 1; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main); padding: 1rem; font-family: 'Courier New', monospace;
+            border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; resize: none;
         }
-        .expanded-textarea:focus { border-color: var(--primary); outline: none; }
+
+        #edit-settings-btn {
+            display: none;
+        }
 
         /* --- Mobile Responsive --- */
         @media (max-width: 900px) {
@@ -656,35 +531,144 @@
             
             .sidebar {
                 position: fixed; top: 0; left: 0; height: 100%; width: 100%;
-                background: #0f172a; transform: translateX(-100%);
+                padding: 3.0rem;
+                background: (--bg-card); transform: translateX(-100%);
             }
             .sidebar.active { transform: translateX(0); }
             
             #mobile-close-sidebar { display: block; background: none; border: none; color: white; font-size: 1.5rem; }
             
-            .top-info-bar { padding: 0.6rem 1rem; }
+            .top-info-bar { 
+                display: flex !important; 
+                justify-content: flex-end;
+                height: 60px; 
+                background: transparent; 
+                pointer-events: none; 
+            }
+
+            .top-left-controls { display: none; } 
+
+            .mobile-header-right {
+                display: flex;
+                pointer-events: auto;
+                margin-right: -20px;
+                z-index: 60;
+            }
+
+            .time-display {
+                margin: 0; 
+                opacity: 1; 
+                font-size: 1.5rem; 
+                pointer-events: auto;
+                text-align: center;
+                color: var(--secondary);
+                text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+                position: absolute; 
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
             .editor-area { height: 100%; width: 100%; }
 
-            .header-btn .btn-text { display: none; }
-            .header-btn { padding: 6px 10px; font-size: 1rem; } 
+            .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; right: 10px; gap: 4px; }
 
-            .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; }
-            .action-btn { width: 40px; height: 30px; }
-            
-            .control-dock { 
-                width: 92%; 
-                bottom: 16px; 
-                padding: 14px 16px; 
-                gap: 16px;
+            .mobile-dock-controls {
+                display: flex; align-items: center; justify-content: center;
+                gap: 3px; width: 100%; padding: 0 5px; box-sizing: border-box;
             }
-            .player-controls { gap: 8px; padding-right: 12px; }
-            .control-btn { width: 36px; height: 36px; }
-            .play-btn { width: 44px; height: 44px; }
-            
-            .dock-sync-btn {
-                padding: 0 16px;
-                height: 48px;
+
+            .action-btn { width: 28px; height: 28px; font-size: 14px; backdrop-filter: blur(4px); }
+
+            .sync-btn {
+                background: var(--secondary); color: #0f172a; font-weight: 800;
+                margin-bottom: 0px; margin-left: 0; border: 0px; padding: 30px 30px;
+                 font-size: 1.5rem; cursor: pointer;
+                transition: var(--trans); display: flex; align-items: center; gap: 0px; height: 40px;
+                border-radius: 10px 50px 50px 10px;
             }
+
+            .header-btn {
+                background: #1f2941; border: 0px; color: var(--text-muted); margin-bottom: 0px;
+                padding: 30px 25px; font-size: 1.0rem; cursor: pointer; margin-right: 0px;
+                transition: var(--trans); display: flex; align-items: center; gap: 0px; height: 40px;
+            }
+
+            .header-btn:hover { background: #2e3b5c; color: white; }
+
+            .header-btn:first-child {
+                border-radius: 50px 0 0 50px;
+                padding: 30px 30px;
+            }
+
+            .fullscreen-btn:active {
+                background: #394b75:
+            }
+
+            #mobile-preview-btn {
+                opacity: 0.75;
+            }
+
+            #mobile-preview-btn.active { 
+            background: #b9c9ff9a; 
+            color: #ffffff; 
+            font-weight: bold; 
+            box-shadow: 0 0 0px rgba(20, 184, 165, 0); 
+            }
+
+
+            .mobile-header-right .header-btn { border-radius: 50px; margin:8px; padding: 0px 13px;}
+
+            .dock-sync-btn { display: none; }         
+             
+            .control-dock {
+                position: fixed; left: 0px; right: 0; transform: none; max-width: 100vw;
+                width: 100%; bottom: 0; padding: 32px 32px; gap:25px;
+                background: #171e30; backdrop-filter: blur(0px); border-radius: 0; border: 0px;
+                box-sizing: border-box; 
+                z-index: 100;
+            }
+
+            #word-context-ui {
+                bottom: 280px; 
+                width: 90%;
+                justify-content: center;
+            }
+
+            .player-controls {
+            display: flex; align-items: left; gap: 20px; flex: 1;
+            justify-content: center; padding-bottom: 10px;
+            }  
+                .control-btn {
+            background: transparent; border: none; color: var(--text-main);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--trans); font-size: 20px; font-weight: 15px;
+            background: rgba(110, 173, 255, 0);
+            }
+            .control-btn:hover { background: rgba(255,255,255,0.1); }
+          .control-btn:active { transform: scale(0.9); }
+        
+           .play-btn { 
+             background: var(--text-main); color: var(--bg-body); 
+            width: 60px; height: 60px; font-size: 1.4rem; border-radius: 15px;
+            }
+           .play-btn:hover { background: white; transform: scale(1.05); }
+
+            .speed-toggle-btn {
+                font-size: 15px;
+            }
+    
+            .dock-row-slider { padding: 0px 20px; gap: 0px; margin-bottom: -8px; }
+            .seek-slider { flex: 1; width: 100%; height: 12px; border-radius: 50px; }
+            .seek-slider::-webkit-slider-thumb {
+                height: 40px; width: 13px; border-radius: 50px; margin-top: -17px; 
+                box-shadow: 0 0 10px #6365f100; border: 4px solid #171e30;
+            }
+
+            .dock-row-slider2 { display: flex; align-items: center; gap: 5px; width: 100%; margin-bottom: -10px; padding: 0px 14px; }
+            
+            #vol-btn { margin-right: 0; }
+            #dur-time-lbl { margin-left:auto; }
             .dock-sync-btn div { display: block; font-size: 0.8rem; } 
         }
     </style>
@@ -695,104 +679,116 @@
     
     <div class="sidebar" id="sidebar">
         <div class="brand">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span>⚡</span> Voxen V5.3
-            </div>
+            <div style="display:flex; align-items:center; gap:8px;"><span>⚡</span> Voxen</div>
             <button id="mobile-close-sidebar" onclick="toggleSettings(false)">✕</button>
         </div>
 
         <div id="sidebar-content">
             <div class="section-title">Media & Project</div>
-            
-            <label>Audio File</label>
+            <div class="label-row2"><label>Audio File</label></div>
             <div class="file-upload-wrapper">
                 <input type="file" id="audio-file" accept="audio/*" class="file-upload-input">
-                <div class="file-upload-label" id="audio-file-label">
-                    <span>🎵 Select Audio File...</span>
-                </div>
+                <div class="file-upload-label" id="audio-file-label"><span>➜] Upload MP3</span></div>
             </div>
 
             <div style="display:flex; gap:8px; margin-bottom:1.5rem;">
-                <div class="file-upload-wrapper" style="margin:0;">
+                <div class="load-project-wrapper" style="margin:0;">
                     <input type="file" id="project-upload" accept=".vxn" class="file-upload-input" onchange="loadProject(this)">
-                    <div class="file-upload-label"><span>📂 Load Project</span></div>
+                    <div class="file-upload-label"><span>📁 Load</span></div>
                 </div>
                 <button class="btn btn-secondary" style="height:45px;" onclick="saveProject()">💾 Save</button>
             </div>
 
-            <div class="section-title">New Session</div>
-
-            <div class="input-group">
-                <div class="label-row">
-                    <label>Paste Lyrics (Reset)</label>
-                    <button class="expand-btn" onclick="openExpandModal('raw')">⤢</button>
+            <div id="workflow-sections" class="disabled-area">
+                <div class="section-title">New Session</div>
+                <div class="input-group">
+                    <div class="label-row">
+                        <label>Paste Lyrics (Reset)</label>
+                        <button class="expand-btn" onclick="openExpandModal('raw')">⤢</button>
+                    </div>
+                    <textarea id="raw-lyrics" placeholder="Line 1...&#10;Line 2..."></textarea>
                 </div>
-                <textarea id="raw-lyrics" placeholder="Line 1...&#10;Line 2..."></textarea>
-            </div>
 
-            <div class="input-group">
-                <label>Mode</label>
-                <div class="mode-toggle">
-                    <input type="radio" id="mode-line" name="mode" value="line" checked>
-                    <label for="mode-line">Line</label>
-                    <input type="radio" id="mode-word" name="mode" value="word">
-                    <label for="mode-word">Word</label>
+                <div class="input-group">
+                    <div class="label-row2"><label>Mode</label></div>
+                    <div class="mode-toggle">
+                        <input type="radio" id="mode-line" name="mode" value="line" checked>
+                        <label for="mode-line">Line</label>
+                        <input type="radio" id="mode-word" name="mode" value="word">
+                        <label for="mode-word">Word</label>
+                    </div>
                 </div>
-            </div>
 
-            <button class="btn" onclick="initializeEditor()">
-                ▶ Create New Editor
-            </button>
-
-            <div class="section-title">Settings & Export</div>
-
-            <div class="input-group">
-                <label>Reaction Offset (ms)</label>
-                <input type="number" id="offset-val" value="-200" step="50">
-            </div>
-
-            <div class="input-group">
-                <div class="label-row">
-                    <label>Export / Import LRC</label>
-                    <button class="expand-btn" onclick="openExpandModal('lrc')">⤢</button>
+                <div class="input-group">
+                    <div class="label-row2"><label>Glow Speed (Fade In)</label></div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="range" id="glow-speed-slider" min="0" max="0.5" step="0.05" value="0.1" style="flex:1" oninput="updateGlowSpeed(this)">
+                        <span id="glow-speed-val" style="font-family:monospace; color:var(--text-muted); font-size:0.8rem;">0.1s</span>
+                    </div>
                 </div>
-                <textarea id="export-output" placeholder="Paste LRC here to import..." style="height: 60px; font-family: monospace;"></textarea>
-                <div style="display: flex; gap: 8px; margin-top: 8px;">
-                    <button class="btn btn-outline" style="flex:1" onclick="generateLRC()">Update</button>
-                    <button class="btn" style="flex:1" onclick="downloadLRC()">Download</button>
+                
+                <button class="btn" onclick="initializeEditor()">▶ Create New Editor</button>
+
+                <div class="section-title">Settings & Export</div>
+                <div class="input-group">
+                    <div class="label-row2"><label>Reaction Offset (ms)</label></div>
+                    <input type="number" id="offset-val" value="-200" step="50">
                 </div>
-            </div>
-        </div>
+
+                <div class="input-group">
+                    <div class="label-row">
+                        <label>Export / Import LRC</label>
+                        <button class="expand-btn" onclick="openExpandModal('lrc')">⤢</button>
+                    </div>
+                    <textarea id="export-output" placeholder="Paste LRC here to import..." style="height: 200px; font-family: monospace;"></textarea>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                        <button class="btn btn-outline" style="padding: 1rem 0;" onclick="generateLRC()">Update</button>
+                        <button class="btn btn-secondary" style="padding: 1rem 0;" onclick="copyLRC()">Copy</button>
+                        <button class="btn btn-secondary" style="padding: 1rem 0;" onclick="loadLRCFromSidebar()">Load</button>
+                        <button class="btn" id="edit-download-btn" style="padding: 1rem 0;" onclick="downloadLRC()">Download</button>
+                    </div>
+                </div>
+            </div> </div>
     </div>
 
     <div class="editor-area">
         <div class="top-info-bar">
+            <div class="mobile-header-left">
+            </div>
+
             <div class="top-left-controls">
-                <button id="mobile-open-settings" class="header-btn" onclick="toggleSettings(true)">
+                <button id="edit-settings-btn" class="header-btn" onclick="toggleSettings(true)">
                     ⚙ <span class="btn-text">Settings</span>
                 </button>
                 <button id="edit-mode-toggle" class="header-btn" onclick="toggleEditMode()">
-                    ✎ <span class="btn-text">Edit Text</span>
+                    ✎ <span class="btn-text">Edit</span>
                 </button>
-                <button id="btn-add-top" class="header-btn" style="margin-left: 0px; display: none;" onclick="addLineAtTop()">
+                    <button id="btn-add-top" class="header-btn" style="margin-left: 0px; display: none;" onclick="addLineAtTop()">
                     + Line
                 </button>
+                <button id="preview-btn" class="header-btn" onclick="togglePreviewMode()">
+                    ▶ <span class="btn-text">Preview</span>
+                </button>
                 <button class="header-btn" onclick="openOffsetModal()">
-                    ⏱ <span class="btn-text">Offset Tool</span>
+                    ⏱ <span class="btn-text">Offset</span>
                 </button>
             </div>
             
             <div id="time-display" class="time-display">00:00.00</div>
+            <div class="mobile-header-right">
+                <button class="header-btn fullscreen-btn" id="fullscreenBtn">⛶</button>
+            </div>
         </div>
         
         <audio id="audio-player"></audio>
 
         <div class="lyrics-list" id="lyrics-container">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 3rem; padding: 1rem;">
-                <p><strong>Ready to Sync</strong></p>
-                <p>1. Open Settings (Top Left).</p>
-                <p>2. Select Audio File.</p>
-                <p>3. "Create New" OR "Load Project" OR "Expand LRC" to import.</p>
+            <div style="text-align: center; color: var(--text-muted); margin-top: 14rem; padding: 1rem; opacity: 0.3;">
+                <p><strong>VOXEN</strong></p>
+                <p>Open Settings.</p>
+                <p>Select Audio File</p>
+                <p>Create New</p>
             </div>
         </div>
 
@@ -804,11 +800,12 @@
 
         <div class="control-dock">
             <div class="dock-row-slider">
-                <span class="seek-time" id="curr-time-lbl">0:00</span>
                 <input type="range" id="seek-slider" class="seek-slider" value="0" min="0" max="100" step="0.1">
-                <span class="seek-time" id="dur-time-lbl">0:00</span>
             </div>
-
+            <div class="dock-row-slider2">
+                 <span class="seek-time" id="curr-time-lbl">0:00</span>
+                 <span class="seek-time" id="dur-time-lbl">0:00</span>
+            </div>
             <div class="dock-row-controls">
                 
                 <div class="player-controls">
@@ -823,6 +820,10 @@
                         </div>
                     </div>
 
+                    <button class="control-btn" onclick="seekAudio(-5)">↺</button>
+                    <button class="control-btn play-btn" id="play-pause-btn" onclick="togglePlay()">▶</button>
+                    <button class="control-btn" onclick="seekAudio(5)">↻</button>
+                    
                     <div class="popup-wrapper volume-wrapper">
                         <button class="control-btn" id="vol-btn" onclick="toggleVolumeMenu()">ᯤ</button>
                         <div class="dock-popup volume-popup" id="volume-popup">
@@ -830,10 +831,6 @@
                                    class="vol-slider" oninput="updateVolume(this.value)">
                         </div>
                     </div>
-
-                    <button class="control-btn" onclick="seekAudio(-5)">↺</button>
-                    <button class="control-btn play-btn" id="play-pause-btn" onclick="togglePlay()">▶</button>
-                    <button class="control-btn" onclick="seekAudio(5)">↻</button>
                 </div>
 
                 <button class="dock-sync-btn" id="main-sync-btn" onclick="triggerSync()">
@@ -841,6 +838,16 @@
                     <div>Sync</div>
                 </button>
             </div>
+
+             <div class="mobile-dock-controls">
+                <button id="mobile-dock-settings" class="header-btn" onclick="toggleSettings(true)">⚙</button>
+                <button id="edit-mode-toggle-mobile" class="header-btn" onclick="toggleEditMode()">✎</button>
+                <button id="edit-offset-btn" class="header-btn" onclick="openOffsetModal()">⏱</button>
+                <button id="mobile-preview-btn" class="header-btn" onclick="togglePreviewMode()">
+                    👁
+                </button>
+                <button class="sync-btn" id="main-sync-btn-mobile" onclick="triggerSync()"><div>+</div></button>
+              </div>
         </div>
     </div>
 </div>
@@ -851,22 +858,11 @@
         <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top:-10px;">
             Shift all synced lines forward (positive) or backward (negative).
         </p>
-        
         <div class="offset-grid">
-            <div class="offset-col">
-                <label>Min</label>
-                <input type="number" id="off-min" value="0" placeholder="0">
-            </div>
-            <div class="offset-col">
-                <label>Sec</label>
-                <input type="number" id="off-sec" value="0" placeholder="0">
-            </div>
-            <div class="offset-col">
-                <label>Ms</label>
-                <input type="number" id="off-ms" value="0" placeholder="0">
-            </div>
+            <div class="offset-col"><label>Min</label><input type="number" id="off-min" value="0" placeholder="0"></div>
+            <div class="offset-col"><label>Sec</label><input type="number" id="off-sec" value="0" placeholder="0"></div>
+            <div class="offset-col"><label>Ms</label><input type="number" id="off-ms" value="0" placeholder="0"></div>
         </div>
-
         <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" onclick="closeOffsetModal()">Cancel</button>
             <button class="btn" onclick="applyOffset()">Apply Offset</button>
@@ -876,13 +872,11 @@
 
 <div class="modal-overlay" id="expand-modal">
     <div class="base-modal expanded-text-modal">
-        <div class="modal-title" id="expand-modal-title">Edit Text</div>
+        <div class="modal-title" id="expand-modal-title">Edit</div>
         <textarea id="expand-textarea" class="expanded-textarea" spellcheck="false"></textarea>
-        
         <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" style="flex:0.5" onclick="closeExpandModal()">Cancel</button>
-            <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;">
-                </div>
+            <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;"></div>
         </div>
     </div>
 </div>
@@ -896,12 +890,13 @@
         currentWordIndex: 0,
         isPlaying: false,
         isEditMode: false,
+        isPreviewMode: false,
         currentSpeed: 1.0
     };
 
     let currentFileName = "lyrics"; 
     let isDraggingSlider = false;
-    let currentModalType = ''; // 'raw' or 'lrc'
+    let currentModalType = ''; 
 
     // --- DOM Elements ---
     const appContainer = document.getElementById('app-container');
@@ -931,11 +926,34 @@
     const ctxPrev = document.getElementById('ctx-prev-word');
     const ctxNext = document.getElementById('ctx-next-word');
     const editToggle = document.getElementById('edit-mode-toggle');
+    const editToggleMobile = document.getElementById('edit-mode-toggle-mobile');
     const editToggleText = editToggle.querySelector('.btn-text');
+    const previewBtn = document.getElementById('preview-btn');
+    const mobilePreviewBtn = document.getElementById('mobile-preview-btn');
     
     const seekSlider = document.getElementById('seek-slider');
     const currTimeLbl = document.getElementById('curr-time-lbl');
     const durTimeLbl = document.getElementById('dur-time-lbl');
+
+     const btn = document.getElementById("fullscreenBtn");
+
+
+     // Fullscreen
+      btn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      btn.textContent = "⛶";
+    } else {
+      document.exitFullscreen();
+      btn.textContent = "⛶";
+    }
+  });
+
+    document.addEventListener("fullscreenchange", () => {
+    btn.textContent = document.fullscreenElement
+      ? "⛶"
+      : "⛶";
+  });
 
     // --- UI/UX Helpers ---
     function toggleSettings(show) {
@@ -944,30 +962,70 @@
     }
 
     function toggleEditMode() {
+        if(state.isPreviewMode) togglePreviewMode(); // disable preview if editing
         state.isEditMode = !state.isEditMode;
         if (state.isEditMode) {
             editToggle.classList.add('active');
+            if(editToggleMobile) editToggleMobile.classList.add('active');
             editToggleText.textContent = "Done";
             appContainer.classList.add('is-editing');
             wordContextUI.classList.remove('visible'); 
         } else {
             editToggle.classList.remove('active');
-            editToggleText.textContent = "Edit Text";
+            if(editToggleMobile) editToggleMobile.classList.remove('active');
+            editToggleText.textContent = "Edit";
             appContainer.classList.remove('is-editing');
         }
         renderEditor(); 
         if(!state.isEditMode) updateVisuals();
     }
 
+    function togglePreviewMode() {
+        if(state.isEditMode) toggleEditMode(); // disable edit if previewing
+        state.isPreviewMode = !state.isPreviewMode;
+        if(state.isPreviewMode) {
+            previewBtn.classList.add('active');
+            mobilePreviewBtn.classList.add('active');
+            appContainer.classList.add('is-preview'); // Enable focus mode css
+            wordContextUI.classList.remove('visible'); 
+            cleanupGlowEffects();
+            
+            // --- START 60FPS LOOP ---
+            requestAnimationFrame(animatePreviewFrame);
+            
+        } else {
+            previewBtn.classList.remove('active');
+            mobilePreviewBtn.classList.remove('active');
+            appContainer.classList.remove('is-preview');
+            cleanupGlowEffects();
+            updateVisuals(); // restore manual state
+        }
+    }
+    
+    // --- GLOW SPEED LOGIC (FIXED) ---
+function updateGlowSpeed(el) {
+    const val = el.value;
+    // Update the CSS variable for the transition duration
+    document.documentElement.style.setProperty('--glow-speed', val + 's');
+    // Update the text label
+    document.getElementById('glow-speed-val').textContent = val + "s";
+    // FIX: Update the visual slider fill color
+    // updateRangeFill(el); //
+}
+ 
+    function cleanupGlowEffects() {
+        document.querySelectorAll('.word-span').forEach(el => el.classList.remove('preview-glow'));
+    }
+
     // --- Popups (Speed & Volume) ---
     function toggleSpeedMenu() {
         speedPopup.classList.toggle('active');
-        volumePopup.classList.remove('active'); // Close other
+        volumePopup.classList.remove('active');
     }
 
     function toggleVolumeMenu() {
         volumePopup.classList.toggle('active');
-        speedPopup.classList.remove('active'); // Close other
+        speedPopup.classList.remove('active');
     }
 
     function updateVolume(val) {
@@ -984,7 +1042,6 @@
             btn.classList.remove('selected');
             if(parseFloat(btn.innerText) === val) btn.classList.add('selected');
         });
-        
         speedPopup.classList.remove('active');
     }
 
@@ -1002,6 +1059,9 @@
             audioPlayer.src = URL.createObjectURL(file);
             currentFileName = file.name.replace(/\.[^/.]+$/, "");
             document.getElementById('audio-file-label').innerHTML = `<span>🎵 ${file.name}</span>`;
+            
+            // UNLOCK UI
+            document.getElementById('workflow-sections').classList.remove('disabled-area');
         }
     });
 
@@ -1022,6 +1082,7 @@
         updateRangeFill(seekSlider);
     });
 
+    // We removed the heavy preview logic from here!
     audioPlayer.addEventListener('timeupdate', () => {
         if (!isDraggingSlider) {
             seekSlider.value = audioPlayer.currentTime;
@@ -1029,6 +1090,89 @@
             updateRangeFill(seekSlider);
         }
     });
+
+    // --- NEW PREVIEW ANIMATION LOOP (60 FPS) ---
+    function animatePreviewFrame() {
+        // If we stop preview mode, stop the loop.
+        if (!state.isPreviewMode) return;
+        
+        // Safety check if lyrics exist
+        if(state.lyrics.length > 0) {
+            const curTime = audioPlayer.currentTime;
+            
+            // 1. Find the active line (Start search from current index to be faster)
+            let activeIdx = -1;
+            
+            // Check if current is still valid to avoid loop if possible
+            const currentLineObj = state.lyrics[state.currentIndex];
+            const nextLineObj = state.lyrics[state.currentIndex + 1];
+
+            // Heuristic: If we are within current line's window, keep it. 
+            // Otherwise search.
+            let needsSearch = true;
+            if (currentLineObj && currentLineObj.time !== null && curTime >= currentLineObj.time) {
+                // If next line exists and we passed it, we need to search forward
+                if (nextLineObj && nextLineObj.time !== null && curTime >= nextLineObj.time) {
+                    needsSearch = true;
+                } else {
+                    activeIdx = state.currentIndex;
+                    needsSearch = false;
+                }
+            }
+            
+            if (needsSearch) {
+                 for(let i=0; i < state.lyrics.length; i++) {
+                    if(state.lyrics[i].time !== null && state.lyrics[i].time <= curTime) {
+                        activeIdx = i;
+                    } else if (state.lyrics[i].time !== null && state.lyrics[i].time > curTime) {
+                        break;
+                    }
+                }
+            }
+
+            if(activeIdx !== -1) {
+                // Only update Line Visuals if changed
+                if (activeIdx !== state.currentIndex) {
+                    // Cleanup old glow
+                    const oldLineEl = document.getElementById(`line-${state.currentIndex}`);
+                    if(oldLineEl) {
+                        const glows = oldLineEl.getElementsByClassName('preview-glow');
+                        while(glows.length > 0) { glows[0].classList.remove('preview-glow'); }
+                    }
+
+                    state.currentIndex = activeIdx;
+                    state.currentWordIndex = 0; 
+                    updateVisuals();
+                    scrollToActive();
+                }
+
+                // 2. Karaoke Effect: Glow Persistence
+                // Only process words in the active line
+                const currentLine = state.lyrics[activeIdx];
+                if (currentLine && currentLine.words && currentLine.words.length > 0) {
+                    for (let w = 0; w < currentLine.words.length; w++) {
+                        const word = currentLine.words[w];
+                        if (word.start === null) continue;
+
+                        const shouldGlow = word.start <= curTime;
+                        const wordSpan = document.getElementById(`word-${activeIdx}-${w}`);
+                        
+                        if (wordSpan) {
+                            // High performance class switching
+                            if (shouldGlow) {
+                                if(!wordSpan.classList.contains('preview-glow')) wordSpan.classList.add('preview-glow');
+                            } else {
+                                if(wordSpan.classList.contains('preview-glow')) wordSpan.classList.remove('preview-glow');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Loop
+        requestAnimationFrame(animatePreviewFrame);
+    }
 
     seekSlider.addEventListener('input', () => {
         isDraggingSlider = true;
@@ -1041,6 +1185,7 @@
         isDraggingSlider = false;
         if(audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
         updateRangeFill(seekSlider);
+        if(state.isPreviewMode) cleanupGlowEffects();
     });
 
     function formatSimpleTime(s) {
@@ -1050,7 +1195,7 @@
         return `${m}:${sec}`;
     }
 
-    // --- Playback ---
+    // --- Playback ---doc
     function togglePlay() {
         if (audioPlayer.paused) audioPlayer.play();
         else audioPlayer.pause();
@@ -1091,17 +1236,13 @@
         state.currentIndex = 0;
         state.currentWordIndex = 0;
         state.isEditMode = false;
+        state.isPreviewMode = false;
         
         resetEditUI();
 
         const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-        
         state.lyrics = lines.map(lineText => {
-            return { 
-                text: lineText, 
-                time: null, 
-                words: parseWords(lineText) 
-            };
+            return { text: lineText, time: null, words: parseWords(lineText) };
         });
 
         renderEditor();
@@ -1110,8 +1251,12 @@
 
     function resetEditUI() {
         editToggle.classList.remove('active');
+        if(editToggleMobile) editToggleMobile.classList.remove('active');
         editToggleText.textContent = "Edit Text";
         appContainer.classList.remove('is-editing');
+        appContainer.classList.remove('is-preview');
+        previewBtn.classList.remove('active');
+        mobilePreviewBtn.classList.remove('active');
     }
 
     function parseWords(text) {
@@ -1150,6 +1295,9 @@
                 if(state.mode === 'line') document.getElementById('mode-line').checked = true;
                 else document.getElementById('mode-word').checked = true;
 
+                // UNLOCK UI
+                document.getElementById('workflow-sections').classList.remove('disabled-area');
+
                 toggleSettings(false);
                 resetEditUI();
                 renderEditor();
@@ -1167,14 +1315,13 @@
     function openExpandModal(type) {
         currentModalType = type;
         expandModal.classList.add('active');
-        expandActions.innerHTML = ''; // Clear old buttons
+        expandActions.innerHTML = ''; 
 
         if (type === 'raw') {
             expandTitle.textContent = "Edit Raw Lyrics";
             expandTextarea.value = rawLyricsInput.value;
             expandTextarea.placeholder = "Line 1...\nLine 2...";
             
-            // Button: Save
             const btnSave = document.createElement('button');
             btnSave.className = 'btn';
             btnSave.textContent = "Update Input";
@@ -1186,17 +1333,10 @@
         } 
         else if (type === 'lrc') {
             expandTitle.textContent = "Edit / Import LRC";
-            // If empty, user might want to paste. If populated, we show current state.
-            // If the main textarea has content, use that. If not, generate it.
-            if(exportOutput.value.trim()) {
-                expandTextarea.value = exportOutput.value;
-            } else {
-                generateLRC(); // fills exportOutput
-                expandTextarea.value = exportOutput.value;
-            }
+            if(exportOutput.value.trim()) expandTextarea.value = exportOutput.value;
+            else { generateLRC(); expandTextarea.value = exportOutput.value; }
             expandTextarea.placeholder = "[00:12.50]Paste your LRC content here to import...";
 
-            // Button 1: Copy
             const btnCopy = document.createElement('button');
             btnCopy.className = 'btn btn-outline';
             btnCopy.textContent = "Copy";
@@ -1207,158 +1347,115 @@
                 setTimeout(() => btnCopy.textContent = "Copy", 1500);
             };
 
-            // Button 2: Import
             const btnImport = document.createElement('button');
             btnImport.className = 'btn';
-            btnImport.innerHTML = "📥 Load to Editor";
+            btnImport.innerHTML = "Load";
             btnImport.onclick = () => {
                 parseAndLoadLRC(expandTextarea.value);
                 closeExpandModal();
             };
-
             expandActions.appendChild(btnCopy);
             expandActions.appendChild(btnImport);
         }
     }
 
-    function closeExpandModal() {
-        expandModal.classList.remove('active');
+    function closeExpandModal() { expandModal.classList.remove('active'); }
+    
+    // Copy/Load Buttons in Sidebar
+    function copyLRC() {
+        exportOutput.select();
+        document.execCommand('copy');
+        alert("LRC copied to clipboard!");
+    }
+    
+    function loadLRCFromSidebar() {
+        parseAndLoadLRC(exportOutput.value);
     }
 
-// --- LRC PARSING LOGIC (FIXED) ---
     function parseAndLoadLRC(lrcText) {
         if (!lrcText.trim()) return;
 
         const lines = lrcText.split('\n');
         const newLyrics = [];
-        
-        // Regex for standard line: [mm:ss.xx] or [mm:ss]
         const timeRegex = /\[(\d{2}):(\d{2}(?:\.\d+)?)\](.*)/;
-        // Regex for Voxen's custom word tag line: <word:s:e|...>
         const wordTagLineRegex = /^<(.+)>$/;
-
         let hasWordData = false;
 
         lines.forEach(line => {
             const trimmed = line.trim();
             if(!trimmed) return;
-
             const timeMatch = trimmed.match(timeRegex);
             
             if (timeMatch) {
-                // 1. It's a standard Lyric line
                 const min = parseInt(timeMatch[1]);
                 const sec = parseFloat(timeMatch[2]);
                 const text = timeMatch[3].trim();
                 const totalTime = (min * 60) + sec;
-                
-                newLyrics.push({
-                    text: text,
-                    time: totalTime,
-                    // Initialize with simple parse, will be overwritten if tags exist next
-                    words: parseWords(text) 
-                });
+                newLyrics.push({ text: text, time: totalTime, words: parseWords(text) });
             } else {
-                // 2. Check if it's the Word-Level Metadata line
                 const wordMatch = trimmed.match(wordTagLineRegex);
-                
                 if (wordMatch && newLyrics.length > 0) {
-                    // This metadata belongs to the *last* pushed lyric line
-                    const rawData = wordMatch[1]; // content inside <>
+                    const rawData = wordMatch[1]; 
                     const segments = rawData.split('|');
                     const lastLyric = newLyrics[newLyrics.length - 1];
-
-                    // Rebuild words array from this data to restore sync
                     const newWords = segments.map(seg => {
-                        // Format: text:start:end
-                        // We pop from the end to safely handle words that might contain colons
                         const parts = seg.split(':');
-                        
                         let s = null, e = null;
                         let wText = parts[0];
-
                         if (parts.length >= 3) {
                             const eStr = parts.pop();
                             const sStr = parts.pop();
-                            wText = parts.join(':'); // Rejoin remaining parts as text
-                            
+                            wText = parts.join(':');
                             s = sStr ? parseFloat(sStr) : null;
                             e = eStr ? parseFloat(eStr) : null;
                         }
-                        
                         return { text: wText, start: s, end: e };
                     });
-
                     lastLyric.words = newWords;
                     hasWordData = true;
                 } 
                 else if (!trimmed.startsWith('[') && !trimmed.startsWith('<')) {
-                    // 3. Plain text line fallback (no timestamp)
-                     newLyrics.push({
-                        text: trimmed,
-                        time: null,
-                        words: parseWords(trimmed)
-                    });
+                     newLyrics.push({ text: trimmed, time: null, words: parseWords(trimmed) });
                 }
             }
         });
 
-        if (newLyrics.length === 0) {
-            alert("No valid LRC timestamps found.");
-            return;
-        }
-
-        // Apply to state
+        if (newLyrics.length === 0) { alert("No valid LRC timestamps found."); return; }
         state.lyrics = newLyrics;
-        
-        // IMPORTANT: Auto-switch mode based on data found
-        if (hasWordData) {
-            state.mode = 'word';
-            document.getElementById('mode-word').checked = true;
-        } else {
-            state.mode = 'line';
-            document.getElementById('mode-line').checked = true;
-        }
+        if (hasWordData) { state.mode = 'word'; document.getElementById('mode-word').checked = true; } 
+        else { state.mode = 'line'; document.getElementById('mode-line').checked = true; }
         
         state.currentIndex = 0;
         state.currentWordIndex = 0;
-
         toggleSettings(false);
         resetEditUI();
         renderEditor();
         updateVisuals();
-        
-        // Update the inputs
         rawLyricsInput.value = newLyrics.map(l => l.text).join('\n');
         exportOutput.value = lrcText;
-        
-        alert(`Imported ${newLyrics.length} lines successfully! Mode set to: ${state.mode.toUpperCase()} Make sure to load the audio before importing!`);
+        alert(`Imported ${newLyrics.length} lines successfully!`);
     }
 
     // --- Rendering ---
     function renderEditor() {
         lyricsContainer.innerHTML = '';
-
         state.lyrics.forEach((item, index) => {
             const row = document.createElement('div');
             row.className = `lyric-line ${index === state.currentIndex && !state.isEditMode ? 'active' : ''}`;
             row.id = `line-${index}`;
 
-            // Meta
             const meta = document.createElement('div');
             meta.className = 'line-meta';
             const timeInp = document.createElement('input');
             timeInp.className = 'timestamp-input';
-            timeInp.placeholder = '--:--';
+            timeInp.placeholder = '--:--:--';
             timeInp.readOnly = true; 
             timeInp.value = item.time ? formatTimeLRC(item.time) : '';
             meta.appendChild(timeInp);
             row.appendChild(meta);
 
-            // Content
             const contentWrapper = document.createElement('div');
             contentWrapper.className = 'line-content-wrapper';
-            
             const content = document.createElement('div');
             content.className = 'line-text';
             
@@ -1367,82 +1464,70 @@
                 content.innerText = item.text;
                 content.onblur = (e) => {
                     const newText = e.target.innerText.replace(/[\r\n]+/g, ' ').trim();
-                    if (newText !== item.text) {
-                        item.text = newText;
-                        item.words = parseWords(newText);
-                    }
+                    if (newText !== item.text) { item.text = newText; item.words = parseWords(newText); }
                 };
             } else {
                 content.contentEditable = "false";
-                if (state.mode === 'line') {
-                    content.textContent = item.text;
-                } else {
-                    item.words.forEach((word, wIdx) => {
-                        const span = document.createElement('span');
-                        span.className = 'word-span';
-                        span.textContent = word.text;
-                        span.id = `word-${index}-${wIdx}`;
-                        if(word.start !== null) span.classList.add('synced');
-                        
-                        span.onclick = (e) => {
-                            e.stopPropagation();
+                item.words.forEach((word, wIdx) => {
+                    const span = document.createElement('span');
+                    span.className = 'word-span';
+                    span.textContent = word.text;
+                    span.id = `word-${index}-${wIdx}`;
+                    
+                    if(word.start !== null) span.classList.add('synced');
+                    
+                    span.onclick = (e) => {
+                        e.stopPropagation();
+                        if(state.isPreviewMode) return;
+                        if(state.mode === 'line') {
                             state.currentIndex = index;
-                            state.currentWordIndex = wIdx;
                             updateVisuals();
-                        };
-                        content.appendChild(span);
-                        content.appendChild(document.createTextNode(" "));
-                    });
-                }
+                            return;
+                        }
+                        // Word mode
+                        state.currentIndex = index;
+                        state.currentWordIndex = wIdx;
+                        updateVisuals();
+                    };
+                    content.appendChild(span);
+                    content.appendChild(document.createTextNode(" "));
+                });
                 
                 content.onclick = (e) => {
                     if(e.target === content) {
+                         if(state.isPreviewMode) return;
                         state.currentIndex = index;
                         if(state.mode === 'word') state.currentWordIndex = 0;
                         updateVisuals();
                     }
                 };
             }
-
             contentWrapper.appendChild(content);
             row.appendChild(contentWrapper);
 
-         // Actions
-        const actions = document.createElement('div');
-        actions.className = 'line-actions';
-        
-        const btnAdd = document.createElement('button');
-        btnAdd.className = 'action-btn';
-        btnAdd.innerHTML = '+';
-        btnAdd.onclick = (e) => { e.stopPropagation(); addLine(index); };
-        
-        const btnDel = document.createElement('button');
-        btnDel.className = 'action-btn btn-del';
-        btnDel.innerHTML = '×';
-        btnDel.onclick = (e) => { e.stopPropagation(); deleteLine(index); };
+            const actions = document.createElement('div');
+            actions.className = 'line-actions';
+            const btnAdd = document.createElement('button');
+            btnAdd.className = 'action-btn'; btnAdd.innerHTML = '+';
+            btnAdd.onclick = (e) => { e.stopPropagation(); addLine(index); };
+            const btnDel = document.createElement('button');
+            btnDel.className = 'action-btn btn-del'; btnDel.innerHTML = '×';
+            btnDel.onclick = (e) => { e.stopPropagation(); deleteLine(index); };
+            actions.appendChild(btnAdd); actions.appendChild(btnDel);
+            row.appendChild(actions);
 
-        actions.appendChild(btnAdd);
-        actions.appendChild(btnDel);
-        row.appendChild(actions);
-
-        lyricsContainer.appendChild(row);
-    });
-}
+            lyricsContainer.appendChild(row);
+        });
+    }
 
     function addLineAtTop() {
         const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
-        state.lyrics.unshift(newItem);
-        state.currentIndex++;
-        renderEditor();
+        state.lyrics.unshift(newItem); state.currentIndex++; renderEditor();
     }
-
-    // --- Line Operations ---
     function addLine(index) {
         const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
-        state.lyrics.splice(index + 1, 0, newItem);
-        renderEditor();
+        state.lyrics.splice(index + 1, 0, newItem); renderEditor();
     }
-
     function deleteLine(index) {
         state.lyrics.splice(index, 1);
         if(state.currentIndex >= state.lyrics.length) state.currentIndex = Math.max(0, state.lyrics.length - 1);
@@ -1451,25 +1536,22 @@
 
     // --- Sync Logic ---
     function triggerSync() {
-        if(state.lyrics.length === 0 || state.isEditMode) return;
+        if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
         
         const offset = parseInt(offsetInput.value) || 0;
         const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
-
-        // Visual feedback
-        const btn = document.getElementById('main-sync-btn');
-        btn.style.transform = 'scale(0.9)';
-        setTimeout(() => btn.style.transform = 'scale(1)', 100);
+        
+        const btns = [document.getElementById('main-sync-btn'), document.getElementById('main-sync-btn-mobile')];
+        btns.forEach(btn => {
+             if(btn) { btn.style.transform = 'scale(0.9)'; setTimeout(() => btn.style.transform = 'scale(1)', 100); }
+        });
 
         if (state.mode === 'line') {
             syncLine(state.currentIndex, time);
-            if (state.currentIndex < state.lyrics.length - 1) {
-                state.currentIndex++;
-            }
+            if (state.currentIndex < state.lyrics.length - 1) state.currentIndex++;
         } else {
             syncWord(state.currentIndex, state.currentWordIndex, time);
         }
-        
         scrollToActive();
         updateVisuals();
     }
@@ -1486,26 +1568,21 @@
         const line = state.lyrics[lIdx];
         if(!line) return;
         const word = line.words[wIdx];
-        
         word.start = time;
-        
         if(wIdx > 0) line.words[wIdx-1].end = time;
         else if (lIdx > 0) {
             const prev = state.lyrics[lIdx-1];
             if(prev.words.length) prev.words[prev.words.length-1].end = time;
         }
-
         if(wIdx === 0) syncLine(lIdx, time);
 
-        if(wIdx < line.words.length - 1) {
-            state.currentWordIndex++;
-        } else {
+        if(wIdx < line.words.length - 1) state.currentWordIndex++;
+        else {
             if(lIdx < state.lyrics.length - 1) {
                 state.currentIndex++;
                 state.currentWordIndex = 0;
             }
         }
-        
         generateLRC();
     }
 
@@ -1517,12 +1594,10 @@
         document.getElementById('off-sec').value = 0;
         document.getElementById('off-ms').value = 0;
     }
-
     function applyOffset() {
         const mins = parseInt(document.getElementById('off-min').value) || 0;
         const secs = parseInt(document.getElementById('off-sec').value) || 0;
         const ms = parseInt(document.getElementById('off-ms').value) || 0;
-
         const totalOffsetSeconds = (mins * 60) + secs + (ms / 1000);
         if (totalOffsetSeconds === 0) return closeOffsetModal();
 
@@ -1535,17 +1610,26 @@
                 });
             }
         });
-
-        renderEditor();
-        updateVisuals();
-        generateLRC();
-        closeOffsetModal();
+        renderEditor(); updateVisuals(); generateLRC(); closeOffsetModal();
         alert(`Offset of ${totalOffsetSeconds}s applied.`);
     }
 
+    // --- UPDATED: Scroll Logic for "Just Above Center" ---
     function scrollToActive() {
         const el = document.getElementById(`line-${state.currentIndex}`);
-        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if(el) {
+            // Check if Mobile
+            if(window.innerWidth <= 900) {
+                 const container = lyricsContainer;
+                 const elTop = el.offsetTop; 
+                 const targetPos = elTop - (container.clientHeight * 0.20);
+                 
+                 container.scrollTo({ top: targetPos, behavior: 'smooth' });
+            } else {
+                 // Desktop default center
+                 el.scrollIntoView({ behavior: 'auto', block: 'center' });
+            }
+        }
     }
 
     function updateVisuals() {
@@ -1556,9 +1640,8 @@
             else el.classList.remove('active');
         });
 
-        if (state.mode === 'word') {
+        if (state.mode === 'word' && !state.isPreviewMode) {
             document.querySelectorAll('.word-span').forEach(el => el.classList.remove('active-word'));
-            
             state.lyrics.forEach((l, lI) => l.words.forEach((w, wI) => {
                 const span = document.getElementById(`word-${lI}-${wI}`);
                 if(span) {
@@ -1566,10 +1649,8 @@
                     else span.classList.remove('synced');
                 }
             }));
-
             const currentSpan = document.getElementById(`word-${state.currentIndex}-${state.currentWordIndex}`);
             if(currentSpan) currentSpan.classList.add('active-word');
-            
             updateWordContextUI();
         } else {
             wordContextUI.classList.remove('visible');
@@ -1577,27 +1658,19 @@
     }
 
     function updateWordContextUI() {
-        if(state.mode !== 'word' || !state.lyrics.length || state.isEditMode) {
+        if(state.mode !== 'word' || !state.lyrics.length || state.isEditMode || state.isPreviewMode) {
             wordContextUI.classList.remove('visible');
             return;
         }
-
         wordContextUI.classList.add('visible');
-        
         const currentLine = state.lyrics[state.currentIndex];
         const currentWord = currentLine ? currentLine.words[state.currentWordIndex] : null;
-        
         let prevWordText = "...";
-
-        if(state.currentWordIndex > 0) {
-            prevWordText = currentLine.words[state.currentWordIndex - 1].text;
-        } else if(state.currentIndex > 0) {
+        if(state.currentWordIndex > 0) prevWordText = currentLine.words[state.currentWordIndex - 1].text;
+        else if(state.currentIndex > 0) {
             const prevLine = state.lyrics[state.currentIndex - 1];
-            if(prevLine && prevLine.words.length > 0) {
-                prevWordText = prevLine.words[prevLine.words.length - 1].text;
-            }
+            if(prevLine && prevLine.words.length > 0) prevWordText = prevLine.words[prevLine.words.length - 1].text;
         }
-
         ctxPrev.textContent = prevWordText;
         ctxNext.textContent = currentWord ? currentWord.text : "End";
     }
@@ -1616,7 +1689,8 @@
         state.lyrics.forEach(l => {
             if(l.time === null) return;
             out += `[${formatTimeLRC(l.time)}]${l.text}\n`;
-            if(state.mode === 'word' && l.words) {
+            if(l.words && l.words.some(w => w.start !== null)) {
+                // Generate word tags if word data exists
                 const tags = l.words.map(w => {
                     const s = w.start ? w.start.toFixed(2) : "";
                     const e = w.end ? w.end.toFixed(2) : "";
@@ -1639,17 +1713,13 @@
 
     // --- Keyboard Control ---
     document.addEventListener('keydown', (e) => {
-        // Prevent shortcuts when typing in inputs/textareas
         if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
-        
         if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
         if(e.code === 'Enter') { e.preventDefault(); triggerSync(); }
         if(e.code === 'ArrowLeft') { e.preventDefault(); seekAudio(-5); }
         if(e.code === 'ArrowRight') { e.preventDefault(); seekAudio(5); }
     });
-
     updateRangeFill(seekSlider);
 </script>
-
 </body>
 </html>
