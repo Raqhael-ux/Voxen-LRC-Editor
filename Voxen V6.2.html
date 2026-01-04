@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Voxen</title>
+    <style>
+        :root {
+            /* Theme Colors */
+            --bg-body: #0c1120f2;       /* Dark Navy */
+            --bg-card: #242d42f2;       /* Slate */
+            --bg-input: #323a4d;
+            --primary: #676bd6;       /* Indigo */
+            --primary-light: #818cf8;
+            --secondary: #66b1ee;     /* Teal */
+            --danger: #ef4444;        /* Red */
+            --warning: #f59e0b;       /* Amber */
+            --text-main: #f1f5f9;
+            --text-muted: #a4b5cc;
+            
+            --border-radius: 32px;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            --trans: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* DYNAMIC GLOW SPEED */
+            --glow-speed: 0.1s; 
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 5px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(255, 255, 255, 0.15); 
+            border-radius: 4px; 
+            border: 0px solid var(--bg-body); 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2vh 2vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden; 
+        }
+        
+        #expand-modal-actions {
+          display: flex;
+          gap: 10px;
+          flex: 1;
+          justify-content: flex-end;
+          align-items: center;
+          flex-wrap: nowrap;
+        }
+
+        #expand-modal-actions .btn:not(.btn-note) {
+          flex: 1;
+        }
+
+        /* --- Main Container --- */
+        .app-container {
+            width: 100%;
+            max-width: 1600px;
+            height: 96vh;
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            overflow: hidden;
+            border: 0px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        /* --- Sidebar (Settings) --- */
+        .sidebar {
+            margin: 0px;
+            width: 380px;
+            background-color: #1c2436;
+            display: flex;
+            flex-direction: column;
+            padding: 2.0rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+            z-index: 200;
+            transition: var(--trans);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Disabled Area Styling */
+        .disabled-area {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: opacity 0.4s ease, filter 0.4s ease;
+            user-select: none;
+        }
+
+        .brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand span { color: var(--primary-light); }
+
+        .section-title {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2.0rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        .section-title:first-of-type { margin-top: 0.5rem; }
+
+        .input-group { margin-bottom: 1.2rem; }
+        .label-row, .label-row2 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+
+        label { 
+            display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; margin: 0;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+
+        .expand-btn {
+            background-color: var(--bg-card);
+            color: rgb(183, 185, 209);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            padding: 1px 5px;
+            cursor: pointer;
+            transition: var(--trans);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .expand-btn:hover { background-color: var(--primary-light); transform: translateY(-1px); }
+
+        textarea, input[type="text"], input[type="number"], select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 2px solid transparent;
+            color: white;
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: var(--trans);
+        }
+
+        /* Styled File Upload */
+        .file-upload-wrapper { position: relative; width: 100%; height: 65px; margin-bottom: 10px; }
+        .load-project-wrapper { position: relative; width: 100%; height: 45px; margin-bottom: 10px; }
+        .file-upload-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+        .file-upload-label {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px dashed var(--text-muted);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: var(--text-muted); font-size: 0.85rem; transition: var(--trans); z-index: 1;
+        }
+        .file-upload-input:hover + .file-upload-label {
+            background: rgba(99, 102, 241, 0.1); border-color: var(--primary); color: var(--primary-light);
+        }
+        
+        textarea { height: 200px; resize: none; font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 0.85rem; font-weight: bold; }
+        textarea:focus, input:focus { outline: none; border-color: var(--primary); background: #242c3ff2; }
+
+        /* Mode Toggle */
+        .mode-toggle { display: flex; background: var(--bg-input); padding: 4px; border-radius: 8px; }
+        .mode-toggle label {
+            flex: 1; text-align: center; padding: 16px; margin: 0; cursor: pointer;
+            border-radius: 6px; color: var(--text-muted); transition: var(--trans);
+        }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + label { background-color: var(--primary); color: white; }
+
+        .btn {
+            background-color: var(--primary); color: white; border: none; padding: 1.0rem;
+            border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;
+            transition: var(--trans); display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn-outline { background: #323a4d44; border: 0px solid var(--text-muted); color: var(--text-muted); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); }
+
+        .btn:hover {
+            background: #a9b1ff;
+        }
+        
+        .btn-secondary:hover {
+            background: #4a5570;
+        }
+        
+        .btn-note {
+          width: 48px;
+          height: 48px;
+          padding: 0;
+          flex-shrink: 0;
+        }
+
+        
+        .btn-outline:hover {
+            background: #4a557044;
+        }
+
+        #mobile-close-sidebar { display: none; }
+
+        /* --- Editor Area --- */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: radial-gradient(circle at top right, #2d3748 0%, transparent 40%);
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        .top-info-bar {
+            position: absolute;
+            top: 0; left: 0px; width: 100%;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 50; height: 80px;
+        }
+        
+        .time-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: center;
+            will-change: content; /* Hint for browser optimization */
+        }
+
+        .top-left-controls { display: flex; gap: 10px; align-items: center; }
+        
+        .mobile-header-right { display: none; } 
+        .mobile-dock-controls { display: none; }
+        .mobile-header-left { display: none; }
+
+        .header-btn {
+            background: #0f172a00;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--trans);
+            display: flex; align-items: center; gap: 6px; height: 40px; border: none;
+        }
+        .header-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        
+        #edit-mode-toggle.active { background: var(--warning); color: #0f172a; font-weight: bold; }
+        #edit-mode-toggle-mobile.active { background: var(--warning) !important; color: #0f172a !important; font-weight: bold; }
+
+        /* Preview Button State */
+        #preview-btn.active, #mobile-preview-btn.active { 
+            background: var(--secondary); 
+            color: #0f172a; 
+            font-weight: bold; 
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.4); 
+        }
+
+        /* Lyrics List */
+        .lyrics-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 80px 1rem 60vh 1rem; 
+            scroll-behavior: smooth;
+            transform: translateZ(0);
+        }
+
+        .lyric-line {
+            display: flex; align-items: flex-start;
+            padding: 0.8rem; margin-bottom: 0.5rem; margin-left: 1.0rem;
+            border-radius: 8px; border-left: 4px solid transparent;
+            background: rgba(255,255,255,0.02);
+            transition: opacity 0.3s ease, transform 0.3s ease; 
+            position: relative;
+            will-change: opacity, transform;
+        }
+
+        .lyric-line.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-left-color: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* --- Preview Mode: Focus Styles --- */
+        .app-container.is-preview .lyric-line {
+            opacity: 0.2; 
+            transform: scale(0.99);
+        }
+        
+        .app-container.is-preview .lyric-line.active {
+            opacity: 1; 
+            transform: scale(1.02);
+            background: rgba(99, 102, 241, 0.2);
+            border-left-color: var(--secondary);
+            z-index: 10;
+        }
+
+        .app-container.is-editing .lyric-line {
+            border-left-color: var(--warning);
+            background: rgba(245, 158, 11, 0.05);
+        }
+        .app-container.is-editing .lyric-line .timestamp-input { opacity: 0.3; }
+
+        .line-meta { display: flex; align-items: center; margin-right: 12px; margin-top: 4px; }
+
+        .timestamp-input {
+            background: transparent; border: none; color: var(--secondary);
+            font-family: monospace; font-size: 0.8rem; width: 60px; padding: 0; opacity: 0.7;
+        }
+
+        .line-content-wrapper { flex: 1; margin-left: 12px; margin-right: 65px; }
+
+        .line-text {
+            font-size: 1.05rem; line-height: 2.0; color: var(--text-main);
+            padding: 4px 4px; border: 1px solid transparent; border-radius: 4px;
+        }
+        
+        .line-text[contenteditable="true"] { 
+            background: rgba(0,0,0,0.2); border-color: var(--primary); outline: none; cursor: text;
+        }
+
+        .line-actions {
+            display: none; position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%); flex-direction: row; gap: 6px; z-index: 10;
+        }
+        .app-container.is-editing .line-actions { display: flex; }
+        .app-container.is-editing #btn-add-top { display: inline-block !important; }
+
+        .action-btn {
+            background: rgba(255,255,255,0.1); border: none; color: var(--text-muted);
+            width: 24px; height: 24px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+        .action-btn:hover { background: var(--primary); color: white; }
+        .action-btn.btn-del:hover { background: var(--danger); }
+
+        /* Word Mode */
+        .word-span {
+            padding: 0px 6px; border-radius: 4px; cursor: pointer;
+            border-bottom: 0px solid transparent; user-select: none;
+            margin-bottom: 8px;
+            /* DYNAMIC TRANSITION SPEED */
+            transition: color var(--glow-speed) ease-out, 
+                        background var(--glow-speed) ease-out,
+                        text-shadow var(--glow-speed) ease-out,
+                        transform var(--glow-speed) ease-out;
+            display: inline-block;
+        }
+        .word-span.synced { color: var(--secondary); background: rgba(20, 184, 166, 0.1); }
+        .word-span.active-word { 
+            background: var(--primary); color: white; transform: scale(1.1); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-weight: bold;
+        }
+        
+        /* Karaoke Effect */
+        .word-span.preview-glow {
+            color: #ffffff !important;
+            text-shadow: 0 0 12px rgba(82, 192, 255, 0.959), 0 0 25px rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+        }
+
+        .app-container:not(.is-editing) .word-span:hover { background: rgba(255,255,255,0.1); }
+
+        /* Floating Word Context UI */
+        #word-context-ui {
+            position: fixed; bottom: 200px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.534);
+            border: 0px solid var(--primary); padding: 10px 20px; border-radius: 12px;
+            display: flex; align-items: center; gap: 15px; opacity: 0;
+            backdrop-filter: blur(16px);
+            pointer-events: none; transition: var(--trans); z-index: 90;
+            box-shadow: 0 0px 0px rgba(0,0,0,0.6);
+        }
+        #word-context-ui.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* Tap Mode Colors (Default) */
+        .ctx-prev { color: var(--secondary); font-size: 1.2rem; font-weight: 800; }
+        .ctx-arrow { color: var(--text-muted); }
+        .ctx-curr { color: var(--text-muted); font-weight: 800; font-size: 1.2rem; transform: scale(1.1); opacity: 0.6; }
+
+        /* Hold Mode Colors Override */
+    #word-context-ui.mode-hold .ctx-prev {
+        color: var(--secondary);
+        transform: scale(1.2);
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(102, 177, 238, 0.3);
+    }
+    
+    #word-context-ui.mode-hold .ctx-curr {
+        /* This is now the "Next" word */
+        color: var(--text-muted);
+        transform: scale(1.0);
+        opacity: 0.6;
+        text-shadow: none;
+        font-weight: 600;
+    }
+        /* --- Unified Control Dock --- */
+        .control-dock {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 650px;
+            background: #171e30; backdrop-filter: blur(16px);
+            border-radius: 24px; border: 0px solid rgba(255,255,255,0.1);
+            padding:20px 20px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 0px 24px rgba(0, 0, 0, 0.233); z-index: 200;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease-out;
+        }
+
+        .control-dock.active-hold-glow {
+        box-shadow: 0 0 15px rgba(103, 107, 214, 0.6), inset 0 0 20px rgba(103, 107, 214, 0.2) !important;
+        border-color: rgba(129, 140, 248, 0.5);
+    }
+
+        /* Dock Row 1: Slider */
+     
+        .dock-row-slider2 { display: flex; align-items: center; gap: 50px; width: 100%; }
+        .seek-time { font-family: monospace; font-size: 0.75rem; color: var(--text-muted); min-width: 40px; text-align: center; }
+        #dur-time-lbl { margin-left:auto; }
+
+        input[type=range] { -webkit-appearance: none; background: transparent; cursor: pointer; padding: 0; margin: 0; border: none; }
+        input[type=range]:focus { outline: none; }
+
+        .seek-slider { flex: 1; width: 100%; height: 6px; border-radius: 4px; }
+        .seek-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+        .seek-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--primary); margin-top: -5px; 
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); transition: transform 0.1s;
+        }
+        .seek-slider::-webkit-slider-thumb:active { transform: scale(1.3); }
+
+        .vol-slider {
+            width: 100px; height: 6px; transform: rotate(-90deg);
+            transform-origin: center; border-radius: 4px; margin: 0;
+        }
+        .vol-slider::-webkit-slider-runnable-track { width: 100px; height: 6px; border-radius: 4px; background: transparent; cursor: pointer; }
+        .vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--primary); margin-top: -5px;
+        }
+
+        .dock-row-controls { display: flex; position: relative; align-items: center; justify-content: center; }
+
+        .player-controls {
+            display: flex; align-items: center; gap: 4px; flex: 1;
+            justify-content: center; padding-right: 0px; 
+        }
+
+        .control-btn {
+            background: transparent; border: none; color: var(--text-main);
+            width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--trans); font-size: 1.2rem;
+            background: rgba(110, 173, 255, 0);
+        }
+        .control-btn:hover { background: rgba(255,255,255,0.1); }
+        .control-btn:active { transform: scale(0.9); }
+        
+        .play-btn { 
+            background: var(--text-main); color: var(--bg-body); 
+            width: 60px; height: 60px; font-size: 1.4rem; border-radius: 15px;
+        }
+        .play-btn:hover { background: white; transform: scale(1.05); }
+
+        .popup-wrapper { position: relative; }
+        
+        .dock-popup {
+            position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 6px; display: flex; flex-direction: column;
+            gap: 4px; opacity: 0; pointer-events: none; transition: var(--trans);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 101;
+        }
+        .dock-popup.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+        .speed-toggle-btn { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); width: auto; padding: 0 8px; }
+        .speed-option {
+            background: transparent; border: none; color: var(--text-muted); padding: 8px 12px;
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; text-align: center;
+        }
+        .speed-option.selected { background: var(--primary); color: white; }
+        .volume-popup { height: 140px; width: 50px; display: flex; align-items: center; justify-content: center; }
+
+        .dock-sync-btn {
+            background: var(--secondary); color: #0f172a; border: none; font-weight: 800;
+            height: 54px; padding: 0 24px; border-radius: 16px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 0px 0px rgba(20, 184, 166, 0.3); transition: transform 0.1s;
+        }
+        .dock-sync-btn:active { transform: scale(0.95); }
+        .dock-sync-btn.holding { transform: scale(0.90); filter: brightness(0.8); }
+        .dock-sync-btn span { font-size: 1.4rem; }
+        .dock-sync-btn div { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .dock-settings-trigger {
+            background: rgba(255,255,255,0.05); color: var(--text-muted); border: none;
+            width: 44px; height: 54px; border-radius: 12px; margin-left: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: var(--trans);
+        }
+        .dock-settings-trigger:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: var(--trans);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .base-modal {
+            background: var(--bg-card); border-radius: 16px;
+            padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .offset-modal { width: 340px; }
+        .sync-settings-modal { width: 340px; }
+        .expanded-text-modal { width: 800px; max-width: 90%; height: 80vh; display:flex; flex-direction:column; }
+        .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
+        
+        .offset-grid { display: flex; gap: 8px; margin-bottom: 20px; }
+        .offset-col { flex: 1; }
+        .offset-col label { font-size: 0.7rem; text-align: center; display:block; }
+        
+        /* New Sync Settings UI */
+        .sync-option-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;
+        }
+        .sync-option-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-right: 10px; }
+        .sync-option-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        
+        .toggle-group {
+            display: flex; background: var(--bg-input); padding: 3px; border-radius: 6px;
+            flex-wrap: wrap; justify-content: flex-end; gap: 2px;
+        }
+        .toggle-opt {
+            padding: 6px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            border-radius: 4px; color: var(--text-muted); transition: var(--trans);
+            user-select: none; text-align: center;
+        }
+        .toggle-opt.active { background: var(--primary); color: white; }
+
+        #glow-trigger {
+            background: var(--bg-input);
+            border-width: 0px;
+        }
+
+        #glow-trigger:hover {
+            background: #68738f;
+        }
+        
+        /* Disabled button state */
+        .toggle-opt.disabled-mode {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        #custom-glow-input {
+            width: 50%; margin-top: 3px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px; font-size: 0.9rem; display: none; text-align: center;
+            margin-left: 20px;
+        }
+        #custom-glow-input.active { display: block; }
+        #glow-speed-container { transition: var(--trans); }
+        #glow-speed-container.disabled { opacity: 0.3; pointer-events: none; }
+
+        .expanded-textarea {
+            flex: 1; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main); padding: 1rem; font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: bold;
+            border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; resize: none;
+        }
+
+        #edit-settings-btn {
+            display: none;
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 900px) {
+            body { padding: 0; height: 100vh; }
+            .app-container { border-radius: 0; height: 100%; max-width: 100%; border: none; }
+            
+            .sidebar {
+                position: fixed; top: 0; left: 0; height: 100%; width: 100%;
+                padding: 2.5rem;
+                background: (--bg-card); transform: translateX(-100%);
+            }
+            .sidebar.active { transform: translateX(0); }
+            
+            #mobile-close-sidebar { display: block; background: none; border: none; color: white; font-size: 1.5rem; }
+            
+            .top-info-bar { 
+                display: flex !important; 
+                justify-content: flex-end;
+                height: 60px; 
+                background: transparent; 
+                pointer-events: none; 
+            }
+
+            .top-left-controls { display: none; } 
+
+            .mobile-header-right {
+                display: flex;
+                pointer-events: auto;
+                margin-right: -20px;
+                z-index: 60;
+            }
+            
+            /* Enable Mobile Mode Indicator */
+            .mobile-header-left { 
+                display: flex !important; 
+                pointer-events: none;
+                z-index: 60;
+                position: absolute; left: 0; top: 0; padding: 10px;
+            }
+
+            .mode-indicator {
+                font-weight: 500;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                opacity: 0.5;
+                border-radius: 50px;
+                background: #1f294100;
+                padding: 0px 20px; font-size: 0.8rem; cursor: pointer; 
+                display: flex; align-items: center; height: 40px;
+            }
+
+            .time-display {
+                margin: 0; 
+                opacity: 1; 
+                font-size: 1.5rem; 
+                pointer-events: auto;
+                text-align: center;
+                color: var(--secondary);
+                text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+                position: absolute; 
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .editor-area { height: 100%; width: 100%; }
+
+            .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; right: 10px; gap: 4px; }
+
+            .mobile-dock-controls {
+                display: flex; align-items: center; justify-content: center;
+                gap: 3px; width: 100%; padding: 0 5px; box-sizing: border-box;
+                margin-bottom: 1.25rem;
+            }
+
+            .mobile-dock-controls button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 1;
+                min-width: 0;
+            }
+
+            .action-btn { width: 28px; height: 28px; font-size: 14px; backdrop-filter: blur(4px); }
+
+            .sync-btn {
+                background: var(--secondary); color: #0f172a; font-weight: 800;
+                margin-bottom: 0px; margin-left: 0; border: 0px; padding: 30px 30px;
+                 font-size: 1.5rem; cursor: pointer;
+                transition: var(--trans); display: flex; align-items: center; gap: 0px; height: 40px;
+                border-radius: 10px;
+            }
+            
+            .sync-btn.holding { transform: scale(0.95); background: var(--primary-light); }
+
+            .header-btn {
+                background: #1f2941; border: 0px; color: var(--text-muted); margin-bottom: 0px;
+                padding: 30px 25px; font-size: 1.0rem; cursor: pointer; margin-right: 0px;
+                transition: var(--trans); display: flex; align-items: center; gap: 0px; height: 40px;
+            }
+
+            .header-btn:hover { background: #2e3b5c; color: white; }
+
+            .header-btn:first-child {
+                border-radius: 50px 0 0 50px;
+                padding: 30px 30px;
+            }
+
+            .fullscreen-btn:active {
+                background: #394b75;
+            }
+
+            #mobile-preview-btn {
+                opacity: 0.75;
+            }
+
+            #mobile-preview-btn.active { 
+            background: #4a4f75; 
+            color: #ffffff; 
+            font-weight: bold; 
+            box-shadow: 0 0 0px rgba(20, 184, 165, 0); 
+            }
+
+
+            .mobile-header-right .header-btn { border-radius: 50px; margin: 8px 8px 8px 0; padding: 0px 13px;}
+
+            .dock-sync-btn { display: none; }    
+            .dock-settings-trigger { display: none; }     
+             
+            .control-dock {
+                position: fixed; left: 0px; right: 0; transform: none; max-width: 100vw;
+                width: 100%; bottom: 0; padding: 32px 32px; gap:25px;
+                background: #171e30; backdrop-filter: blur(0px); border-radius: 0; border: 0px;
+                box-sizing: border-box; 
+                z-index: 100;
+                box-shadow: 0 0px 150px rgba(0, 0, 0, 0.315);
+            }
+
+            #word-context-ui {
+                bottom: 320px; 
+                width: auto;
+                max-width: 90%;
+                min-width: 250px;
+                justify-content: center;
+                background: rgba(15, 23, 42, 0.534);
+                border: 0px solid var(--primary); padding: 10px 20px; border-radius: 12px;
+                box-shadow: 0 0px 0px rgba(0,0,0,0.6);
+            }
+
+            .player-controls {
+            display: flex; align-items: left; gap: 20px; flex: 1;
+            justify-content: center; padding-bottom: 10px;
+            }  
+                .control-btn {
+            background: transparent; border: none; color: var(--text-main);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--trans); font-size: 20px; font-weight: 15px;
+            background: rgba(110, 173, 255, 0);
+            }
+            .control-btn:hover { background: rgba(255,255,255,0.1); }
+          .control-btn:active { transform: scale(0.9); }
+        
+           .play-btn { 
+             background: var(--text-main); color: var(--bg-body); 
+            width: 60px; height: 60px; font-size: 1.4rem; border-radius: 15px;
+            }
+           .play-btn:hover { background: white; transform: scale(1.05); }
+
+            .speed-toggle-btn {
+                font-size: 15px;
+            }
+    
+            .dock-row-slider { padding: 0px 20px; gap: 0px; margin-bottom: -8px; }
+            .seek-slider { flex: 1; width: 100%; height: 12px; border-radius: 50px; }
+            .seek-slider::-webkit-slider-thumb {
+                height: 40px; width: 13px; border-radius: 50px; margin-top: -17px; 
+                box-shadow: 0 0 10px #6365f100; border: 4px solid #171e30;
+            }
+
+            .dock-row-slider2 { display: flex; align-items: center; gap: 5px; width: 100%; margin-bottom: -10px; padding: 0px 14px; }
+            
+            #vol-btn { margin-right: 0; }
+            #dur-time-lbl { margin-left:auto; }
+            .dock-sync-btn div { display: block; font-size: 0.8rem; } 
+
+            #mobile-dock-settings {
+                margin-left: 0.5rem;
+            }
+
+            #sync-mode-btn {
+                margin-right: 2px;
+                border-radius: 50px 15px 15px 50px;
+            }
+
+            #fullscreenBtn {
+                border-radius: 15px 50px 50px 15px;
+            }
+
+            #main-sync-btn-mobile {
+                border-radius: 8px 50px 50px 8px;
+            }
+
+            ::-webkit-scrollbar-thumb { 
+                background: rgba(255, 255, 255, 0.178); 
+                width: 2px;
+            }
+            ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container" id="app-container">
+    
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <div style="display:flex; align-items:center; gap:8px;"><span>⚡</span> Voxen</div>
+            <button id="mobile-close-sidebar" onclick="toggleSettings(false)">✕</button>
+        </div>
+
+        <div id="sidebar-content">
+            <div class="section-title">Media & Project</div>
+            <div class="label-row2"><label>Audio File</label></div>
+            <div class="file-upload-wrapper">
+                <input type="file" id="audio-file" accept="audio/*" class="file-upload-input">
+                <div class="file-upload-label" id="audio-file-label"><span>➜] Upload MP3</span></div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-bottom:1.5rem;">
+                <div class="load-project-wrapper" style="margin:0;">
+                    <input type="file" id="project-upload" accept=".vxn" class="file-upload-input" onchange="loadProject(this)">
+                    <div class="file-upload-label"><span>📁 Load</span></div>
+                </div>
+                <button class="btn btn-secondary" style="height:45px;" onclick="saveProject()">💾 Save</button>
+            </div>
+
+            <div id="workflow-sections" class="disabled-area">
+                <div class="section-title">New Session</div>
+                <div class="input-group">
+                    <div class="label-row">
+                        <label>Paste Lyrics (Reset)</label>
+                        <button class="expand-btn" onclick="openExpandModal('raw')">⤢</button>
+                    </div>
+                    <textarea id="raw-lyrics" placeholder="Look at the stars&#10;Look how they shine for you"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-row2"><label>Mode</label></div>
+                    <div class="mode-toggle">
+                        <input type="radio" id="mode-line" name="mode" value="line" checked>
+                        <label for="mode-line">Line</label>
+                        <input type="radio" id="mode-word" name="mode" value="word">
+                        <label for="mode-word">Word</label>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="initializeEditor()">▶ Create New Editor</button>
+
+                <div class="section-title">Settings & Export</div>
+                <div class="input-group">
+                    <div class="label-row2"><label>Reaction Offset (ms)</label></div>
+                    <input type="number" id="offset-val" value="-200" step="50">
+                </div>
+
+                <div class="input-group">
+                    <div class="label-row">
+                        <label>Export / Import LRC</label>
+                        <button class="expand-btn" onclick="openExpandModal('lrc')">⤢</button>
+                    </div>
+                    <textarea id="export-output" placeholder="Paste LRC here to import..." style="height: 200px; font-family: monospace;"></textarea>
+                    
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 8px;">
+    <button class="btn btn-outline" style="padding: 1.25rem 0; border-radius: 25px 5px 5px 25px;" onclick="generateLRC()">Update</button>
+    <button class="btn btn-secondary" style="padding: 1.25rem 0; border-radius: 5px;" onclick="copyLRC()">Copy</button>
+    <button class="btn btn-secondary" style="padding: 1.25rem 0; border-radius: 5px;" onclick="loadLRCFromSidebar()">Load</button>
+    <button class="btn" id="edit-download-btn" style="padding: 1.25rem 0; border-radius: 5px 25px 25px 5px;" onclick="downloadLRC()">➜]</button>
+</div>
+                </div>
+            </div> </div>
+    </div>
+
+    <div class="editor-area">
+        <div class="top-info-bar">
+            <div class="mobile-header-left">
+                <div id="mobile-mode-indicator" class="mode-indicator">Tap</div>
+            </div>
+
+            <div class="top-left-controls">
+                <button id="edit-settings-btn" class="header-btn" onclick="toggleSettings(true)">
+                    ⚙ <span class="btn-text">Settings</span>
+                </button>
+                <button id="edit-mode-toggle" class="header-btn" onclick="toggleEditMode()">
+                    ✎ <span class="btn-text">Edit</span>
+                </button>
+                    <button id="btn-add-top" class="header-btn" style="margin-left: 0px; display: none;" onclick="addLineAtTop()">
+                    + Line
+                </button>
+                <button id="preview-btn" class="header-btn" onclick="togglePreviewMode()">
+                    ▶ <span class="btn-text">Preview</span>
+                </button>
+                <button class="header-btn" onclick="openOffsetModal()">
+                    ⏱ <span class="btn-text">Offset</span>
+                </button>
+            </div>
+            
+            <div id="time-display" class="time-display">00:00.00</div>
+            <div class="mobile-header-right">
+                <button id="sync-mode-btn" class="header-btn" onclick="openSyncSettings()">⚙</button>
+                <button class="header-btn fullscreen-btn" id="fullscreenBtn">⛶</button>
+            </div>
+        </div>
+        
+        <audio id="audio-player"></audio>
+
+        <div class="lyrics-list" id="lyrics-container">
+            <div style="text-align: center; color: var(--text-muted); margin-top: 14rem; padding: 1rem; opacity: 0.3;">
+                <p><strong>VOXEN</strong></p>
+                <p>Open Settings.</p>
+                <p>Select Audio File</p>
+                <p>Create New</p>
+            </div>
+        </div>
+
+        <div id="word-context-ui">
+            <span class="ctx-prev" id="ctx-prev-word">Previous</span>
+            <span class="ctx-arrow">→</span>
+            <span class="ctx-curr" id="ctx-next-word">Target Word</span>
+        </div>
+
+        <div class="control-dock">
+            <div class="dock-row-slider">
+                <input type="range" id="seek-slider" class="seek-slider" value="0" min="0" max="100" step="0.1">
+            </div>
+            <div class="dock-row-slider2">
+                 <span class="seek-time" id="curr-time-lbl">0:00</span>
+                 <span class="seek-time" id="dur-time-lbl">0:00</span>
+            </div>
+            <div class="dock-row-controls">
+                
+                <div class="player-controls">
+                    <div class="popup-wrapper">
+                        <button class="control-btn speed-toggle-btn" id="speed-btn" onclick="toggleSpeedMenu()">1.0x</button>
+                        <div class="dock-popup speed-popup" id="speed-popup">
+                            <button class="speed-option" onclick="setSpeed(0.5)">0.5x</button>
+                            <button class="speed-option" onclick="setSpeed(0.75)">0.75x</button>
+                            <button class="speed-option selected" onclick="setSpeed(1.0)">1.0x</button>
+                            <button class="speed-option" onclick="setSpeed(1.25)">1.25x</button>
+                            <button class="speed-option" onclick="setSpeed(1.5)">1.5x</button>
+                        </div>
+                    </div>
+
+                    <button class="control-btn" onclick="seekAudio(-5)">↺</button>
+                    <button class="control-btn play-btn" id="play-pause-btn" onclick="togglePlay()">▶</button>
+                    <button class="control-btn" onclick="seekAudio(5)">↻</button>
+                    
+                    <div class="popup-wrapper volume-wrapper">
+                        <button class="control-btn" id="vol-btn" onclick="toggleVolumeMenu()">ᯤ</button>
+                        <div class="dock-popup volume-popup" id="volume-popup">
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" 
+                                   class="vol-slider" oninput="updateVolume(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="dock-sync-btn" id="main-sync-btn">
+                    <span>⏱︎</span>
+                    <div id="main-sync-btn-text">TAP</div>
+                </button>
+                <button class="dock-settings-trigger" onclick="openSyncSettings()">
+                    <span>⚙</span>
+                </button>
+            </div>
+
+             <div class="mobile-dock-controls">
+                <button id="mobile-dock-settings" class="header-btn" onclick="toggleSettings(true)">⚙</button>
+                <button id="edit-mode-toggle-mobile" class="header-btn" onclick="toggleEditMode()">✎</button>
+                <button id="edit-offset-btn" class="header-btn" onclick="openOffsetModal()">⏱</button>
+                <button id="mobile-preview-btn" class="header-btn" onclick="togglePreviewMode()">
+                    ▷
+                </button>
+                <button class="sync-btn" id="main-sync-btn-mobile"><div>+</div></button>
+              </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="sync-settings-modal">
+    <div class="base-modal sync-settings-modal">
+        <div class="modal-title">Sync Logic</div>
+        
+        <div class="sync-option-row">
+            <div>
+                <div class="sync-option-label">Sync Mode</div>
+                <div class="sync-option-sub">Input Behavior</div>
+            </div>
+           <div class="toggle-group">
+        <div class="toggle-opt active" id="opt-tap" onclick="setSyncInputMode('tap')">Tap</div>
+        <div class="toggle-opt" id="opt-hold" onclick="setSyncInputMode('hold')">Hold</div>
+        <div class="toggle-opt" id="opt-sync-auto" onclick="setSyncInputMode('auto')">Hybrid</div>
+    </div>
+        </div>
+
+        <div class="sync-option-row">
+            <div>
+                <div class="sync-option-label">Preview Glow</div>
+                <div class="sync-option-sub">Fade In Mode</div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-opt active" id="opt-custom" onclick="setGlowMode('custom')">Custom</div>
+                <div class="toggle-opt" id="opt-auto" onclick="setGlowMode('auto')">Auto</div>
+            </div>
+        </div>
+
+        <div class="sync-option-row" id="glow-speed-container">
+            <div>
+                <div class="sync-option-label">Glow Speed</div>
+                <div class="sync-option-sub">Duration</div>
+            </div>
+            <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                     <input type="number" id="custom-glow-input" placeholder="0.1" step="0.1" onchange="setGlowSpeed(this.value, true)">
+                <div class="popup-wrapper" style="width: 100%; display: flex; justify-content: flex-end;">
+                     <div class="toggle-group">
+                          <button class="toggle-opt active" id="glow-trigger" onclick="toggleGlowMenu()">0.1s ▼</button>
+                     </div>
+                    <div class="dock-popup" id="glow-popup" style="bottom: auto; top: 100%; left: auto; right: 0; transform: none; width: 120px; z-index: 200;">
+                        <button class="speed-option" onclick="setGlowSpeed(0.1)">0.1s</button>
+                        <button class="speed-option" onclick="setGlowSpeed(0.25)">0.25s</button>
+                        <button class="speed-option" onclick="setGlowSpeed(0.5)">0.5s</button>
+                        <button class="speed-option" onclick="toggleCustomGlowInput()">Custom</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="closeSyncSettings()">Close</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="offset-modal">
+    <div class="base-modal offset-modal">
+        <div class="modal-title">Bulk Offset Timestamp</div>
+        <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top:-10px;">
+            Shift all synced lines forward (positive) or backward (negative).
+        </p>
+        <div class="offset-grid">
+            <div class="offset-col"><label>Min</label><input type="number" id="off-min" value="0" placeholder="0"></div>
+            <div class="offset-col"><label>Sec</label><input type="number" id="off-sec" value="0" placeholder="0"></div>
+            <div class="offset-col"><label>Ms</label><input type="number" id="off-ms" value="0" placeholder="0"></div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" onclick="closeOffsetModal()">Cancel</button>
+            <button class="btn" onclick="applyOffset()">Apply Offset</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="expand-modal">
+    <div class="base-modal expanded-text-modal">
+        <div class="modal-title" id="expand-modal-title">Edit</div>
+        <textarea id="expand-textarea" class="expanded-textarea" spellcheck="false"></textarea>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" style="flex:0.5" onclick="closeExpandModal()">Cancel</button>
+            <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- State ---
+let state = {
+    lyrics: [],
+    mode: 'line',
+    currentIndex: 0,
+    currentWordIndex: 0,
+    isPlaying: false,
+    isEditMode: false,
+    isPreviewMode: false,
+    currentSpeed: 1.0,
+    syncInputMode: 'tap', // 'tap', 'hold', or 'auto'
+    glowMode: 'custom'
+};
+
+    let currentFileName = "lyrics"; 
+    let isDraggingSlider = false;
+    let currentModalType = ''; 
+
+    // --- DOM Elements ---
+    const appContainer = document.getElementById('app-container');
+    const audioPlayer = document.getElementById('audio-player');
+    const lyricsContainer = document.getElementById('lyrics-container');
+    const timeDisplay = document.getElementById('time-display');
+    const exportOutput = document.getElementById('export-output');
+    const rawLyricsInput = document.getElementById('raw-lyrics');
+    const offsetInput = document.getElementById('offset-val');
+    const sidebar = document.getElementById('sidebar');
+    const playBtn = document.getElementById('play-pause-btn');
+    
+    // Popups
+    const speedBtn = document.getElementById('speed-btn');
+    const speedPopup = document.getElementById('speed-popup');
+    const volumePopup = document.getElementById('volume-popup');
+    const volumeSlider = document.getElementById('volume-slider');
+    const glowPopup = document.getElementById('glow-popup');
+    const glowTrigger = document.getElementById('glow-trigger');
+    
+    // Modals
+    const offsetModal = document.getElementById('offset-modal');
+    const expandModal = document.getElementById('expand-modal');
+    const expandTextarea = document.getElementById('expand-textarea');
+    const expandTitle = document.getElementById('expand-modal-title');
+    const expandActions = document.getElementById('expand-modal-actions');
+    const syncSettingsModal = document.getElementById('sync-settings-modal');
+
+    const wordContextUI = document.getElementById('word-context-ui');
+    const ctxPrev = document.getElementById('ctx-prev-word');
+    const ctxNext = document.getElementById('ctx-next-word');
+    const editToggle = document.getElementById('edit-mode-toggle');
+    const editToggleMobile = document.getElementById('edit-mode-toggle-mobile');
+    const editToggleText = editToggle.querySelector('.btn-text');
+    const previewBtn = document.getElementById('preview-btn');
+    const mobilePreviewBtn = document.getElementById('mobile-preview-btn');
+    
+    const seekSlider = document.getElementById('seek-slider');
+    const currTimeLbl = document.getElementById('curr-time-lbl');
+    const durTimeLbl = document.getElementById('dur-time-lbl');
+    
+    // Indicators
+    const mainSyncBtnText = document.getElementById('main-sync-btn-text');
+    const mobileModeIndicator = document.getElementById('mobile-mode-indicator');
+    const controlDock = document.querySelector('.control-dock');
+    const btn = document.getElementById("fullscreenBtn");
+
+
+     // Fullscreen
+      btn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      btn.textContent = "⛶";
+    } else {
+      document.exitFullscreen();
+      btn.textContent = "⛶";
+    }
+  });
+
+    document.addEventListener("fullscreenchange", () => {
+    btn.textContent = document.fullscreenElement
+      ? "⛶"
+      : "⛶";
+  });
+
+    // --- UI/UX Helpers ---
+    function toggleSettings(show) {
+        if(show) sidebar.classList.add('active');
+        else sidebar.classList.remove('active');
+    }
+
+    function toggleEditMode() {
+        if(state.isPreviewMode) togglePreviewMode(); // disable preview if editing
+        state.isEditMode = !state.isEditMode;
+        if (state.isEditMode) {
+            editToggle.classList.add('active');
+            if(editToggleMobile) editToggleMobile.classList.add('active');
+            editToggleText.textContent = "Done";
+            appContainer.classList.add('is-editing');
+            wordContextUI.classList.remove('visible'); 
+        } else {
+            editToggle.classList.remove('active');
+            if(editToggleMobile) editToggleMobile.classList.remove('active');
+            editToggleText.textContent = "Edit";
+            appContainer.classList.remove('is-editing');
+        }
+        renderEditor(); 
+        if(!state.isEditMode) updateVisuals();
+    }
+
+    function togglePreviewMode() {
+        if(state.isEditMode) toggleEditMode(); // disable edit if previewing
+        state.isPreviewMode = !state.isPreviewMode;
+        if(state.isPreviewMode) {
+            previewBtn.classList.add('active');
+            mobilePreviewBtn.classList.add('active');
+            appContainer.classList.add('is-preview'); // Enable focus mode css
+            wordContextUI.classList.remove('visible'); 
+            cleanupGlowEffects();
+            
+            // --- START LOOP ---
+            requestAnimationFrame(animatePreviewFrame);
+            
+        } else {
+            previewBtn.classList.remove('active');
+            mobilePreviewBtn.classList.remove('active');
+            appContainer.classList.remove('is-preview');
+            cleanupGlowEffects();
+            updateVisuals(); // restore manual state
+        }
+    }
+    
+    // --- GLOW SPEED LOGIC (UPDATED) ---
+    function toggleGlowMenu() {
+        glowPopup.classList.toggle('active');
+    }
+
+    function setGlowSpeed(val, isCustomInput = false) {
+        val = parseFloat(val);
+        if(isNaN(val)) return;
+
+        document.documentElement.style.setProperty('--glow-speed', val + 's');
+        
+        if (isCustomInput) {
+             glowTrigger.textContent = "Custom ▼";
+        } else {
+            glowTrigger.textContent = val + "s ▼";
+            // Hide custom input if preset selected
+            document.getElementById('custom-glow-input').classList.remove('active');
+        }
+        
+        glowPopup.classList.remove('active');
+    }
+
+    function toggleCustomGlowInput() {
+        glowTrigger.textContent = "Custom ▼";
+        const input = document.getElementById('custom-glow-input');
+        input.classList.add('active');
+        input.focus();
+        glowPopup.classList.remove('active');
+    }
+ 
+    function cleanupGlowEffects() {
+        document.querySelectorAll('.word-span').forEach(el => {
+            el.classList.remove('preview-glow');
+            el.style.transition = ""; // reset inline styles
+        });
+    }
+
+    // --- Popups (Speed & Volume) ---
+    function toggleSpeedMenu() {
+        speedPopup.classList.toggle('active');
+        volumePopup.classList.remove('active');
+    }
+
+    function toggleVolumeMenu() {
+        volumePopup.classList.toggle('active');
+        speedPopup.classList.remove('active');
+    }
+
+    function updateVolume(val) {
+        audioPlayer.volume = val;
+        updateRangeFill(volumeSlider);
+    }
+
+    function setSpeed(val) {
+        state.currentSpeed = val;
+        audioPlayer.playbackRate = val;
+        speedBtn.textContent = val + "x";
+        
+        document.querySelectorAll('.speed-option').forEach(btn => {
+            btn.classList.remove('selected');
+            if(parseFloat(btn.innerText) === val) btn.classList.add('selected');
+        });
+        speedPopup.classList.remove('active');
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.popup-wrapper')) {
+            speedPopup.classList.remove('active');
+            volumePopup.classList.remove('active');
+            glowPopup.classList.remove('active');
+        }
+    });
+
+    // --- File Input ---
+    document.getElementById('audio-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            audioPlayer.src = URL.createObjectURL(file);
+            currentFileName = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById('audio-file-label').innerHTML = `<span>🎵 ${file.name}</span>`;
+            
+            // UNLOCK UI
+            document.getElementById('workflow-sections').classList.remove('disabled-area');
+        }
+    });
+
+    // --- Slider Fill ---
+    function updateRangeFill(slider) {
+        const min = slider.min || 0;
+        const max = slider.max || 100;
+        const val = slider.value;
+        const percent = (val - min) * 100 / (max - min);
+        slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, var(--bg-input) ${percent}%, var(--bg-input) 100%)`;
+    }
+    updateRangeFill(volumeSlider);
+
+    // --- Playback Slider ---
+    audioPlayer.addEventListener('loadedmetadata', () => {
+        seekSlider.max = audioPlayer.duration;
+        durTimeLbl.textContent = formatSimpleTime(audioPlayer.duration);
+        updateRangeFill(seekSlider);
+    });
+
+    audioPlayer.addEventListener('timeupdate', () => {
+        if (!isDraggingSlider) {
+            seekSlider.value = audioPlayer.currentTime;
+            currTimeLbl.textContent = formatSimpleTime(audioPlayer.currentTime);
+            updateRangeFill(seekSlider);
+        }
+    });
+
+    // --- PREVIEW ANIMATION LOOP (UPDATED FOR AUTO DURATION) ---
+    function animatePreviewFrame() {
+        if (!state.isPreviewMode) return;
+        
+        if(state.lyrics.length > 0) {
+            const curTime = audioPlayer.currentTime;
+            let activeIdx = -1;
+            
+            const currentLineObj = state.lyrics[state.currentIndex];
+            const nextLineObj = state.lyrics[state.currentIndex + 1];
+
+            let needsSearch = true;
+            if (currentLineObj && currentLineObj.time !== null && curTime >= currentLineObj.time) {
+                if (nextLineObj && nextLineObj.time !== null && curTime >= nextLineObj.time) {
+                    needsSearch = true;
+                } else {
+                    activeIdx = state.currentIndex;
+                    needsSearch = false;
+                }
+            }
+            
+            if (needsSearch) {
+                 for(let i=0; i < state.lyrics.length; i++) {
+                    if(state.lyrics[i].time !== null && state.lyrics[i].time <= curTime) {
+                        activeIdx = i;
+                    } else if (state.lyrics[i].time !== null && state.lyrics[i].time > curTime) {
+                        break;
+                    }
+                }
+            }
+
+            if(activeIdx !== -1) {
+                if (activeIdx !== state.currentIndex) {
+                    // Cleanup old glow
+                    const oldLineEl = document.getElementById(`line-${state.currentIndex}`);
+                    if(oldLineEl) {
+                        const glows = oldLineEl.getElementsByClassName('preview-glow');
+                        while(glows.length > 0) { glows[0].classList.remove('preview-glow'); }
+                    }
+
+                    state.currentIndex = activeIdx;
+                    state.currentWordIndex = 0; 
+                    updateVisuals();
+                    scrollToActive();
+                }
+
+                const currentLine = state.lyrics[activeIdx];
+                if (currentLine && currentLine.words && currentLine.words.length > 0) {
+                    for (let w = 0; w < currentLine.words.length; w++) {
+                        const word = currentLine.words[w];
+                        if (word.start === null) continue;
+
+                        const shouldGlow = word.start <= curTime;
+                        const wordSpan = document.getElementById(`word-${activeIdx}-${w}`);
+                        
+                        if (wordSpan) {
+                            if (shouldGlow) {
+                                if(!wordSpan.classList.contains('preview-glow')) {
+                                    // --- NEW: AUTO GLOW LOGIC ---
+                                    if(state.glowMode === 'auto' && word.end !== null) {
+                                        const dur = Math.max(0.1, word.end - word.start);
+                                        // Dynamic transition based on duration
+                                        wordSpan.style.transition = `color ${dur}s linear, text-shadow ${dur}s linear, transform 0.2s ease`;
+                                    } else {
+                                        // Reset to CSS default (handled by class removal mostly, but ensure clean slate)
+                                        wordSpan.style.transition = ""; 
+                                    }
+                                    
+                                    wordSpan.classList.add('preview-glow');
+                                }
+                            } else {
+                                if(wordSpan.classList.contains('preview-glow')) {
+                                    wordSpan.classList.remove('preview-glow');
+                                    wordSpan.style.transition = ""; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        requestAnimationFrame(animatePreviewFrame);
+    }
+
+    seekSlider.addEventListener('input', () => {
+        isDraggingSlider = true;
+        currTimeLbl.textContent = formatSimpleTime(seekSlider.value);
+        updateRangeFill(seekSlider);
+    });
+
+    seekSlider.addEventListener('change', () => {
+        audioPlayer.currentTime = seekSlider.value;
+        isDraggingSlider = false;
+        if(audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+        updateRangeFill(seekSlider);
+        if(state.isPreviewMode) cleanupGlowEffects();
+    });
+
+    function formatSimpleTime(s) {
+        if(!s || isNaN(s)) return "0:00";
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60).toString().padStart(2, '0');
+        return `${m}:${sec}`;
+    }
+
+    // --- Playback ---doc
+    function togglePlay() {
+        if (audioPlayer.paused) audioPlayer.play();
+        else audioPlayer.pause();
+    }
+
+    function seekAudio(seconds) {
+        audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime + seconds);
+        if(audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+        updateRangeFill(seekSlider);
+    }
+
+    audioPlayer.addEventListener('play', () => {
+        state.isPlaying = true;
+        playBtn.textContent = "𝗜𝗜";
+        requestAnimationFrame(updateTimer);
+    });
+
+    audioPlayer.addEventListener('pause', () => {
+        state.isPlaying = false;
+        playBtn.textContent = "▶";
+        timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+    });
+
+    function updateTimer() {
+        if (!audioPlayer.paused) {
+            timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
+            requestAnimationFrame(updateTimer);
+        }
+    }
+
+    // --- Core Logic ---
+    function initializeEditor() {
+        const rawText = rawLyricsInput.value;
+        if (!rawText.trim()) return alert("Please enter lyrics first.");
+        
+        toggleSettings(false);
+        state.mode = document.querySelector('input[name="mode"]:checked').value;
+        state.currentIndex = 0;
+        state.currentWordIndex = 0;
+        state.isEditMode = false;
+        state.isPreviewMode = false;
+        
+        resetEditUI();
+
+        const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
+        state.lyrics = lines.map(lineText => {
+            return { text: lineText, time: null, words: parseWords(lineText) };
+        });
+
+        renderEditor();
+        updateWordContextUI();
+    }
+
+    function resetEditUI() {
+        editToggle.classList.remove('active');
+        if(editToggleMobile) editToggleMobile.classList.remove('active');
+        editToggleText.textContent = "Edit Text";
+        appContainer.classList.remove('is-editing');
+        appContainer.classList.remove('is-preview');
+        previewBtn.classList.remove('active');
+        mobilePreviewBtn.classList.remove('active');
+    }
+
+    function parseWords(text) {
+        return text.split(/\s+/).map(w => ({ text: w, start: null, end: null }));
+    }
+
+    // --- Project Saving / Loading ---
+    function saveProject() {
+        const projectData = {
+            version: "v4",
+            timestamp: Date.now(),
+            mode: state.mode,
+            lyrics: state.lyrics,
+            currentIndex: state.currentIndex
+        };
+        const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${currentFileName}.vxn`; 
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function loadProject(input) {
+        const file = input.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                state.lyrics = data.lyrics;
+                state.mode = data.mode;
+                state.currentIndex = 0; 
+                state.currentWordIndex = 0;
+                
+                if(state.mode === 'line') document.getElementById('mode-line').checked = true;
+                else document.getElementById('mode-word').checked = true;
+
+                // UNLOCK UI
+                document.getElementById('workflow-sections').classList.remove('disabled-area');
+
+                toggleSettings(false);
+                resetEditUI();
+                renderEditor();
+                updateVisuals();
+                alert("Project loaded!");
+            } catch(err) {
+                alert("Error loading project file: " + err);
+            }
+        };
+        reader.readAsText(file);
+        input.value = "";
+    }
+
+    // --- EXPANDABLE MODAL LOGIC ---
+    function openExpandModal(type) {
+        currentModalType = type;
+        expandModal.classList.add('active');
+        expandActions.innerHTML = ''; 
+
+        if (type === 'raw') {
+            expandTitle.textContent = "Edit Raw Lyrics";
+            expandTextarea.value = rawLyricsInput.value;
+            expandTextarea.placeholder = "Line 1...\nLine 2...";
+            
+            // Symbol Button
+            const btnSymbol = document.createElement('button');
+            btnSymbol.className = 'btn btn-secondary btn-note';
+            btnSymbol.style.flex = "0 0 auto";
+            btnSymbol.textContent = "♩";
+            btnSymbol.onclick = () => {
+                const startPos = expandTextarea.selectionStart;
+                const endPos = expandTextarea.selectionEnd;
+                const text = expandTextarea.value;
+                expandTextarea.value = text.substring(0, startPos) + "♩" + text.substring(endPos);
+                expandTextarea.focus();
+                expandTextarea.selectionStart = expandTextarea.selectionEnd = startPos + 1;
+            };
+
+            const btnSave = document.createElement('button');
+            btnSave.className = 'btn';
+            btnSave.textContent = "Update Input";
+            btnSave.onclick = () => {
+                rawLyricsInput.value = expandTextarea.value;
+                closeExpandModal();
+            };
+            
+            expandActions.appendChild(btnSymbol);
+            expandActions.appendChild(btnSave);
+        } 
+        else if (type === 'lrc') {
+            expandTitle.textContent = "Edit / Import LRC";
+            if(exportOutput.value.trim()) expandTextarea.value = exportOutput.value;
+            else { generateLRC(); expandTextarea.value = exportOutput.value; }
+            expandTextarea.placeholder = "[00:12.50]Paste your LRC content here to import...";
+
+            const btnCopy = document.createElement('button');
+            btnCopy.className = 'btn btn-outline';
+            btnCopy.textContent = "Copy";
+            btnCopy.onclick = () => {
+                expandTextarea.select();
+                document.execCommand('copy');
+                btnCopy.textContent = "Copied!";
+                setTimeout(() => btnCopy.textContent = "Copy", 1500);
+            };
+
+            const btnImport = document.createElement('button');
+            btnImport.className = 'btn';
+            btnImport.innerHTML = "Load";
+            btnImport.onclick = () => {
+                parseAndLoadLRC(expandTextarea.value);
+                closeExpandModal();
+            };
+            
+            expandActions.appendChild(btnCopy);
+            expandActions.appendChild(btnImport);
+        }
+    }
+
+    function closeExpandModal() { expandModal.classList.remove('active'); }
+    
+    // Copy/Load Buttons in Sidebar
+    function copyLRC() {
+        exportOutput.select();
+        document.execCommand('copy');
+        alert("LRC copied to clipboard!");
+    }
+    
+    function loadLRCFromSidebar() {
+        parseAndLoadLRC(exportOutput.value);
+    }
+
+    function parseAndLoadLRC(lrcText) {
+        if (!lrcText.trim()) return;
+
+        const lines = lrcText.split('\n');
+        const newLyrics = [];
+        const timeRegex = /\[(\d{2}):(\d{2}(?:\.\d+)?)\](.*)/;
+        const wordTagLineRegex = /^<(.+)>$/;
+        let hasWordData = false;
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if(!trimmed) return;
+            const timeMatch = trimmed.match(timeRegex);
+            
+            if (timeMatch) {
+                const min = parseInt(timeMatch[1]);
+                const sec = parseFloat(timeMatch[2]);
+                const text = timeMatch[3].trim();
+                const totalTime = (min * 60) + sec;
+                newLyrics.push({ text: text, time: totalTime, words: parseWords(text) });
+            } else {
+                const wordMatch = trimmed.match(wordTagLineRegex);
+                if (wordMatch && newLyrics.length > 0) {
+                    const rawData = wordMatch[1]; 
+                    const segments = rawData.split('|');
+                    const lastLyric = newLyrics[newLyrics.length - 1];
+                    const newWords = segments.map(seg => {
+                        const parts = seg.split(':');
+                        let s = null, e = null;
+                        let wText = parts[0];
+                        if (parts.length >= 3) {
+                            const eStr = parts.pop();
+                            const sStr = parts.pop();
+                            wText = parts.join(':');
+                            s = sStr ? parseFloat(sStr) : null;
+                            e = eStr ? parseFloat(eStr) : null;
+                        }
+                        return { text: wText, start: s, end: e };
+                    });
+                    lastLyric.words = newWords;
+                    hasWordData = true;
+                } 
+                else if (!trimmed.startsWith('[') && !trimmed.startsWith('<')) {
+                     newLyrics.push({ text: trimmed, time: null, words: parseWords(trimmed) });
+                }
+            }
+        });
+
+        if (newLyrics.length === 0) { alert("No valid LRC timestamps found."); return; }
+        state.lyrics = newLyrics;
+        if (hasWordData) { state.mode = 'word'; document.getElementById('mode-word').checked = true; } 
+        else { state.mode = 'line'; document.getElementById('mode-line').checked = true; }
+        
+        state.currentIndex = 0;
+        state.currentWordIndex = 0;
+        toggleSettings(false);
+        resetEditUI();
+        renderEditor();
+        updateVisuals();
+        rawLyricsInput.value = newLyrics.map(l => l.text).join('\n');
+        exportOutput.value = lrcText;
+        alert(`Imported ${newLyrics.length} lines successfully!`);
+    }
+
+    // --- Rendering ---
+    function renderEditor() {
+        lyricsContainer.innerHTML = '';
+        state.lyrics.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = `lyric-line ${index === state.currentIndex && !state.isEditMode ? 'active' : ''}`;
+            row.id = `line-${index}`;
+
+            const meta = document.createElement('div');
+            meta.className = 'line-meta';
+            const timeInp = document.createElement('input');
+            timeInp.className = 'timestamp-input';
+            timeInp.placeholder = '--:--:--';
+            timeInp.readOnly = true; 
+            timeInp.value = item.time ? formatTimeLRC(item.time) : '';
+            meta.appendChild(timeInp);
+            row.appendChild(meta);
+
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'line-content-wrapper';
+            const content = document.createElement('div');
+            content.className = 'line-text';
+            
+            if (state.isEditMode) {
+                content.contentEditable = "true";
+                content.innerText = item.text;
+                content.onblur = (e) => {
+                    const newText = e.target.innerText.replace(/[\r\n]+/g, ' ').trim();
+                    if (newText !== item.text) { item.text = newText; item.words = parseWords(newText); }
+                };
+            } else {
+                content.contentEditable = "false";
+                item.words.forEach((word, wIdx) => {
+                    const span = document.createElement('span');
+                    span.className = 'word-span';
+                    span.textContent = word.text;
+                    span.id = `word-${index}-${wIdx}`;
+                    
+                    if(word.start !== null) span.classList.add('synced');
+                    
+                    span.onclick = (e) => {
+                        e.stopPropagation();
+                        if(state.isPreviewMode) return;
+                        if(state.mode === 'line') {
+                            state.currentIndex = index;
+                            updateVisuals();
+                            return;
+                        }
+                        // Word mode
+                        state.currentIndex = index;
+                        state.currentWordIndex = wIdx;
+                        updateVisuals();
+                    };
+                    content.appendChild(span);
+                    content.appendChild(document.createTextNode(" "));
+                });
+                
+                content.onclick = (e) => {
+                    if(e.target === content) {
+                         if(state.isPreviewMode) return;
+                        state.currentIndex = index;
+                        if(state.mode === 'word') state.currentWordIndex = 0;
+                        updateVisuals();
+                    }
+                };
+            }
+            contentWrapper.appendChild(content);
+            row.appendChild(contentWrapper);
+
+            const actions = document.createElement('div');
+            actions.className = 'line-actions';
+            const btnAdd = document.createElement('button');
+            btnAdd.className = 'action-btn'; btnAdd.innerHTML = '+';
+            btnAdd.onclick = (e) => { e.stopPropagation(); addLine(index); };
+            const btnDel = document.createElement('button');
+            btnDel.className = 'action-btn btn-del'; btnDel.innerHTML = '×';
+            btnDel.onclick = (e) => { e.stopPropagation(); deleteLine(index); };
+            actions.appendChild(btnAdd); actions.appendChild(btnDel);
+            row.appendChild(actions);
+
+            lyricsContainer.appendChild(row);
+        });
+    }
+
+    function addLineAtTop() {
+        const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
+        state.lyrics.unshift(newItem); state.currentIndex++; renderEditor();
+    }
+    function addLine(index) {
+        const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
+        state.lyrics.splice(index + 1, 0, newItem); renderEditor();
+    }
+    function deleteLine(index) {
+        state.lyrics.splice(index, 1);
+        if(state.currentIndex >= state.lyrics.length) state.currentIndex = Math.max(0, state.lyrics.length - 1);
+        renderEditor();
+    }
+
+    // --- SYNC LOGIC (TAP & HOLD) ---
+    // Attaching Listeners
+    const syncBtnDesktop = document.getElementById('main-sync-btn');
+    const syncBtnMobile = document.getElementById('main-sync-btn-mobile');
+
+    [syncBtnDesktop, syncBtnMobile].forEach(btn => {
+        if(!btn) return;
+        btn.addEventListener('mousedown', (e) => handleSyncDown(e));
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleSyncDown(e); });
+        
+        btn.addEventListener('mouseup', (e) => handleSyncUp(e));
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); handleSyncUp(e); });
+        btn.addEventListener('mouseleave', (e) => handleSyncUp(e)); // Safety
+    });
+
+    function updateAutoModeLabel() {
+    // Only run this logic if we are actually in Auto mode
+    if (state.syncInputMode !== 'auto') return;
+    
+    // Safety check
+    if (!state.lyrics[state.currentIndex]) return;
+
+    const currentLine = state.lyrics[state.currentIndex];
+    
+    // Logic: If it's the last word of the line, Auto mode behaves like HOLD.
+    // Otherwise, it behaves like TAP.
+    const isLastWord = state.currentWordIndex === currentLine.words.length - 1;
+
+    if (isLastWord) {
+        mainSyncBtnText.textContent = "HOLD";
+        mobileModeIndicator.textContent = "Hold";
+    } else {
+        mainSyncBtnText.textContent = "TAP";
+        mobileModeIndicator.textContent = "Tap";
+    }
+}
+
+    let holdActive = false;
+
+   function handleSyncDown(e) {
+    if (state.currentIndex >= state.lyrics.length) return;
+    if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
+    
+    if (holdActive) return;
+
+    // Visuals: Button press
+    const btns = [syncBtnDesktop, syncBtnMobile];
+    btns.forEach(b => b.classList.add('holding'));
+
+    const offset = parseInt(offsetInput.value) || 0;
+    const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+
+    if (state.mode === 'line') {
+        syncLine(state.currentIndex, time);
+        state.currentIndex++;
+        scrollToActive();
+        updateVisuals();
+    } else {
+        // --- WORD MODE LOGIC ---
+        
+        if (state.syncInputMode === 'tap') {
+            // Standard Tap
+            syncWordTap(state.currentIndex, state.currentWordIndex, time);
+            scrollToActive();
+            updateVisuals();
+
+        } else if (state.syncInputMode === 'hold') {
+            // Standard Hold
+            startHoldAction(time);
+
+        } else if (state.syncInputMode === 'auto') {
+            // --- Task 1: Auto Mode Logic ---
+            const currentLine = state.lyrics[state.currentIndex];
+            const isLastWord = state.currentWordIndex === currentLine.words.length - 1;
+
+            if (isLastWord) {
+                // Last word -> Behaves like Hold
+                startHoldAction(time);
+            } else {
+                // Not last word -> Behaves like Tap
+                syncWordTap(state.currentIndex, state.currentWordIndex, time);
+                scrollToActive();
+                updateVisuals();
+            }
+        }
+    }
+}
+
+// Helper to centralize Hold starting logic (used by Hold and Auto)
+function startHoldAction(time) {
+    holdActive = true;
+    
+    // Task 3: Activate Dock Glow
+    controlDock.classList.add('active-hold-glow');
+    
+    syncWordStart(state.currentIndex, state.currentWordIndex, time);
+    scrollToActive();
+    updateVisuals();
+}
+
+ function handleSyncUp(e) {
+    // Visuals: Button release
+    const btns = [syncBtnDesktop, syncBtnMobile];
+    btns.forEach(b => b.classList.remove('holding'));
+
+    if (!holdActive) return; 
+    holdActive = false;
+    
+    // Task 3: Deactivate Dock Glow
+    controlDock.classList.remove('active-hold-glow');
+
+    const offset = parseInt(offsetInput.value) || 0;
+    const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+
+    // Logic for ending a Hold action (Applies to Hold mode AND Auto mode's last word)
+    if (state.mode === 'word') {
+         syncWordEnd(state.currentIndex, state.currentWordIndex, time);
+         advanceWordCursor();
+         scrollToActive();
+         updateVisuals();
+    }
+}
+    function syncLine(idx, time) {
+        if(!state.lyrics[idx]) return;
+        state.lyrics[idx].time = time;
+        const el = document.getElementById(`line-${idx}`);
+        if(el) el.querySelector('.timestamp-input').value = formatTimeLRC(time);
+        generateLRC();
+    }
+// Classic Tap: Sets start, auto sets prev end, advances
+    function syncWordTap(lIdx, wIdx, time) {
+        const line = state.lyrics[lIdx];
+        if(!line) return;
+        const word = line.words[wIdx];
+        
+        word.start = time;
+
+        // --- PREVIOUS WORD LOGIC ---
+        if(wIdx > 0) {
+            // Case A: Previous word is in the SAME line.
+            // In Auto/Tap modes, mid-line words always chain together.
+            line.words[wIdx-1].end = time;
+        }
+        else if (lIdx > 0) {
+            // Case B: Previous word is the LAST word of the PREVIOUS line.
+            const prev = state.lyrics[lIdx-1];
+            if(prev.words.length) {
+                const prevWord = prev.words[prev.words.length-1];
+
+                // BUG FIX:
+                // In 'auto' mode, this previous word was a "Hold". 
+                // If it already has an end time (from releasing the button), DO NOT overwrite it.
+                if (state.syncInputMode === 'auto') {
+                    if (prevWord.end === null) prevWord.end = time;
+                } else {
+                    // In strict 'tap' mode, we always overwrite to close the gap.
+                    prevWord.end = time;
+                }
+            }
+        }
+
+        // Auto-close very last word of song if in Tap mode
+        if (state.syncInputMode === 'tap' && lIdx === state.lyrics.length - 1 && wIdx === line.words.length - 1) {
+             if(audioPlayer.duration) word.end = audioPlayer.duration;
+        }
+
+        if(wIdx === 0) syncLine(lIdx, time);
+        advanceWordCursor();
+        generateLRC();
+    }
+
+    // Hold Mode Start: Just set start
+    function syncWordStart(lIdx, wIdx, time) {
+        const line = state.lyrics[lIdx];
+        if(!line) return;
+        const word = line.words[wIdx];
+        word.start = time;
+        
+        // FIX: In Auto Mode, the transition from the second-to-last word (Tap)
+        // to the last word (Hold) requires closing the gap of the previous word.
+        if (state.syncInputMode === 'auto' && wIdx > 0) {
+             line.words[wIdx-1].end = time;
+        }
+        
+        if(wIdx === 0) syncLine(lIdx, time);
+        generateLRC(); // Save partial state
+    }
+
+    // Hold Mode End: Just set end
+    function syncWordEnd(lIdx, wIdx, time) {
+        const line = state.lyrics[lIdx];
+        if(!line) return;
+        const word = line.words[wIdx];
+        word.end = time;
+        generateLRC();
+    }
+
+    function advanceWordCursor() {
+        const line = state.lyrics[state.currentIndex];
+        if(!line) return;
+        
+        if(state.currentWordIndex < line.words.length - 1) {
+            state.currentWordIndex++;
+        } else {
+            state.currentIndex++;
+            state.currentWordIndex = 0;
+        }
+    }
+
+    // --- Bulk Offset Logic ---
+    function openOffsetModal() { offsetModal.classList.add('active'); }
+    function closeOffsetModal() { 
+        offsetModal.classList.remove('active'); 
+        document.getElementById('off-min').value = 0;
+        document.getElementById('off-sec').value = 0;
+        document.getElementById('off-ms').value = 0;
+    }
+    function applyOffset() {
+        const mins = parseInt(document.getElementById('off-min').value) || 0;
+        const secs = parseInt(document.getElementById('off-sec').value) || 0;
+        const ms = parseInt(document.getElementById('off-ms').value) || 0;
+        const totalOffsetSeconds = (mins * 60) + secs + (ms / 1000);
+        if (totalOffsetSeconds === 0) return closeOffsetModal();
+
+        state.lyrics.forEach(line => {
+            if(line.time !== null) line.time = Math.max(0, line.time + totalOffsetSeconds);
+            if(line.words) {
+                line.words.forEach(w => {
+                    if(w.start !== null) w.start = Math.max(0, w.start + totalOffsetSeconds);
+                    if(w.end !== null) w.end = Math.max(0, w.end + totalOffsetSeconds);
+                });
+            }
+        });
+        renderEditor(); updateVisuals(); generateLRC(); closeOffsetModal();
+        alert(`Offset of ${totalOffsetSeconds}s applied.`);
+    }
+
+ // Update Sync Settings UI opener to handle the new button
+function openSyncSettings() { 
+    syncSettingsModal.classList.add('active');
+    
+    const holdBtn = document.getElementById('opt-hold');
+    const autoBtn = document.getElementById('opt-sync-auto');
+
+    // Check Line Mode restriction
+    if (state.mode === 'line') {
+        holdBtn.classList.add('disabled-mode');
+        autoBtn.classList.add('disabled-mode'); // Auto also disabled in Line mode
+        
+        // Reset to Tap if we were in a restricted mode
+        if (state.syncInputMode === 'hold' || state.syncInputMode === 'auto') {
+            setSyncInputMode('tap');
+        }
+    } else {
+        holdBtn.classList.remove('disabled-mode');
+        autoBtn.classList.remove('disabled-mode');
+    }
+}
+    
+    function closeSyncSettings() { syncSettingsModal.classList.remove('active'); }
+
+   // Update Sync Mode Setter
+function setSyncInputMode(mode) {
+    // Prevent setting restricted modes if line mode
+    if ((mode === 'hold' || mode === 'auto') && state.mode === 'line') return;
+
+    state.syncInputMode = mode;
+    
+    // Toggle active classes
+    document.getElementById('opt-tap').classList.toggle('active', mode === 'tap');
+    document.getElementById('opt-hold').classList.toggle('active', mode === 'hold');
+    document.getElementById('opt-sync-auto').classList.toggle('active', mode === 'auto');
+
+    // --- NEW: Force Auto Glow for Hold/Auto modes ---
+    if (mode === 'hold' || mode === 'auto') {
+        setGlowMode('auto');
+    }
+    
+    updateSyncUI();
+    // Update context UI immediately to reflect text position changes
+    updateWordContextUI(); 
+}
+    
+    // NEW: Update UI based on Sync Mode
+   function updateSyncUI() {
+    if (state.syncInputMode === 'tap') {
+        mainSyncBtnText.textContent = "TAP";
+        mobileModeIndicator.textContent = "Tap";
+    } else if (state.syncInputMode === 'hold') {
+        mainSyncBtnText.textContent = "HOLD";
+        mobileModeIndicator.textContent = "Hold";
+    } else {
+        // Auto Mode: Determine label based on the current word
+        updateAutoModeLabel();
+    }
+}
+
+    function setGlowMode(mode) {
+        state.glowMode = mode;
+        document.getElementById('opt-custom').classList.toggle('active', mode === 'custom');
+        document.getElementById('opt-auto').classList.toggle('active', mode === 'auto');
+        
+        // Hide/Show Speed options
+        const speedCont = document.getElementById('glow-speed-container');
+        if(mode === 'auto') speedCont.classList.add('disabled');
+        else speedCont.classList.remove('disabled');
+    }
+
+    // --- Scroll Logic ---
+    function scrollToActive() {
+        const el = document.getElementById(`line-${state.currentIndex}`);
+        if(el) {
+            // Check if Mobile
+            if(window.innerWidth <= 900) {
+                 const container = lyricsContainer;
+                 const elTop = el.offsetTop; 
+                 const targetPos = elTop - (container.clientHeight * 0.20);
+                 
+                 container.scrollTo({ top: targetPos, behavior: 'smooth' });
+            } else {
+                 // Desktop default center
+                 el.scrollIntoView({ behavior: 'auto', block: 'center' });
+            }
+        }
+    }
+
+   function updateVisuals() {
+        if(state.isEditMode) return;
+
+        document.querySelectorAll('.word-span.active-word').forEach(el => el.classList.remove('active-word'));
+        if (state.mode === 'word' && !state.isPreviewMode) {
+             state.lyrics.forEach((l, lI) => l.words.forEach((w, wI) => {
+                const span = document.getElementById(`word-${lI}-${wI}`);
+                if(span) {
+                    if(w.start !== null) span.classList.add('synced');
+                    else span.classList.remove('synced');
+                }
+            }));
+        }
+
+        // Highlight Active Line
+        document.querySelectorAll('.lyric-line').forEach((el, idx) => {
+            if(idx === state.currentIndex) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+
+        if (state.currentIndex >= state.lyrics.length) {
+            wordContextUI.classList.remove('visible');
+            return;
+        }
+
+        // Highlight Active Word
+        if (state.mode === 'word' && !state.isPreviewMode) {
+            const currentSpan = document.getElementById(`word-${state.currentIndex}-${state.currentWordIndex}`);
+            if(currentSpan) currentSpan.classList.add('active-word');
+            
+            updateWordContextUI();
+            
+            // --- NEW: Update the button label if in Auto Mode ---
+            if (state.syncInputMode === 'auto') {
+                updateAutoModeLabel();
+            }
+
+        } else {
+            wordContextUI.classList.remove('visible');
+        }
+    }
+
+function updateWordContextUI() {
+    if(state.mode !== 'word' || !state.lyrics.length || state.isEditMode || state.isPreviewMode) {
+        wordContextUI.classList.remove('visible');
+        return;
+    }
+    wordContextUI.classList.add('visible');
+    
+    const currentLine = state.lyrics[state.currentIndex];
+    const currentWord = currentLine ? currentLine.words[state.currentWordIndex] : null;
+    
+    // Determine UI Layout based on Mode
+    // Task 2: "This behavior applies whenever Hold mode is active"
+    if (state.syncInputMode === 'hold') {
+        
+        wordContextUI.classList.add('mode-hold');
+        
+        // LEFT SIDE: Current Word (Highlighted via CSS)
+        ctxPrev.textContent = currentWord ? currentWord.text : "End";
+        
+        // RIGHT SIDE: Next Word
+        let nextWordText = "End of Line";
+        
+        // Check next word in current line
+        if (state.currentWordIndex < currentLine.words.length - 1) {
+            nextWordText = currentLine.words[state.currentWordIndex + 1].text;
+        } 
+        // Or check first word of next line
+        else if (state.currentIndex < state.lyrics.length - 1) {
+            const nextLine = state.lyrics[state.currentIndex + 1];
+            if (nextLine.words.length > 0) {
+                nextWordText = nextLine.words[0].text;
+            }
+        } else {
+            nextWordText = "End of Song";
+        }
+        
+        ctxNext.textContent = nextWordText;
+
+    } else {
+        // STANDARD TAP / AUTO LAYOUT (Default behavior)
+        wordContextUI.classList.remove('mode-hold');
+
+        // LEFT SIDE: Previous Word
+        let prevWordText = "...";
+        if(state.currentWordIndex > 0) prevWordText = currentLine.words[state.currentWordIndex - 1].text;
+        else if(state.currentIndex > 0) {
+            const prevLine = state.lyrics[state.currentIndex - 1];
+            if(prevLine && prevLine.words.length > 0) prevWordText = prevLine.words[prevLine.words.length - 1].text;
+        }
+        ctxPrev.textContent = prevWordText;
+
+        // RIGHT SIDE: Current Word (Target)
+        ctxNext.textContent = currentWord ? currentWord.text : "End";
+    }
+}
+
+    // --- Helpers ---
+    function formatTimeDisplay(s) {
+        if(s < 0) s = 0;
+        const m = Math.floor(s / 60);
+        const sec = (s % 60).toFixed(2);
+        return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(5,'0')}`;
+    }
+    function formatTimeLRC(s) { return formatTimeDisplay(s); }
+
+    function generateLRC() {
+        let out = "";
+        state.lyrics.forEach(l => {
+            if(l.time === null) return;
+            out += `[${formatTimeLRC(l.time)}]${l.text}\n`;
+            if(l.words && l.words.some(w => w.start !== null)) {
+                // Generate word tags if word data exists
+                const tags = l.words.map(w => {
+                    const s = w.start ? w.start.toFixed(2) : "";
+                    const e = w.end ? w.end.toFixed(2) : "";
+                    return `${w.text}:${s}:${e}`;
+                }).join('|');
+                out += `<${tags}>\n`;
+            }
+        });
+        exportOutput.value = out;
+    }
+
+    function downloadLRC() {
+        generateLRC();
+        const blob = new Blob([exportOutput.value], {type:'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${currentFileName}.lrc`; 
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    // --- Keyboard Control ---
+    document.addEventListener('keydown', (e) => {
+        if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
+        
+        // SPACE: Toggle Play
+        if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
+        
+        // ENTER: Trigger Sync
+        if(e.code === 'Enter') { 
+            e.preventDefault(); 
+            // FIX: Block repeats for Enter key
+            if(e.repeat) return;
+            handleSyncDown(e);
+        }
+        
+        if(e.code === 'ArrowLeft') { e.preventDefault(); seekAudio(-5); }
+        if(e.code === 'ArrowRight') { e.preventDefault(); seekAudio(5); }
+    });
+
+    document.addEventListener('keyup', (e) => {
+         if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA') return;
+         if(e.code === 'Enter') {
+             e.preventDefault();
+             handleSyncUp(e);
+         }
+    });
+    
+    // Init
+    updateRangeFill(seekSlider);
+    updateSyncUI(); // Set initial labels
+</script>
+</body>
+</html>
