@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen</title>
+    <title>Voxen V6.4</title>
     <style>
         :root {
             /* Theme Colors */
@@ -51,19 +51,17 @@
         }
         
         #expand-modal-actions {
-  display: flex;
-  gap: 10px;
-  flex: 1;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: nowrap;
-}
+          display: flex;
+          gap: 10px;
+          flex: 1;
+          justify-content: flex-end;
+          align-items: center;
+          flex-wrap: nowrap;
+        }
 
-#expand-modal-actions .btn:not(.btn-note) {
-  flex: 1;
-}
-
-
+        #expand-modal-actions .btn:not(.btn-note) {
+          flex: 1;
+        }
 
         /* --- Main Container --- */
         .app-container {
@@ -164,26 +162,6 @@
             transition: var(--trans);
         }
 
-        /* --- Rounded Settings Slider --- */
-        #glow-speed-slider {
-            -webkit-appearance: none;
-            height: 14px;
-            background-color:rgba(15, 23, 42, 0.603);
-            border-radius: 50px; 
-            overflow: hidden;
-            cursor: pointer;
-        }
-        
-        #glow-speed-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 25px;
-            width: 14px;
-            border-radius: 0px;
-            background: #fff;
-            box-shadow: -400px 0 0 400px var(--primary);
-            cursor: pointer;
-        }
-
         /* Styled File Upload */
         .file-upload-wrapper { position: relative; width: 100%; height: 65px; margin-bottom: 10px; }
         .load-project-wrapper { position: relative; width: 100%; height: 45px; margin-bottom: 10px; }
@@ -231,11 +209,11 @@
         }
         
         .btn-note {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  flex-shrink: 0;
-}
+          width: 48px;
+          height: 48px;
+          padding: 0;
+          flex-shrink: 0;
+        }
 
         
         .btn-outline:hover {
@@ -309,7 +287,6 @@
             overflow-y: auto;
             padding: 80px 1rem 60vh 1rem; 
             scroll-behavior: smooth;
-            /* Performance: Create a new layer */
             transform: translateZ(0);
         }
 
@@ -318,9 +295,8 @@
             padding: 0.8rem; margin-bottom: 0.5rem; margin-left: 1.0rem;
             border-radius: 8px; border-left: 4px solid transparent;
             background: rgba(255,255,255,0.02);
-            transition: opacity 0.3s ease, transform 0.3s ease; /* Optimized transition */
+            transition: opacity 0.3s ease, transform 0.3s ease; 
             position: relative;
-            /* Performance */
             will-change: opacity, transform;
         }
 
@@ -334,8 +310,6 @@
         .app-container.is-preview .lyric-line {
             opacity: 0.2; 
             transform: scale(0.99);
-            /* Removed Blur for performance on Mobile */
-            /* filter: blur(0.5px); */ 
         }
         
         .app-container.is-preview .lyric-line.active {
@@ -403,11 +377,10 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-weight: bold;
         }
         
-        /* Karaoke Effect: WHITE GLOW (Requested Change) */
+        /* Karaoke Effect */
         .word-span.preview-glow {
             color: #ffffff !important;
             text-shadow: 0 0 12px rgba(82, 192, 255, 0.959), 0 0 25px rgba(255, 255, 255, 0.3);
-            /* transform: scale(1.15); */
             font-weight: bold;
         }
 
@@ -425,9 +398,15 @@
             box-shadow: 0 0px 0px rgba(0,0,0,0.6);
         }
         #word-context-ui.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* Tap Mode Colors (Default) */
         .ctx-prev { color: var(--secondary); font-size: 1.2rem; font-weight: 800; }
         .ctx-arrow { color: var(--text-muted); }
         .ctx-curr { color: var(--text-muted); font-weight: 800; font-size: 1.2rem; transform: scale(1.1); opacity: 0.6; }
+
+        /* Hold Mode Colors Override */
+        #word-context-ui.mode-hold .ctx-prev { color: var(--text-muted); }
+        #word-context-ui.mode-hold .ctx-curr { color: var(--secondary); transform: scale(1.2); opacity: 1; text-shadow: 0 0 10px rgba(102, 177, 238, 0.3); }
 
         /* --- Unified Control Dock --- */
         .control-dock {
@@ -516,8 +495,17 @@
             box-shadow: 0 0px 0px rgba(20, 184, 166, 0.3); transition: transform 0.1s;
         }
         .dock-sync-btn:active { transform: scale(0.95); }
+        .dock-sync-btn.holding { transform: scale(0.90); filter: brightness(0.8); }
         .dock-sync-btn span { font-size: 1.4rem; }
         .dock-sync-btn div { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .dock-settings-trigger {
+            background: rgba(255,255,255,0.05); color: var(--text-muted); border: none;
+            width: 44px; height: 54px; border-radius: 12px; margin-left: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: var(--trans);
+        }
+        .dock-settings-trigger:hover { background: rgba(255,255,255,0.1); color: white; }
 
         /* --- Modals --- */
         .modal-overlay {
@@ -534,12 +522,58 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .offset-modal { width: 340px; }
+        .sync-settings-modal { width: 340px; }
         .expanded-text-modal { width: 800px; max-width: 90%; height: 80vh; display:flex; flex-direction:column; }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
         
         .offset-grid { display: flex; gap: 8px; margin-bottom: 20px; }
         .offset-col { flex: 1; }
         .offset-col label { font-size: 0.7rem; text-align: center; display:block; }
+        
+        /* New Sync Settings UI */
+        .sync-option-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;
+        }
+        .sync-option-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-right: 10px; }
+        .sync-option-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        
+        .toggle-group {
+            display: flex; background: var(--bg-input); padding: 3px; border-radius: 6px;
+            flex-wrap: wrap; justify-content: flex-end; gap: 2px;
+        }
+        .toggle-opt {
+            padding: 6px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            border-radius: 4px; color: var(--text-muted); transition: var(--trans);
+            user-select: none; text-align: center;
+        }
+        .toggle-opt.active { background: var(--primary); color: white; }
+
+        #glow-trigger {
+            background: var(--bg-input);
+            border-width: 0px;
+        }
+
+        #glow-trigger:hover {
+            background: #68738f;
+        }
+        
+        /* Disabled button state */
+        .toggle-opt.disabled-mode {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        #custom-glow-input {
+            width: 50%; margin-top: 3px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px; font-size: 0.9rem; display: none; text-align: center;
+            margin-left: 20px;
+        }
+        #custom-glow-input.active { display: block; }
+        #glow-speed-container { transition: var(--trans); }
+        #glow-speed-container.disabled { opacity: 0.3; pointer-events: none; }
 
         .expanded-textarea {
             flex: 1; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
@@ -571,7 +605,6 @@
                 height: 60px; 
                 background: transparent; 
                 pointer-events: none; 
-                /*box-shadow: 0 0px 150px rgba(0, 0, 0, 0.233);*/
             }
 
             .top-left-controls { display: none; } 
@@ -581,6 +614,25 @@
                 pointer-events: auto;
                 margin-right: -20px;
                 z-index: 60;
+            }
+            
+            /* Enable Mobile Mode Indicator */
+            .mobile-header-left { 
+                display: flex !important; 
+                pointer-events: none;
+                z-index: 60;
+                position: absolute; left: 0; top: 0; padding: 10px;
+            }
+
+            .mode-indicator {
+                font-weight: 500;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                opacity: 0.5;
+                border-radius: 50px;
+                background: #1f294100;
+                padding: 0px 20px; font-size: 0.8rem; cursor: pointer; 
+                display: flex; align-items: center; height: 40px;
             }
 
             .time-display {
@@ -621,8 +673,10 @@
                 margin-bottom: 0px; margin-left: 0; border: 0px; padding: 30px 30px;
                  font-size: 1.5rem; cursor: pointer;
                 transition: var(--trans); display: flex; align-items: center; gap: 0px; height: 40px;
-                border-radius: 10px 50px 50px 10px;
+                border-radius: 10px;
             }
+            
+            .sync-btn.holding { transform: scale(0.95); background: var(--primary-light); }
 
             .header-btn {
                 background: #1f2941; border: 0px; color: var(--text-muted); margin-bottom: 0px;
@@ -653,9 +707,10 @@
             }
 
 
-            .mobile-header-right .header-btn { border-radius: 50px; margin:8px; padding: 0px 13px;}
+            .mobile-header-right .header-btn { border-radius: 50px; margin: 8px 8px 8px 0; padding: 0px 13px;}
 
-            .dock-sync-btn { display: none; }         
+            .dock-sync-btn { display: none; }    
+            .dock-settings-trigger { display: none; }     
              
             .control-dock {
                 position: fixed; left: 0px; right: 0; transform: none; max-width: 100vw;
@@ -718,8 +773,17 @@
                 margin-left: 0.5rem;
             }
 
+            #sync-mode-btn {
+                margin-right: 2px;
+                border-radius: 50px 15px 15px 50px;
+            }
+
+            #fullscreenBtn {
+                border-radius: 15px 50px 50px 15px;
+            }
+
             #main-sync-btn-mobile {
-                margin-right: 0.5rem;
+                border-radius: 8px 50px 50px 8px;
             }
 
             ::-webkit-scrollbar-thumb { 
@@ -775,14 +839,6 @@
                         <label for="mode-word">Word</label>
                     </div>
                 </div>
-
-                <div class="input-group">
-                    <div class="label-row2"><label>Glow Speed (Fade In)</label></div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                            <input type="range" id="glow-speed-slider" min="0" max="0.5" step="0.05" value="0.1" style="flex:1" oninput="updateGlowSpeed(this)">
-                        <span id="glow-speed-val" style="font-family:monospace; color:var(--text-muted); font-size:0.8rem;">0.1s</span>
-                    </div>
-                </div>
                 
                 <button class="btn" onclick="initializeEditor()">▶ Create New Editor</button>
 
@@ -812,6 +868,7 @@
     <div class="editor-area">
         <div class="top-info-bar">
             <div class="mobile-header-left">
+                <div id="mobile-mode-indicator" class="mode-indicator">Tap</div>
             </div>
 
             <div class="top-left-controls">
@@ -834,6 +891,7 @@
             
             <div id="time-display" class="time-display">00:00.00</div>
             <div class="mobile-header-right">
+                <button id="sync-mode-btn" class="header-btn" onclick="openSyncSettings()">⚙</button>
                 <button class="header-btn fullscreen-btn" id="fullscreenBtn">⛶</button>
             </div>
         </div>
@@ -890,9 +948,12 @@
                     </div>
                 </div>
 
-                <button class="dock-sync-btn" id="main-sync-btn" onclick="triggerSync()">
+                <button class="dock-sync-btn" id="main-sync-btn">
                     <span>⏱︎</span>
-                    <div>Sync</div>
+                    <div id="main-sync-btn-text">TAP</div>
+                </button>
+                <button class="dock-settings-trigger" onclick="openSyncSettings()">
+                    <span>⚙</span>
                 </button>
             </div>
 
@@ -903,9 +964,60 @@
                 <button id="mobile-preview-btn" class="header-btn" onclick="togglePreviewMode()">
                     ▷
                 </button>
-                <button class="sync-btn" id="main-sync-btn-mobile" onclick="triggerSync()"><div>+</div></button>
+                <button class="sync-btn" id="main-sync-btn-mobile"><div>+</div></button>
               </div>
         </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="sync-settings-modal">
+    <div class="base-modal sync-settings-modal">
+        <div class="modal-title">Sync Logic</div>
+        
+        <div class="sync-option-row">
+            <div>
+                <div class="sync-option-label">Sync Mode</div>
+                <div class="sync-option-sub">Input Behavior</div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-opt active" id="opt-tap" onclick="setSyncInputMode('tap')">Tap</div>
+                <div class="toggle-opt" id="opt-hold" onclick="setSyncInputMode('hold')">Hold</div>
+            </div>
+        </div>
+
+        <div class="sync-option-row">
+            <div>
+                <div class="sync-option-label">Preview Glow</div>
+                <div class="sync-option-sub">Fade In Mode</div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-opt active" id="opt-custom" onclick="setGlowMode('custom')">Custom</div>
+                <div class="toggle-opt" id="opt-auto" onclick="setGlowMode('auto')">Auto</div>
+            </div>
+        </div>
+
+        <div class="sync-option-row" id="glow-speed-container">
+            <div>
+                <div class="sync-option-label">Glow Speed</div>
+                <div class="sync-option-sub">Duration</div>
+            </div>
+            <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                     <input type="number" id="custom-glow-input" placeholder="0.1" step="0.1" onchange="setGlowSpeed(this.value, true)">
+                <div class="popup-wrapper" style="width: 100%; display: flex; justify-content: flex-end;">
+                     <div class="toggle-group">
+                          <button class="toggle-opt active" id="glow-trigger" onclick="toggleGlowMenu()">0.1s ▼</button>
+                     </div>
+                    <div class="dock-popup" id="glow-popup" style="bottom: auto; top: 100%; left: auto; right: 0; transform: none; width: 120px; z-index: 200;">
+                        <button class="speed-option" onclick="setGlowSpeed(0.1)">0.1s</button>
+                        <button class="speed-option" onclick="setGlowSpeed(0.25)">0.25s</button>
+                        <button class="speed-option" onclick="setGlowSpeed(0.5)">0.5s</button>
+                        <button class="speed-option" onclick="toggleCustomGlowInput()">Custom</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="closeSyncSettings()">Close</button>
     </div>
 </div>
 
@@ -948,7 +1060,9 @@
         isPlaying: false,
         isEditMode: false,
         isPreviewMode: false,
-        currentSpeed: 1.0
+        currentSpeed: 1.0,
+        syncInputMode: 'tap', // 'tap' or 'hold'
+        glowMode: 'custom'    // 'custom' or 'auto'
     };
 
     let currentFileName = "lyrics"; 
@@ -971,6 +1085,8 @@
     const speedPopup = document.getElementById('speed-popup');
     const volumePopup = document.getElementById('volume-popup');
     const volumeSlider = document.getElementById('volume-slider');
+    const glowPopup = document.getElementById('glow-popup');
+    const glowTrigger = document.getElementById('glow-trigger');
     
     // Modals
     const offsetModal = document.getElementById('offset-modal');
@@ -978,6 +1094,7 @@
     const expandTextarea = document.getElementById('expand-textarea');
     const expandTitle = document.getElementById('expand-modal-title');
     const expandActions = document.getElementById('expand-modal-actions');
+    const syncSettingsModal = document.getElementById('sync-settings-modal');
 
     const wordContextUI = document.getElementById('word-context-ui');
     const ctxPrev = document.getElementById('ctx-prev-word');
@@ -991,6 +1108,10 @@
     const seekSlider = document.getElementById('seek-slider');
     const currTimeLbl = document.getElementById('curr-time-lbl');
     const durTimeLbl = document.getElementById('dur-time-lbl');
+    
+    // Indicators
+    const mainSyncBtnText = document.getElementById('main-sync-btn-text');
+    const mobileModeIndicator = document.getElementById('mobile-mode-indicator');
 
      const btn = document.getElementById("fullscreenBtn");
 
@@ -1047,7 +1168,7 @@
             wordContextUI.classList.remove('visible'); 
             cleanupGlowEffects();
             
-            // --- START 60FPS LOOP ---
+            // --- START LOOP ---
             requestAnimationFrame(animatePreviewFrame);
             
         } else {
@@ -1059,15 +1180,41 @@
         }
     }
     
-    // --- GLOW SPEED LOGIC ---
-function updateGlowSpeed(el) {
-    const val = el.value;
-    document.documentElement.style.setProperty('--glow-speed', val + 's');
-    document.getElementById('glow-speed-val').textContent = val + "s";
-}
+    // --- GLOW SPEED LOGIC (UPDATED) ---
+    function toggleGlowMenu() {
+        glowPopup.classList.toggle('active');
+    }
+
+    function setGlowSpeed(val, isCustomInput = false) {
+        val = parseFloat(val);
+        if(isNaN(val)) return;
+
+        document.documentElement.style.setProperty('--glow-speed', val + 's');
+        
+        if (isCustomInput) {
+             glowTrigger.textContent = "Custom ▼";
+        } else {
+            glowTrigger.textContent = val + "s ▼";
+            // Hide custom input if preset selected
+            document.getElementById('custom-glow-input').classList.remove('active');
+        }
+        
+        glowPopup.classList.remove('active');
+    }
+
+    function toggleCustomGlowInput() {
+        glowTrigger.textContent = "Custom ▼";
+        const input = document.getElementById('custom-glow-input');
+        input.classList.add('active');
+        input.focus();
+        glowPopup.classList.remove('active');
+    }
  
     function cleanupGlowEffects() {
-        document.querySelectorAll('.word-span').forEach(el => el.classList.remove('preview-glow'));
+        document.querySelectorAll('.word-span').forEach(el => {
+            el.classList.remove('preview-glow');
+            el.style.transition = ""; // reset inline styles
+        });
     }
 
     // --- Popups (Speed & Volume) ---
@@ -1102,6 +1249,7 @@ function updateGlowSpeed(el) {
         if (!e.target.closest('.popup-wrapper')) {
             speedPopup.classList.remove('active');
             volumePopup.classList.remove('active');
+            glowPopup.classList.remove('active');
         }
     });
 
@@ -1143,27 +1291,19 @@ function updateGlowSpeed(el) {
         }
     });
 
-    // --- NEW PREVIEW ANIMATION LOOP ---
+    // --- PREVIEW ANIMATION LOOP (UPDATED FOR AUTO DURATION) ---
     function animatePreviewFrame() {
-        // If we stop preview mode, stop the loop.
         if (!state.isPreviewMode) return;
         
-        // Safety check if lyrics exist
         if(state.lyrics.length > 0) {
             const curTime = audioPlayer.currentTime;
-            
-            // 1. Find the active line (Start search from current index to be faster)
             let activeIdx = -1;
             
-            // Check if current is still valid to avoid loop if possible
             const currentLineObj = state.lyrics[state.currentIndex];
             const nextLineObj = state.lyrics[state.currentIndex + 1];
 
-            // Heuristic: If we are within current line's window, keep it. 
-            // Otherwise search.
             let needsSearch = true;
             if (currentLineObj && currentLineObj.time !== null && curTime >= currentLineObj.time) {
-                // If next line exists and we passed it, we need to search forward
                 if (nextLineObj && nextLineObj.time !== null && curTime >= nextLineObj.time) {
                     needsSearch = true;
                 } else {
@@ -1183,7 +1323,6 @@ function updateGlowSpeed(el) {
             }
 
             if(activeIdx !== -1) {
-                // Only update Line Visuals if changed
                 if (activeIdx !== state.currentIndex) {
                     // Cleanup old glow
                     const oldLineEl = document.getElementById(`line-${state.currentIndex}`);
@@ -1198,8 +1337,6 @@ function updateGlowSpeed(el) {
                     scrollToActive();
                 }
 
-                // Karaoke Effect: Glow Persistence
-                // Only process words in the active line
                 const currentLine = state.lyrics[activeIdx];
                 if (currentLine && currentLine.words && currentLine.words.length > 0) {
                     for (let w = 0; w < currentLine.words.length; w++) {
@@ -1210,19 +1347,31 @@ function updateGlowSpeed(el) {
                         const wordSpan = document.getElementById(`word-${activeIdx}-${w}`);
                         
                         if (wordSpan) {
-                            // High performance class switching
                             if (shouldGlow) {
-                                if(!wordSpan.classList.contains('preview-glow')) wordSpan.classList.add('preview-glow');
+                                if(!wordSpan.classList.contains('preview-glow')) {
+                                    // --- NEW: AUTO GLOW LOGIC ---
+                                    if(state.glowMode === 'auto' && word.end !== null) {
+                                        const dur = Math.max(0.1, word.end - word.start);
+                                        // Dynamic transition based on duration
+                                        wordSpan.style.transition = `color ${dur}s linear, text-shadow ${dur}s linear, transform 0.2s ease`;
+                                    } else {
+                                        // Reset to CSS default (handled by class removal mostly, but ensure clean slate)
+                                        wordSpan.style.transition = ""; 
+                                    }
+                                    
+                                    wordSpan.classList.add('preview-glow');
+                                }
                             } else {
-                                if(wordSpan.classList.contains('preview-glow')) wordSpan.classList.remove('preview-glow');
+                                if(wordSpan.classList.contains('preview-glow')) {
+                                    wordSpan.classList.remove('preview-glow');
+                                    wordSpan.style.transition = ""; 
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
-        // Loop
         requestAnimationFrame(animatePreviewFrame);
     }
 
@@ -1603,28 +1752,78 @@ function updateGlowSpeed(el) {
         renderEditor();
     }
 
-    // --- Sync Logic ---
-   function triggerSync() {
-        if (state.currentIndex >= state.lyrics.length) return;
+    // --- SYNC LOGIC (TAP & HOLD) ---
+    // Attaching Listeners
+    const syncBtnDesktop = document.getElementById('main-sync-btn');
+    const syncBtnMobile = document.getElementById('main-sync-btn-mobile');
+
+    [syncBtnDesktop, syncBtnMobile].forEach(btn => {
+        if(!btn) return;
+        btn.addEventListener('mousedown', (e) => handleSyncDown(e));
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleSyncDown(e); });
         
+        btn.addEventListener('mouseup', (e) => handleSyncUp(e));
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); handleSyncUp(e); });
+        btn.addEventListener('mouseleave', (e) => handleSyncUp(e)); // Safety
+    });
+
+    let holdActive = false;
+
+    function handleSyncDown(e) {
+        if (state.currentIndex >= state.lyrics.length) return;
         if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
         
+        // BUG FIX: Prevent spamming if already holding
+        if (holdActive) return;
+
+        // Visuals
+        const btns = [syncBtnDesktop, syncBtnMobile];
+        btns.forEach(b => b.classList.add('holding'));
+
         const offset = parseInt(offsetInput.value) || 0;
         const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
-        
-        const btns = [document.getElementById('main-sync-btn'), document.getElementById('main-sync-btn-mobile')];
-        btns.forEach(btn => {
-             if(btn) { btn.style.transform = 'scale(0.9)'; setTimeout(() => btn.style.transform = 'scale(1)', 100); }
-        });
 
         if (state.mode === 'line') {
+            // Line mode is always Tap behavior essentially
             syncLine(state.currentIndex, time);
             state.currentIndex++;
+            scrollToActive();
+            updateVisuals();
         } else {
-            syncWord(state.currentIndex, state.currentWordIndex, time);
+            // WORD MODE
+            if (state.syncInputMode === 'tap') {
+                // Classic Tap: Start current, End previous, Auto-advance
+                syncWordTap(state.currentIndex, state.currentWordIndex, time);
+                scrollToActive();
+                updateVisuals();
+            } else {
+                // Hold Mode: Start current ONLY
+                holdActive = true;
+                syncWordStart(state.currentIndex, state.currentWordIndex, time);
+                scrollToActive();
+                updateVisuals();
+            }
         }
-        scrollToActive();
-        updateVisuals();
+    }
+
+    function handleSyncUp(e) {
+        // Visuals
+        const btns = [syncBtnDesktop, syncBtnMobile];
+        btns.forEach(b => b.classList.remove('holding'));
+
+        if (!holdActive) return; // Only process if we were holding
+        holdActive = false;
+
+        const offset = parseInt(offsetInput.value) || 0;
+        const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+
+        if (state.mode === 'word' && state.syncInputMode === 'hold') {
+             syncWordEnd(state.currentIndex, state.currentWordIndex, time);
+             // Advance logic is now here for Hold Mode
+             advanceWordCursor();
+             scrollToActive();
+             updateVisuals();
+        }
     }
 
     function syncLine(idx, time) {
@@ -1635,38 +1834,60 @@ function updateGlowSpeed(el) {
         generateLRC();
     }
 
-  function syncWord(lIdx, wIdx, time) {
+    // Classic Tap: Sets start, auto sets prev end, advances
+    function syncWordTap(lIdx, wIdx, time) {
         const line = state.lyrics[lIdx];
         if(!line) return;
         const word = line.words[wIdx];
-        word.start = time;
         
-        // --- Handle End Timestamp ---
+        word.start = time;
+
+        // Auto-close previous word
         if(wIdx > 0) line.words[wIdx-1].end = time;
         else if (lIdx > 0) {
             const prev = state.lyrics[lIdx-1];
             if(prev.words.length) prev.words[prev.words.length-1].end = time;
         }
 
-        const isLastLine = lIdx === state.lyrics.length - 1;
-        const isLastWord = wIdx === line.words.length - 1;
-        
-        if (isLastLine && isLastWord) {
-             if(audioPlayer.duration) {
-                 word.end = audioPlayer.duration;
-             }
+        // Auto-close last word if at end
+        if (lIdx === state.lyrics.length - 1 && wIdx === line.words.length - 1) {
+             if(audioPlayer.duration) word.end = audioPlayer.duration;
         }
-        // ------------------------------------------
 
         if(wIdx === 0) syncLine(lIdx, time);
+        advanceWordCursor();
+        generateLRC();
+    }
 
-        if(wIdx < line.words.length - 1) {
+    // Hold Mode Start: Just set start
+    function syncWordStart(lIdx, wIdx, time) {
+        const line = state.lyrics[lIdx];
+        if(!line) return;
+        const word = line.words[wIdx];
+        word.start = time;
+        if(wIdx === 0) syncLine(lIdx, time);
+        generateLRC(); // Save partial state
+    }
+
+    // Hold Mode End: Just set end
+    function syncWordEnd(lIdx, wIdx, time) {
+        const line = state.lyrics[lIdx];
+        if(!line) return;
+        const word = line.words[wIdx];
+        word.end = time;
+        generateLRC();
+    }
+
+    function advanceWordCursor() {
+        const line = state.lyrics[state.currentIndex];
+        if(!line) return;
+        
+        if(state.currentWordIndex < line.words.length - 1) {
             state.currentWordIndex++;
         } else {
             state.currentIndex++;
             state.currentWordIndex = 0;
         }
-        generateLRC();
     }
 
     // --- Bulk Offset Logic ---
@@ -1695,6 +1916,55 @@ function updateGlowSpeed(el) {
         });
         renderEditor(); updateVisuals(); generateLRC(); closeOffsetModal();
         alert(`Offset of ${totalOffsetSeconds}s applied.`);
+    }
+
+    // --- NEW: Sync Settings Modal Functions ---
+    function openSyncSettings() { 
+        syncSettingsModal.classList.add('active');
+        
+        // NEW: Check Line Mode restriction
+        const holdBtn = document.getElementById('opt-hold');
+        if (state.mode === 'line') {
+            holdBtn.classList.add('disabled-mode');
+            if (state.syncInputMode === 'hold') setSyncInputMode('tap');
+        } else {
+            holdBtn.classList.remove('disabled-mode');
+        }
+    }
+    
+    function closeSyncSettings() { syncSettingsModal.classList.remove('active'); }
+
+    function setSyncInputMode(mode) {
+        // Prevent setting hold if line mode
+        if (mode === 'hold' && state.mode === 'line') return;
+
+        state.syncInputMode = mode;
+        document.getElementById('opt-tap').classList.toggle('active', mode === 'tap');
+        document.getElementById('opt-hold').classList.toggle('active', mode === 'hold');
+        updateSyncUI();
+    }
+    
+    // NEW: Update UI based on Sync Mode
+    function updateSyncUI() {
+        // Desktop Button Text
+        if (state.syncInputMode === 'tap') {
+            mainSyncBtnText.textContent = "TAP";
+            mobileModeIndicator.textContent = "Tap";
+        } else {
+            mainSyncBtnText.textContent = "HOLD";
+            mobileModeIndicator.textContent = "Hold";
+        }
+    }
+
+    function setGlowMode(mode) {
+        state.glowMode = mode;
+        document.getElementById('opt-custom').classList.toggle('active', mode === 'custom');
+        document.getElementById('opt-auto').classList.toggle('active', mode === 'auto');
+        
+        // Hide/Show Speed options
+        const speedCont = document.getElementById('glow-speed-container');
+        if(mode === 'auto') speedCont.classList.add('disabled');
+        else speedCont.classList.remove('disabled');
     }
 
     // --- Scroll Logic
@@ -1729,19 +1999,18 @@ function updateGlowSpeed(el) {
             }));
         }
 
-        // 3. Highlight Active Line
+        // Highlight Active Line
         document.querySelectorAll('.lyric-line').forEach((el, idx) => {
             if(idx === state.currentIndex) el.classList.add('active');
             else el.classList.remove('active');
         });
 
-        // 4. DONE CHECK
         if (state.currentIndex >= state.lyrics.length) {
             wordContextUI.classList.remove('visible');
             return;
         }
 
-        // 5. Highlight Active Word (Purple)
+        // Highlight Active Word
         if (state.mode === 'word' && !state.isPreviewMode) {
             const currentSpan = document.getElementById(`word-${state.currentIndex}-${state.currentWordIndex}`);
             if(currentSpan) currentSpan.classList.add('active-word');
@@ -1758,6 +2027,14 @@ function updateGlowSpeed(el) {
             return;
         }
         wordContextUI.classList.add('visible');
+        
+        // Toggle Hold Color Logic
+        if(state.syncInputMode === 'hold') {
+            wordContextUI.classList.add('mode-hold');
+        } else {
+            wordContextUI.classList.remove('mode-hold');
+        }
+
         const currentLine = state.lyrics[state.currentIndex];
         const currentWord = currentLine ? currentLine.words[state.currentWordIndex] : null;
         let prevWordText = "...";
@@ -1809,12 +2086,33 @@ function updateGlowSpeed(el) {
     // --- Keyboard Control ---
     document.addEventListener('keydown', (e) => {
         if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
+        
+        // SPACE: Toggle Play
         if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
-        if(e.code === 'Enter') { e.preventDefault(); triggerSync(); }
+        
+        // ENTER: Trigger Sync
+        if(e.code === 'Enter') { 
+            e.preventDefault(); 
+            // FIX: Block repeats for Enter key
+            if(e.repeat) return;
+            handleSyncDown(e);
+        }
+        
         if(e.code === 'ArrowLeft') { e.preventDefault(); seekAudio(-5); }
         if(e.code === 'ArrowRight') { e.preventDefault(); seekAudio(5); }
     });
+
+    document.addEventListener('keyup', (e) => {
+         if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA') return;
+         if(e.code === 'Enter') {
+             e.preventDefault();
+             handleSyncUp(e);
+         }
+    });
+    
+    // Init
     updateRangeFill(seekSlider);
+    updateSyncUI(); // Set initial labels
 </script>
 </body>
 </html>
