@@ -10,7 +10,7 @@ Just drop in your **MP3**, paste your lyrics, and start syncing. Simple as that.
 
 If you don’t want to download the HTML file, you can use the web version instead:
 
-🔗 **[Voxen Sync Online](https://raqhael-ux.github.io/Voxen-Advanced-LRC-Editor-Word-by-word-/)**
+🔗 **[Voxen Sync Online](https://raqhael-ux.github.io/Voxen-LRC-Editor/)**
 
 > 📱 **Mobile note:** On Chrome mobile, the header UI may get cut off during editing. For a smoother experience, consider using a web-wrapper app like **Weblo**.
 
