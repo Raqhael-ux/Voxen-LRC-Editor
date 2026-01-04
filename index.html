@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen V6.4</title>
+    <title>Voxen</title>
     <style>
         :root {
             /* Theme Colors */
@@ -405,9 +405,21 @@
         .ctx-curr { color: var(--text-muted); font-weight: 800; font-size: 1.2rem; transform: scale(1.1); opacity: 0.6; }
 
         /* Hold Mode Colors Override */
-        #word-context-ui.mode-hold .ctx-prev { color: var(--text-muted); }
-        #word-context-ui.mode-hold .ctx-curr { color: var(--secondary); transform: scale(1.2); opacity: 1; text-shadow: 0 0 10px rgba(102, 177, 238, 0.3); }
-
+    #word-context-ui.mode-hold .ctx-prev {
+        color: var(--secondary);
+        transform: scale(1.2);
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(102, 177, 238, 0.3);
+    }
+    
+    #word-context-ui.mode-hold .ctx-curr {
+        /* This is now the "Next" word */
+        color: var(--text-muted);
+        transform: scale(1.0);
+        opacity: 0.6;
+        text-shadow: none;
+        font-weight: 600;
+    }
         /* --- Unified Control Dock --- */
         .control-dock {
             position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -417,9 +429,16 @@
             padding:20px 20px;
             display: flex; flex-direction: column; gap: 12px;
             box-shadow: 0 0px 24px rgba(0, 0, 0, 0.233); z-index: 200;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease-out;
         }
 
+        .control-dock.active-hold-glow {
+        box-shadow: 0 0 15px rgba(103, 107, 214, 0.6), inset 0 0 20px rgba(103, 107, 214, 0.2) !important;
+        border-color: rgba(129, 140, 248, 0.5);
+    }
+
         /* Dock Row 1: Slider */
+     
         .dock-row-slider2 { display: flex; align-items: center; gap: 50px; width: 100%; }
         .seek-time { font-family: monospace; font-size: 0.75rem; color: var(--text-muted); min-width: 40px; text-align: center; }
         #dur-time-lbl { margin-left:auto; }
@@ -979,10 +998,11 @@
                 <div class="sync-option-label">Sync Mode</div>
                 <div class="sync-option-sub">Input Behavior</div>
             </div>
-            <div class="toggle-group">
-                <div class="toggle-opt active" id="opt-tap" onclick="setSyncInputMode('tap')">Tap</div>
-                <div class="toggle-opt" id="opt-hold" onclick="setSyncInputMode('hold')">Hold</div>
-            </div>
+           <div class="toggle-group">
+        <div class="toggle-opt active" id="opt-tap" onclick="setSyncInputMode('tap')">Tap</div>
+        <div class="toggle-opt" id="opt-hold" onclick="setSyncInputMode('hold')">Hold</div>
+        <div class="toggle-opt" id="opt-sync-auto" onclick="setSyncInputMode('auto')">Hybrid</div>
+    </div>
         </div>
 
         <div class="sync-option-row">
@@ -1052,18 +1072,18 @@
 
 <script>
     // --- State ---
-    let state = {
-        lyrics: [],
-        mode: 'line',
-        currentIndex: 0,
-        currentWordIndex: 0,
-        isPlaying: false,
-        isEditMode: false,
-        isPreviewMode: false,
-        currentSpeed: 1.0,
-        syncInputMode: 'tap', // 'tap' or 'hold'
-        glowMode: 'custom'    // 'custom' or 'auto'
-    };
+let state = {
+    lyrics: [],
+    mode: 'line',
+    currentIndex: 0,
+    currentWordIndex: 0,
+    isPlaying: false,
+    isEditMode: false,
+    isPreviewMode: false,
+    currentSpeed: 1.0,
+    syncInputMode: 'tap', // 'tap', 'hold', or 'auto'
+    glowMode: 'custom'
+};
 
     let currentFileName = "lyrics"; 
     let isDraggingSlider = false;
@@ -1112,8 +1132,8 @@
     // Indicators
     const mainSyncBtnText = document.getElementById('main-sync-btn-text');
     const mobileModeIndicator = document.getElementById('mobile-mode-indicator');
-
-     const btn = document.getElementById("fullscreenBtn");
+    const controlDock = document.querySelector('.control-dock');
+    const btn = document.getElementById("fullscreenBtn");
 
 
      // Fullscreen
@@ -1767,65 +1787,113 @@
         btn.addEventListener('mouseleave', (e) => handleSyncUp(e)); // Safety
     });
 
+    function updateAutoModeLabel() {
+    // Only run this logic if we are actually in Auto mode
+    if (state.syncInputMode !== 'auto') return;
+    
+    // Safety check
+    if (!state.lyrics[state.currentIndex]) return;
+
+    const currentLine = state.lyrics[state.currentIndex];
+    
+    // Logic: If it's the last word of the line, Auto mode behaves like HOLD.
+    // Otherwise, it behaves like TAP.
+    const isLastWord = state.currentWordIndex === currentLine.words.length - 1;
+
+    if (isLastWord) {
+        mainSyncBtnText.textContent = "HOLD";
+        mobileModeIndicator.textContent = "Hold";
+    } else {
+        mainSyncBtnText.textContent = "TAP";
+        mobileModeIndicator.textContent = "Tap";
+    }
+}
+
     let holdActive = false;
 
-    function handleSyncDown(e) {
-        if (state.currentIndex >= state.lyrics.length) return;
-        if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
+   function handleSyncDown(e) {
+    if (state.currentIndex >= state.lyrics.length) return;
+    if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
+    
+    if (holdActive) return;
+
+    // Visuals: Button press
+    const btns = [syncBtnDesktop, syncBtnMobile];
+    btns.forEach(b => b.classList.add('holding'));
+
+    const offset = parseInt(offsetInput.value) || 0;
+    const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+
+    if (state.mode === 'line') {
+        syncLine(state.currentIndex, time);
+        state.currentIndex++;
+        scrollToActive();
+        updateVisuals();
+    } else {
+        // --- WORD MODE LOGIC ---
         
-        // BUG FIX: Prevent spamming if already holding
-        if (holdActive) return;
-
-        // Visuals
-        const btns = [syncBtnDesktop, syncBtnMobile];
-        btns.forEach(b => b.classList.add('holding'));
-
-        const offset = parseInt(offsetInput.value) || 0;
-        const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
-
-        if (state.mode === 'line') {
-            // Line mode is always Tap behavior essentially
-            syncLine(state.currentIndex, time);
-            state.currentIndex++;
+        if (state.syncInputMode === 'tap') {
+            // Standard Tap
+            syncWordTap(state.currentIndex, state.currentWordIndex, time);
             scrollToActive();
             updateVisuals();
-        } else {
-            // WORD MODE
-            if (state.syncInputMode === 'tap') {
-                // Classic Tap: Start current, End previous, Auto-advance
-                syncWordTap(state.currentIndex, state.currentWordIndex, time);
-                scrollToActive();
-                updateVisuals();
+
+        } else if (state.syncInputMode === 'hold') {
+            // Standard Hold
+            startHoldAction(time);
+
+        } else if (state.syncInputMode === 'auto') {
+            // --- Task 1: Auto Mode Logic ---
+            const currentLine = state.lyrics[state.currentIndex];
+            const isLastWord = state.currentWordIndex === currentLine.words.length - 1;
+
+            if (isLastWord) {
+                // Last word -> Behaves like Hold
+                startHoldAction(time);
             } else {
-                // Hold Mode: Start current ONLY
-                holdActive = true;
-                syncWordStart(state.currentIndex, state.currentWordIndex, time);
+                // Not last word -> Behaves like Tap
+                syncWordTap(state.currentIndex, state.currentWordIndex, time);
                 scrollToActive();
                 updateVisuals();
             }
         }
     }
+}
 
-    function handleSyncUp(e) {
-        // Visuals
-        const btns = [syncBtnDesktop, syncBtnMobile];
-        btns.forEach(b => b.classList.remove('holding'));
+// Helper to centralize Hold starting logic (used by Hold and Auto)
+function startHoldAction(time) {
+    holdActive = true;
+    
+    // Task 3: Activate Dock Glow
+    controlDock.classList.add('active-hold-glow');
+    
+    syncWordStart(state.currentIndex, state.currentWordIndex, time);
+    scrollToActive();
+    updateVisuals();
+}
 
-        if (!holdActive) return; // Only process if we were holding
-        holdActive = false;
+ function handleSyncUp(e) {
+    // Visuals: Button release
+    const btns = [syncBtnDesktop, syncBtnMobile];
+    btns.forEach(b => b.classList.remove('holding'));
 
-        const offset = parseInt(offsetInput.value) || 0;
-        const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+    if (!holdActive) return; 
+    holdActive = false;
+    
+    // Task 3: Deactivate Dock Glow
+    controlDock.classList.remove('active-hold-glow');
 
-        if (state.mode === 'word' && state.syncInputMode === 'hold') {
-             syncWordEnd(state.currentIndex, state.currentWordIndex, time);
-             // Advance logic is now here for Hold Mode
-             advanceWordCursor();
-             scrollToActive();
-             updateVisuals();
-        }
+    const offset = parseInt(offsetInput.value) || 0;
+    const time = Math.max(0, audioPlayer.currentTime + (offset / 1000));
+
+    // Logic for ending a Hold action (Applies to Hold mode AND Auto mode's last word)
+    if (state.mode === 'word') {
+         syncWordEnd(state.currentIndex, state.currentWordIndex, time);
+         advanceWordCursor();
+         scrollToActive();
+         updateVisuals();
     }
-
+}
     function syncLine(idx, time) {
         if(!state.lyrics[idx]) return;
         state.lyrics[idx].time = time;
@@ -1833,8 +1901,7 @@
         if(el) el.querySelector('.timestamp-input').value = formatTimeLRC(time);
         generateLRC();
     }
-
-    // Classic Tap: Sets start, auto sets prev end, advances
+// Classic Tap: Sets start, auto sets prev end, advances
     function syncWordTap(lIdx, wIdx, time) {
         const line = state.lyrics[lIdx];
         if(!line) return;
@@ -1842,15 +1909,32 @@
         
         word.start = time;
 
-        // Auto-close previous word
-        if(wIdx > 0) line.words[wIdx-1].end = time;
+        // --- PREVIOUS WORD LOGIC ---
+        if(wIdx > 0) {
+            // Case A: Previous word is in the SAME line.
+            // In Auto/Tap modes, mid-line words always chain together.
+            line.words[wIdx-1].end = time;
+        }
         else if (lIdx > 0) {
+            // Case B: Previous word is the LAST word of the PREVIOUS line.
             const prev = state.lyrics[lIdx-1];
-            if(prev.words.length) prev.words[prev.words.length-1].end = time;
+            if(prev.words.length) {
+                const prevWord = prev.words[prev.words.length-1];
+
+                // BUG FIX:
+                // In 'auto' mode, this previous word was a "Hold". 
+                // If it already has an end time (from releasing the button), DO NOT overwrite it.
+                if (state.syncInputMode === 'auto') {
+                    if (prevWord.end === null) prevWord.end = time;
+                } else {
+                    // In strict 'tap' mode, we always overwrite to close the gap.
+                    prevWord.end = time;
+                }
+            }
         }
 
-        // Auto-close last word if at end
-        if (lIdx === state.lyrics.length - 1 && wIdx === line.words.length - 1) {
+        // Auto-close very last word of song if in Tap mode
+        if (state.syncInputMode === 'tap' && lIdx === state.lyrics.length - 1 && wIdx === line.words.length - 1) {
              if(audioPlayer.duration) word.end = audioPlayer.duration;
         }
 
@@ -1865,6 +1949,13 @@
         if(!line) return;
         const word = line.words[wIdx];
         word.start = time;
+        
+        // FIX: In Auto Mode, the transition from the second-to-last word (Tap)
+        // to the last word (Hold) requires closing the gap of the previous word.
+        if (state.syncInputMode === 'auto' && wIdx > 0) {
+             line.words[wIdx-1].end = time;
+        }
+        
         if(wIdx === 0) syncLine(lIdx, time);
         generateLRC(); // Save partial state
     }
@@ -1918,43 +2009,65 @@
         alert(`Offset of ${totalOffsetSeconds}s applied.`);
     }
 
-    // --- NEW: Sync Settings Modal Functions ---
-    function openSyncSettings() { 
-        syncSettingsModal.classList.add('active');
+ // Update Sync Settings UI opener to handle the new button
+function openSyncSettings() { 
+    syncSettingsModal.classList.add('active');
+    
+    const holdBtn = document.getElementById('opt-hold');
+    const autoBtn = document.getElementById('opt-sync-auto');
+
+    // Check Line Mode restriction
+    if (state.mode === 'line') {
+        holdBtn.classList.add('disabled-mode');
+        autoBtn.classList.add('disabled-mode'); // Auto also disabled in Line mode
         
-        // NEW: Check Line Mode restriction
-        const holdBtn = document.getElementById('opt-hold');
-        if (state.mode === 'line') {
-            holdBtn.classList.add('disabled-mode');
-            if (state.syncInputMode === 'hold') setSyncInputMode('tap');
-        } else {
-            holdBtn.classList.remove('disabled-mode');
+        // Reset to Tap if we were in a restricted mode
+        if (state.syncInputMode === 'hold' || state.syncInputMode === 'auto') {
+            setSyncInputMode('tap');
         }
+    } else {
+        holdBtn.classList.remove('disabled-mode');
+        autoBtn.classList.remove('disabled-mode');
     }
+}
     
     function closeSyncSettings() { syncSettingsModal.classList.remove('active'); }
 
-    function setSyncInputMode(mode) {
-        // Prevent setting hold if line mode
-        if (mode === 'hold' && state.mode === 'line') return;
+   // Update Sync Mode Setter
+function setSyncInputMode(mode) {
+    // Prevent setting restricted modes if line mode
+    if ((mode === 'hold' || mode === 'auto') && state.mode === 'line') return;
 
-        state.syncInputMode = mode;
-        document.getElementById('opt-tap').classList.toggle('active', mode === 'tap');
-        document.getElementById('opt-hold').classList.toggle('active', mode === 'hold');
-        updateSyncUI();
+    state.syncInputMode = mode;
+    
+    // Toggle active classes
+    document.getElementById('opt-tap').classList.toggle('active', mode === 'tap');
+    document.getElementById('opt-hold').classList.toggle('active', mode === 'hold');
+    document.getElementById('opt-sync-auto').classList.toggle('active', mode === 'auto');
+
+    // --- NEW: Force Auto Glow for Hold/Auto modes ---
+    if (mode === 'hold' || mode === 'auto') {
+        setGlowMode('auto');
     }
     
+    updateSyncUI();
+    // Update context UI immediately to reflect text position changes
+    updateWordContextUI(); 
+}
+    
     // NEW: Update UI based on Sync Mode
-    function updateSyncUI() {
-        // Desktop Button Text
-        if (state.syncInputMode === 'tap') {
-            mainSyncBtnText.textContent = "TAP";
-            mobileModeIndicator.textContent = "Tap";
-        } else {
-            mainSyncBtnText.textContent = "HOLD";
-            mobileModeIndicator.textContent = "Hold";
-        }
+   function updateSyncUI() {
+    if (state.syncInputMode === 'tap') {
+        mainSyncBtnText.textContent = "TAP";
+        mobileModeIndicator.textContent = "Tap";
+    } else if (state.syncInputMode === 'hold') {
+        mainSyncBtnText.textContent = "HOLD";
+        mobileModeIndicator.textContent = "Hold";
+    } else {
+        // Auto Mode: Determine label based on the current word
+        updateAutoModeLabel();
     }
+}
 
     function setGlowMode(mode) {
         state.glowMode = mode;
@@ -1967,7 +2080,7 @@
         else speedCont.classList.remove('disabled');
     }
 
-    // --- Scroll Logic
+    // --- Scroll Logic ---
     function scrollToActive() {
         const el = document.getElementById(`line-${state.currentIndex}`);
         if(el) {
@@ -1985,7 +2098,7 @@
         }
     }
 
-    function updateVisuals() {
+   function updateVisuals() {
         if(state.isEditMode) return;
 
         document.querySelectorAll('.word-span.active-word').forEach(el => el.classList.remove('active-word'));
@@ -2016,27 +2129,60 @@
             if(currentSpan) currentSpan.classList.add('active-word');
             
             updateWordContextUI();
+            
+            // --- NEW: Update the button label if in Auto Mode ---
+            if (state.syncInputMode === 'auto') {
+                updateAutoModeLabel();
+            }
+
         } else {
             wordContextUI.classList.remove('visible');
         }
     }
 
-    function updateWordContextUI() {
-        if(state.mode !== 'word' || !state.lyrics.length || state.isEditMode || state.isPreviewMode) {
-            wordContextUI.classList.remove('visible');
-            return;
-        }
-        wordContextUI.classList.add('visible');
+function updateWordContextUI() {
+    if(state.mode !== 'word' || !state.lyrics.length || state.isEditMode || state.isPreviewMode) {
+        wordContextUI.classList.remove('visible');
+        return;
+    }
+    wordContextUI.classList.add('visible');
+    
+    const currentLine = state.lyrics[state.currentIndex];
+    const currentWord = currentLine ? currentLine.words[state.currentWordIndex] : null;
+    
+    // Determine UI Layout based on Mode
+    // Task 2: "This behavior applies whenever Hold mode is active"
+    if (state.syncInputMode === 'hold') {
         
-        // Toggle Hold Color Logic
-        if(state.syncInputMode === 'hold') {
-            wordContextUI.classList.add('mode-hold');
+        wordContextUI.classList.add('mode-hold');
+        
+        // LEFT SIDE: Current Word (Highlighted via CSS)
+        ctxPrev.textContent = currentWord ? currentWord.text : "End";
+        
+        // RIGHT SIDE: Next Word
+        let nextWordText = "End of Line";
+        
+        // Check next word in current line
+        if (state.currentWordIndex < currentLine.words.length - 1) {
+            nextWordText = currentLine.words[state.currentWordIndex + 1].text;
+        } 
+        // Or check first word of next line
+        else if (state.currentIndex < state.lyrics.length - 1) {
+            const nextLine = state.lyrics[state.currentIndex + 1];
+            if (nextLine.words.length > 0) {
+                nextWordText = nextLine.words[0].text;
+            }
         } else {
-            wordContextUI.classList.remove('mode-hold');
+            nextWordText = "End of Song";
         }
+        
+        ctxNext.textContent = nextWordText;
 
-        const currentLine = state.lyrics[state.currentIndex];
-        const currentWord = currentLine ? currentLine.words[state.currentWordIndex] : null;
+    } else {
+        // STANDARD TAP / AUTO LAYOUT (Default behavior)
+        wordContextUI.classList.remove('mode-hold');
+
+        // LEFT SIDE: Previous Word
         let prevWordText = "...";
         if(state.currentWordIndex > 0) prevWordText = currentLine.words[state.currentWordIndex - 1].text;
         else if(state.currentIndex > 0) {
@@ -2044,8 +2190,11 @@
             if(prevLine && prevLine.words.length > 0) prevWordText = prevLine.words[prevLine.words.length - 1].text;
         }
         ctxPrev.textContent = prevWordText;
+
+        // RIGHT SIDE: Current Word (Target)
         ctxNext.textContent = currentWord ? currentWord.text : "End";
     }
+}
 
     // --- Helpers ---
     function formatTimeDisplay(s) {
