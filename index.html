@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voxen v5.9 (60FPS)</title>
+    <title>Voxen</title>
     <style>
         :root {
             /* Theme Colors */
@@ -49,6 +49,21 @@
             justify-content: center;
             overflow: hidden; 
         }
+        
+        #expand-modal-actions {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+#expand-modal-actions .btn:not(.btn-note) {
+  flex: 1;
+}
+
+
 
         /* --- Main Container --- */
         .app-container {
@@ -79,7 +94,7 @@
             backdrop-filter: blur(10px);
         }
         
-        /* NEW: Disabled Area Styling */
+        /* Disabled Area Styling */
         .disabled-area {
             opacity: 0.3;
             pointer-events: none;
@@ -149,12 +164,12 @@
             transition: var(--trans);
         }
 
-        /* --- UPDATED: Rounded Settings Slider --- */
+        /* --- Rounded Settings Slider --- */
         #glow-speed-slider {
             -webkit-appearance: none;
             height: 14px;
             background-color:rgba(15, 23, 42, 0.603);
-            border-radius: 50px; /* Fully rounded pill shape */
+            border-radius: 50px; 
             overflow: hidden;
             cursor: pointer;
         }
@@ -165,7 +180,7 @@
             width: 14px;
             border-radius: 0px;
             background: #fff;
-            box-shadow: -400px 0 0 400px var(--primary); /* Fill trick */
+            box-shadow: -400px 0 0 400px var(--primary);
             cursor: pointer;
         }
 
@@ -185,7 +200,7 @@
             background: rgba(99, 102, 241, 0.1); border-color: var(--primary); color: var(--primary-light);
         }
         
-        textarea { height: 200px; resize: none; font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        textarea { height: 200px; resize: none; font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 0.85rem; font-weight: bold; }
         textarea:focus, input:focus { outline: none; border-color: var(--primary); background: #242c3ff2; }
 
         /* Mode Toggle */
@@ -214,6 +229,14 @@
         .btn-secondary:hover {
             background: #4a5570;
         }
+        
+        .btn-note {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
         
         .btn-outline:hover {
             background: #4a557044;
@@ -255,7 +278,7 @@
         
         .mobile-header-right { display: none; } 
         .mobile-dock-controls { display: none; }
-        .mobile-header-left { display: none; } /* Hidden now as moved to dock */
+        .mobile-header-left { display: none; }
 
         .header-btn {
             background: #0f172a00;
@@ -270,7 +293,6 @@
         .header-btn:hover { background: rgba(255,255,255,0.1); color: white; }
         
         #edit-mode-toggle.active { background: var(--warning); color: #0f172a; font-weight: bold; }
-        /* Fix for mobile Edit button highlight */
         #edit-mode-toggle-mobile.active { background: var(--warning) !important; color: #0f172a !important; font-weight: bold; }
 
         /* Preview Button State */
@@ -285,7 +307,7 @@
         .lyrics-list {
             flex: 1;
             overflow-y: auto;
-            padding: 80px 1rem 220px 1rem; 
+            padding: 80px 1rem 60vh 1rem; 
             scroll-behavior: smooth;
             /* Performance: Create a new layer */
             transform: translateZ(0);
@@ -395,12 +417,12 @@
         #word-context-ui {
             position: fixed; bottom: 200px; left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(15, 23, 42, 0.418);
-            border: 2px solid var(--primary); padding: 10px 20px; border-radius: 12px;
+            background: rgba(15, 23, 42, 0.534);
+            border: 0px solid var(--primary); padding: 10px 20px; border-radius: 12px;
             display: flex; align-items: center; gap: 15px; opacity: 0;
             backdrop-filter: blur(16px);
             pointer-events: none; transition: var(--trans); z-index: 90;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.6);
         }
         #word-context-ui.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
         .ctx-prev { color: var(--secondary); font-size: 1.2rem; font-weight: 800; }
@@ -521,7 +543,7 @@
 
         .expanded-textarea {
             flex: 1; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-main); padding: 1rem; font-family: 'Courier New', monospace;
+            color: var(--text-main); padding: 1rem; font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: bold;
             border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; resize: none;
         }
 
@@ -536,20 +558,20 @@
             
             .sidebar {
                 position: fixed; top: 0; left: 0; height: 100%; width: 100%;
-                padding: 3.0rem;
+                padding: 2.5rem;
                 background: (--bg-card); transform: translateX(-100%);
             }
             .sidebar.active { transform: translateX(0); }
             
             #mobile-close-sidebar { display: block; background: none; border: none; color: white; font-size: 1.5rem; }
             
-            /* Header Display Enabled for Timer */
             .top-info-bar { 
                 display: flex !important; 
-                justify-content: flex-end; /* UPDATED: Force align right for preview button */
+                justify-content: flex-end;
                 height: 60px; 
                 background: transparent; 
                 pointer-events: none; 
+                /*box-shadow: 0 0px 150px rgba(0, 0, 0, 0.233);*/
             }
 
             .top-left-controls { display: none; } 
@@ -558,7 +580,7 @@
                 display: flex;
                 pointer-events: auto;
                 margin-right: -20px;
-                z-index: 60; /* Ensure on top */
+                z-index: 60;
             }
 
             .time-display {
@@ -578,10 +600,18 @@
 
             .line-actions { margin-left: 0; margin-top: 4px; flex-direction: row; right: 10px; gap: 4px; }
 
-            /* Updated Mobile Dock Controls to include Settings */
             .mobile-dock-controls {
                 display: flex; align-items: center; justify-content: center;
                 gap: 3px; width: 100%; padding: 0 5px; box-sizing: border-box;
+                margin-bottom: 1.25rem;
+            }
+
+            .mobile-dock-controls button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 1;
+                min-width: 0;
             }
 
             .action-btn { width: 28px; height: 28px; font-size: 14px; backdrop-filter: blur(4px); }
@@ -616,7 +646,7 @@
             }
 
             #mobile-preview-btn.active { 
-            background: #b9c9ff9a; 
+            background: #4a4f75; 
             color: #ffffff; 
             font-weight: bold; 
             box-shadow: 0 0 0px rgba(20, 184, 165, 0); 
@@ -633,13 +663,18 @@
                 background: #171e30; backdrop-filter: blur(0px); border-radius: 0; border: 0px;
                 box-sizing: border-box; 
                 z-index: 100;
+                box-shadow: 0 0px 150px rgba(0, 0, 0, 0.315);
             }
 
-            /* UPDATED: Move Word Context UI UP above the dock on mobile */
             #word-context-ui {
-                bottom: 300px; 
-                width: 90%;
+                bottom: 320px; 
+                width: auto;
+                max-width: 90%;
+                min-width: 250px;
                 justify-content: center;
+                background: rgba(15, 23, 42, 0.534);
+                border: 0px solid var(--primary); padding: 10px 20px; border-radius: 12px;
+                box-shadow: 0 0px 0px rgba(0,0,0,0.6);
             }
 
             .player-controls {
@@ -678,6 +713,20 @@
             #vol-btn { margin-right: 0; }
             #dur-time-lbl { margin-left:auto; }
             .dock-sync-btn div { display: block; font-size: 0.8rem; } 
+
+            #mobile-dock-settings {
+                margin-left: 0.5rem;
+            }
+
+            #main-sync-btn-mobile {
+                margin-right: 0.5rem;
+            }
+
+            ::-webkit-scrollbar-thumb { 
+                background: rgba(255, 255, 255, 0.178); 
+                width: 2px;
+            }
+            ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
         }
     </style>
 </head>
@@ -714,7 +763,7 @@
                         <label>Paste Lyrics (Reset)</label>
                         <button class="expand-btn" onclick="openExpandModal('raw')">⤢</button>
                     </div>
-                    <textarea id="raw-lyrics" placeholder="Line 1...&#10;Line 2..."></textarea>
+                    <textarea id="raw-lyrics" placeholder="Look at the stars&#10;Look how they shine for you"></textarea>
                 </div>
 
                 <div class="input-group">
@@ -750,12 +799,12 @@
                     </div>
                     <textarea id="export-output" placeholder="Paste LRC here to import..." style="height: 200px; font-family: monospace;"></textarea>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
-                        <button class="btn btn-outline" style="padding: 1rem 0;" onclick="generateLRC()">Update</button>
-                        <button class="btn btn-secondary" style="padding: 1rem 0;" onclick="copyLRC()">Copy</button>
-                        <button class="btn btn-secondary" style="padding: 1rem 0;" onclick="loadLRCFromSidebar()">Load</button>
-                        <button class="btn" id="edit-download-btn" style="padding: 1rem 0;" onclick="downloadLRC()">Download</button>
-                    </div>
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 8px;">
+    <button class="btn btn-outline" style="padding: 1.25rem 0; border-radius: 25px 5px 5px 25px;" onclick="generateLRC()">Update</button>
+    <button class="btn btn-secondary" style="padding: 1.25rem 0; border-radius: 5px;" onclick="copyLRC()">Copy</button>
+    <button class="btn btn-secondary" style="padding: 1.25rem 0; border-radius: 5px;" onclick="loadLRCFromSidebar()">Load</button>
+    <button class="btn" id="edit-download-btn" style="padding: 1.25rem 0; border-radius: 5px 25px 25px 5px;" onclick="downloadLRC()">➜]</button>
+</div>
                 </div>
             </div> </div>
     </div>
@@ -998,7 +1047,7 @@
             wordContextUI.classList.remove('visible'); 
             cleanupGlowEffects();
             
-            // --- NEW: START 60FPS LOOP ---
+            // --- START 60FPS LOOP ---
             requestAnimationFrame(animatePreviewFrame);
             
         } else {
@@ -1010,15 +1059,11 @@
         }
     }
     
-    // --- GLOW SPEED LOGIC (FIXED) ---
+    // --- GLOW SPEED LOGIC ---
 function updateGlowSpeed(el) {
     const val = el.value;
-    // Update the CSS variable for the transition duration
     document.documentElement.style.setProperty('--glow-speed', val + 's');
-    // Update the text label
     document.getElementById('glow-speed-val').textContent = val + "s";
-    // FIX: Update the visual slider fill color
-    // updateRangeFill(el); // Removed here as this specific slider uses box-shadow trick
 }
  
     function cleanupGlowEffects() {
@@ -1068,7 +1113,7 @@ function updateGlowSpeed(el) {
             currentFileName = file.name.replace(/\.[^/.]+$/, "");
             document.getElementById('audio-file-label').innerHTML = `<span>🎵 ${file.name}</span>`;
             
-            // NEW: UNLOCK UI
+            // UNLOCK UI
             document.getElementById('workflow-sections').classList.remove('disabled-area');
         }
     });
@@ -1082,7 +1127,6 @@ function updateGlowSpeed(el) {
         slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, var(--bg-input) ${percent}%, var(--bg-input) 100%)`;
     }
     updateRangeFill(volumeSlider);
-    // Removed general fill for glow-slider to use specific pill styling
 
     // --- Playback Slider ---
     audioPlayer.addEventListener('loadedmetadata', () => {
@@ -1091,7 +1135,6 @@ function updateGlowSpeed(el) {
         updateRangeFill(seekSlider);
     });
 
-    // We removed the heavy preview logic from here!
     audioPlayer.addEventListener('timeupdate', () => {
         if (!isDraggingSlider) {
             seekSlider.value = audioPlayer.currentTime;
@@ -1100,7 +1143,7 @@ function updateGlowSpeed(el) {
         }
     });
 
-    // --- NEW PREVIEW ANIMATION LOOP (60 FPS) ---
+    // --- NEW PREVIEW ANIMATION LOOP ---
     function animatePreviewFrame() {
         // If we stop preview mode, stop the loop.
         if (!state.isPreviewMode) return;
@@ -1155,7 +1198,7 @@ function updateGlowSpeed(el) {
                     scrollToActive();
                 }
 
-                // 2. Karaoke Effect: Glow Persistence
+                // Karaoke Effect: Glow Persistence
                 // Only process words in the active line
                 const currentLine = state.lyrics[activeIdx];
                 if (currentLine && currentLine.words && currentLine.words.length > 0) {
@@ -1304,7 +1347,7 @@ function updateGlowSpeed(el) {
                 if(state.mode === 'line') document.getElementById('mode-line').checked = true;
                 else document.getElementById('mode-word').checked = true;
 
-                // NEW: UNLOCK UI
+                // UNLOCK UI
                 document.getElementById('workflow-sections').classList.remove('disabled-area');
 
                 toggleSettings(false);
@@ -1331,6 +1374,20 @@ function updateGlowSpeed(el) {
             expandTextarea.value = rawLyricsInput.value;
             expandTextarea.placeholder = "Line 1...\nLine 2...";
             
+            // Symbol Button
+            const btnSymbol = document.createElement('button');
+            btnSymbol.className = 'btn btn-secondary btn-note';
+            btnSymbol.style.flex = "0 0 auto";
+            btnSymbol.textContent = "♩";
+            btnSymbol.onclick = () => {
+                const startPos = expandTextarea.selectionStart;
+                const endPos = expandTextarea.selectionEnd;
+                const text = expandTextarea.value;
+                expandTextarea.value = text.substring(0, startPos) + "♩" + text.substring(endPos);
+                expandTextarea.focus();
+                expandTextarea.selectionStart = expandTextarea.selectionEnd = startPos + 1;
+            };
+
             const btnSave = document.createElement('button');
             btnSave.className = 'btn';
             btnSave.textContent = "Update Input";
@@ -1338,6 +1395,8 @@ function updateGlowSpeed(el) {
                 rawLyricsInput.value = expandTextarea.value;
                 closeExpandModal();
             };
+            
+            expandActions.appendChild(btnSymbol);
             expandActions.appendChild(btnSave);
         } 
         else if (type === 'lrc') {
@@ -1363,6 +1422,7 @@ function updateGlowSpeed(el) {
                 parseAndLoadLRC(expandTextarea.value);
                 closeExpandModal();
             };
+            
             expandActions.appendChild(btnCopy);
             expandActions.appendChild(btnImport);
         }
@@ -1370,12 +1430,10 @@ function updateGlowSpeed(el) {
 
     function closeExpandModal() { expandModal.classList.remove('active'); }
     
-    // NEW: Copy/Load Buttons in Sidebar
+    // Copy/Load Buttons in Sidebar
     function copyLRC() {
         exportOutput.select();
         document.execCommand('copy');
-        // Simple visual feedback could be added here if desired, 
-        // e.g. changing the button text momentarily.
         alert("LRC copied to clipboard!");
     }
     
@@ -1546,7 +1604,9 @@ function updateGlowSpeed(el) {
     }
 
     // --- Sync Logic ---
-    function triggerSync() {
+   function triggerSync() {
+        if (state.currentIndex >= state.lyrics.length) return;
+        
         if(state.lyrics.length === 0 || state.isEditMode || state.isPreviewMode) return;
         
         const offset = parseInt(offsetInput.value) || 0;
@@ -1559,7 +1619,7 @@ function updateGlowSpeed(el) {
 
         if (state.mode === 'line') {
             syncLine(state.currentIndex, time);
-            if (state.currentIndex < state.lyrics.length - 1) state.currentIndex++;
+            state.currentIndex++;
         } else {
             syncWord(state.currentIndex, state.currentWordIndex, time);
         }
@@ -1575,24 +1635,36 @@ function updateGlowSpeed(el) {
         generateLRC();
     }
 
-    function syncWord(lIdx, wIdx, time) {
+  function syncWord(lIdx, wIdx, time) {
         const line = state.lyrics[lIdx];
         if(!line) return;
         const word = line.words[wIdx];
         word.start = time;
+        
+        // --- Handle End Timestamp ---
         if(wIdx > 0) line.words[wIdx-1].end = time;
         else if (lIdx > 0) {
             const prev = state.lyrics[lIdx-1];
             if(prev.words.length) prev.words[prev.words.length-1].end = time;
         }
+
+        const isLastLine = lIdx === state.lyrics.length - 1;
+        const isLastWord = wIdx === line.words.length - 1;
+        
+        if (isLastLine && isLastWord) {
+             if(audioPlayer.duration) {
+                 word.end = audioPlayer.duration;
+             }
+        }
+        // ------------------------------------------
+
         if(wIdx === 0) syncLine(lIdx, time);
 
-        if(wIdx < line.words.length - 1) state.currentWordIndex++;
-        else {
-            if(lIdx < state.lyrics.length - 1) {
-                state.currentIndex++;
-                state.currentWordIndex = 0;
-            }
+        if(wIdx < line.words.length - 1) {
+            state.currentWordIndex++;
+        } else {
+            state.currentIndex++;
+            state.currentWordIndex = 0;
         }
         generateLRC();
     }
@@ -1625,16 +1697,14 @@ function updateGlowSpeed(el) {
         alert(`Offset of ${totalOffsetSeconds}s applied.`);
     }
 
-    // --- UPDATED: Scroll Logic for "Just Above Center" ---
+    // --- Scroll Logic
     function scrollToActive() {
         const el = document.getElementById(`line-${state.currentIndex}`);
         if(el) {
             // Check if Mobile
             if(window.innerWidth <= 900) {
-                 // Calculate position to be 35% from top (visually above center)
                  const container = lyricsContainer;
                  const elTop = el.offsetTop; 
-                 // We want the element's top to be at 35% of container height
                  const targetPos = elTop - (container.clientHeight * 0.20);
                  
                  container.scrollTo({ top: targetPos, behavior: 'smooth' });
@@ -1648,22 +1718,34 @@ function updateGlowSpeed(el) {
     function updateVisuals() {
         if(state.isEditMode) return;
 
-        document.querySelectorAll('.lyric-line').forEach((el, idx) => {
-            if(idx === state.currentIndex) el.classList.add('active');
-            else el.classList.remove('active');
-        });
-
+        document.querySelectorAll('.word-span.active-word').forEach(el => el.classList.remove('active-word'));
         if (state.mode === 'word' && !state.isPreviewMode) {
-            document.querySelectorAll('.word-span').forEach(el => el.classList.remove('active-word'));
-            state.lyrics.forEach((l, lI) => l.words.forEach((w, wI) => {
+             state.lyrics.forEach((l, lI) => l.words.forEach((w, wI) => {
                 const span = document.getElementById(`word-${lI}-${wI}`);
                 if(span) {
                     if(w.start !== null) span.classList.add('synced');
                     else span.classList.remove('synced');
                 }
             }));
+        }
+
+        // 3. Highlight Active Line
+        document.querySelectorAll('.lyric-line').forEach((el, idx) => {
+            if(idx === state.currentIndex) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+
+        // 4. DONE CHECK
+        if (state.currentIndex >= state.lyrics.length) {
+            wordContextUI.classList.remove('visible');
+            return;
+        }
+
+        // 5. Highlight Active Word (Purple)
+        if (state.mode === 'word' && !state.isPreviewMode) {
             const currentSpan = document.getElementById(`word-${state.currentIndex}-${state.currentWordIndex}`);
             if(currentSpan) currentSpan.classList.add('active-word');
+            
             updateWordContextUI();
         } else {
             wordContextUI.classList.remove('visible');
