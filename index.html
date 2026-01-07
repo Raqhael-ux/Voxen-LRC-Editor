@@ -89,7 +89,6 @@
             flex-shrink: 0;
             z-index: 200;
             transition: var(--trans);
-            backdrop-filter: blur(10px);
         }
         
         /* Disabled Area Styling */
@@ -429,7 +428,7 @@
             padding:20px 20px;
             display: flex; flex-direction: column; gap: 12px;
             box-shadow: 0 0px 24px rgba(0, 0, 0, 0.233); z-index: 200;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease-out;
+            transition: transform 0s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0s linear;
         }
 
         .control-dock.active-hold-glow {
@@ -540,7 +539,7 @@
             padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .offset-modal { width: 340px; }
+        .offset-modal { width: 340px;}
         .sync-settings-modal { width: 340px; }
         .expanded-text-modal { width: 800px; max-width: 90%; height: 80vh; display:flex; flex-direction:column; }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
@@ -609,13 +608,28 @@
             body { padding: 0; height: 100vh; }
             .app-container { border-radius: 0; height: 100%; max-width: 100%; border: none; }
             
-            .sidebar {
-                position: fixed; top: 0; left: 0; height: 100%; width: 100%;
-                padding: 2.5rem;
-                background: (--bg-card); transform: translateX(-100%);
-            }
-            .sidebar.active { transform: translateX(0); }
-            
+            /* --- Find this inside @media (max-width: 900px) --- */
+
+.sidebar {
+    position: fixed; 
+    top: auto; 
+    bottom: 0; 
+    left: 0; 
+    height: 90vh; /* Covers 90% of screen */
+    width: 100%;
+    padding: 2.5rem;
+    background: #1c2436; /* Fixed typo from original */
+    transform: translateY(100%); /* Start hidden below */
+    border-radius: 24px 24px 0 0; /* Rounded top corners */
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    z-index: 300; /* Ensure it sits above the dock */
+}
+
+.sidebar.active { 
+    transform: translateY(0); /* Slide up to show */
+}
+
+
             #mobile-close-sidebar { display: block; background: none; border: none; color: white; font-size: 1.5rem; }
             
             .top-info-bar { 
@@ -2262,6 +2276,52 @@ function updateWordContextUI() {
     // Init
     updateRangeFill(seekSlider);
     updateSyncUI(); // Set initial labels
+    
+    // --- Mobile Swipe Gestures ---
+
+    const dockEl = document.querySelector('.control-dock');
+    const sidebarEl = document.getElementById('sidebar');
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    // 1. Swipe Up on Dock -> Open Settings
+    dockEl.addEventListener('touchstart', (e) => {
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    dockEl.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].screenY;
+        handleGesture('up');
+    }, { passive: true });
+
+    // 2. Swipe Down on Sidebar -> Close Settings
+    sidebarEl.addEventListener('touchstart', (e) => {
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    sidebarEl.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].screenY;
+        handleGesture('down');
+    }, { passive: true });
+
+    function handleGesture(direction) {
+        const swipeDistance = touchStartY - touchEndY;
+        const threshold = 50; // Minimum pixels to count as a swipe
+
+        if (direction === 'up') {
+            // Swipe Up (positive distance) on Dock
+            if (swipeDistance > threshold) {
+                toggleSettings(true);
+            }
+        } 
+        else if (direction === 'down') {
+            // Swipe Down (negative distance) on Sidebar
+            // Only close if we are scrolled to the very top to avoid conflict with internal scrolling
+            if (sidebarEl.scrollTop === 0 && swipeDistance < -threshold) {
+                toggleSettings(false);
+            }
+        }
+    }
 </script>
 </body>
 </html>
