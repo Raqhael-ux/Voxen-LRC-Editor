@@ -25,6 +25,15 @@ If you don’t want to download the HTML file, you can use the web version inste
 
 ---
 
+## ❤️ Planned for V2!
+* Duet Support
+* UI Overhaul
+* Background Lyrics Support
+* Change export type (Musixmatch or Advanced)
+* (Unsure) Preview slide animation
+
+---
+
 ## 🎊 V6 Is Here!
 * 🖌️ Website design overhaul!
 * 📱 Made mobile view look like an app
