@@ -28,10 +28,10 @@ If you don’t want to download the HTML file, you can use the web version inste
 ## ❤️ Planned for V2!
 * Duet Support
 * UI Overhaul
-* Background Lyrics Support
-* Change export type (Musixmatch or Advanced)
+* ✅ Background Lyrics Support
+* ✅ Change export type (Advanced or Pro)
 * (Unsure) Preview slide animation
-
+* Wiki
 ---
 
 ## 🎊 V6 Is Here!
