@@ -40,14 +40,9 @@
 
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: var(--bg-body);
-        color: var(--text-main);
-        margin: 0;
-        padding: 2vh 2vw;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        overflow: hidden; 
+        background-color: var(--bg-body); color: var(--text-main);
+        margin: 0; padding: 2vh 2vw; height: 100vh;
+        display: flex; justify-content: center; overflow: hidden; 
     }
 
     /* Custom Scrollbars */
@@ -63,136 +58,79 @@
        3. MAIN LAYOUT
        ========================================= */
     .app-container {
-        width: 100%;
-        max-width: 1600px;
-        height: 96vh;
-        background-color: var(--bg-card);
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        display: flex;
-        overflow: hidden;
-        position: relative;
+        width: 100%; max-width: 1600px; height: 96vh;
+        background-color: var(--bg-card); border-radius: var(--border-radius); box-shadow: var(--shadow);
+        display: flex; overflow: hidden; position: relative;
     }
 
     /* =========================================
        4. SIDEBAR (SETTINGS)
        ========================================= */
     .sidebar {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        bottom: 20px;
-        width: 450px;
-        background-color: #161d2b;
-        display: flex;
-        flex-direction: column;
-        padding: 0;
-        z-index: 300;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-        border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        overflow: hidden;
+        position: absolute; top: 20px; left: 20px; bottom: 20px; width: 450px;
+        background-color: #161d2b; display: flex; flex-direction: column;
+        padding: 0; z-index: 300; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+        border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);  overflow: hidden;
         
         /* Hidden state (PC) */
-        transform: translateX(-110%);
-        opacity: 0;
-        pointer-events: none;
-        will-change: transform;       
-        backface-visibility: hidden;  
-        contain: paint;               
+        transform: translateX(-110%); opacity: 0; pointer-events: none; will-change: transform;       
+        backface-visibility: hidden; contain: paint;               
     }
 
-    .sidebar.active {
-        transform: translateX(0);
-        opacity: 1;
-        pointer-events: auto;
-    }
+    .sidebar.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
     .sidebar-container {
-        background-color: #1c2436;
-        margin-top: 10px;
-        border-radius: 0px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        min-height: 0;
-        contain: content;
+        background-color: #1c2436; margin-top: 10px; border-radius: 0px;
+        flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; contain: content;
     }
 
-    .sidebar-inner {
-        padding: 1.5rem;
-        display: flex; 
-        flex-direction: column; 
-        height: 100%;
-        overflow-y: auto;
-    }
+    .sidebar-inner { padding: 1.5rem; display: flex;  flex-direction: column;  height: 100%; overflow-y: auto; }
 
     /* PC Overlay */
     .sidebar-overlay-pc {
-        position: absolute; top:0; left:0; width:100%; height:100%;
-        background: rgba(0,0,0,0.6);
-        z-index: 250;
-        opacity: 0; pointer-events: none;
-        transition: opacity 0.3s;
-        will-change: opacity;
+        position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);
+        z-index: 250;  opacity: 0; pointer-events: none; transition: opacity 0.3s; will-change: opacity;
     }
     .sidebar.active ~ .sidebar-overlay-pc { opacity: 1; pointer-events: auto; }
 
     /* Sidebar Components */
-    .brand {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .brand { font-size: 1.4rem; font-weight: 800;
+        color: var(--text-main); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;
     }
     .brand span { color: var(--primary-light); }
 
     .section-title {
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 2.0rem;
-        margin-bottom: 0.5rem;
-        padding-bottom: 1px;
-    }
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    margin: 0.5rem auto 0.5rem;   /* center horizontally */
+    padding: 10px 16px;
+
+    display: inline-flex;       /* ⬅ shrink to content */
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+}
+
     .section-title:first-of-type { margin-top: 0.5rem; }
 
     /* Sidebar Tabs */
-    .sidebar-tabs {
-        display: flex;
-        gap: 5px;
-        padding: 15px 15px 0 15px;
-    }
+    .sidebar-tabs { display: flex; gap: 5px; padding: 15px 15px 0 15px; }
 
     .tab-btn {
-        flex: 1;
-        background: rgba(255,255,255,0.02);
-        border: none;
-        color: var(--text-muted);
-        padding: 12px;
-        font-weight: 700;
-        font-size: 0.8rem;
-        cursor: pointer;
-        border-bottom: 3px solid transparent;
-        transition: var(--trans);
-        border-radius: 25px;
-        margin-bottom: 10px;
+        flex: 1; background: rgba(255,255,255,0.02);  border: none;  color: var(--text-muted);
+        padding: 12px; font-weight: 700; font-size: 0.8rem;  cursor: pointer;
+        border-bottom: 3px solid transparent; transition: var(--trans);  border-radius: 25px; margin-bottom: 10px;
     }
     .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .tab-btn.active { color: var(--primary-light); }
 
-    .tab-content {
-        display: none;
-        flex-direction: column;
-        gap: 15px;
-        padding-top: 20px;
-        animation: fadeIn 0.3s ease;
+    .tab-content { display: none; flex-direction: column; gap: 15px; padding-top: 10px; animation: fadeIn 0.3s ease;
     }
     .tab-content.active { display: flex; }
 
@@ -201,30 +139,13 @@
     /* =========================================
        5. FORMS & INPUTS
        ========================================= */
-    .input-group { margin-bottom: 1.2rem; }
-    .label-row, .label-row2 { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 0.4rem; 
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: capitalize;
-    }
-    
-    label { 
-        display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; margin: 0;
-    }
+    .input-group { margin-bottom: 0.5rem; }
+    .label-row, .label-row2 {  display: flex;  justify-content: space-between;  align-items: center;  margin-bottom: 0.4rem;  font-size: 0.75rem; font-weight: 800; text-transform: capitalize; }
+    label {  display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; margin: 0; }
 
     textarea, input[type="text"], input[type="number"], select {
-        width: 100%;
-        background: var(--bg-input);
-        border: 2px solid transparent;
-        color: white;
-        padding: 0.6rem;
-        border-radius: 8px;
-        font-family: inherit;
-        transition: var(--trans);
+        width: 100%;  background: var(--bg-input); border: 2px solid transparent; color: white;
+        padding: 0.6rem; border-radius: 8px; font-family: inherit; transition: var(--trans);
     }
     textarea:focus, input:focus { outline: none; border-color: var(--primary); background: #242c3ff2; }
 
@@ -251,9 +172,8 @@
     input[type="radio"]:checked + label { background-color: var(--primary); color: white; }
 
     /* File Upload Custom */
-    .file-upload-wrapper { position: relative; width: 100%; height: 65px; margin-bottom: 10px; }
-    .load-project-wrapper { position: relative; width: 100%; height: 45px; margin-bottom: 10px; }
-    
+    .file-upload-wrapper { position: relative; width: 100%; height: 65px; margin-bottom: 0px; }
+    .load-project-wrapper { position: relative; width: 100%; height: 45px; margin-bottom: 0px; }
     .file-upload-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
     .file-upload-label {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -314,38 +234,18 @@
     /* =========================================
        7. EDITOR AREA
        ========================================= */
-    .editor-area {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        /*background: radial-gradient(circle at top right, #2d3748 0%, transparent 40%);*/
-        overflow: hidden;
-    }
+    .editor-area { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden;}
 
     /* Top Information Bar */
     .top-info-bar {
         position: absolute; top: 0; left: 0px; width: 100%; height: 80px;
         background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px);
-        padding: 0.5rem 1.5rem;
-        display: flex; justify-content: space-between; align-items: center;
-        z-index: 50;
+        padding: 0.5rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 50;
     }
 
-    .time-display {
-    font-family: 'Courier New', monospace; 
-    font-size: 1.5rem; 
-    font-weight: 700;
-    color: var(--secondary); 
-    text-align: center; 
-    will-change: content;
-    
-    /* Center Absolute on PC */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none; /* Let clicks pass through to potential elements below if needed */
-}
+    .time-display { font-family: 'Courier New', monospace;  font-size: 1.5rem;  font-weight: 700; color: var(--secondary);  text-align: center;  will-change: content;
+     position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; 
+    }
     .top-right-controls { display: flex; gap: 10px; align-items: center; justify-content: flex-end;}
     .top-left-controls { display: flex; gap: 10px; align-items: center; }
     .mobile-header-right, .mobile-dock-controls, .mobile-header-left { display: none; }
@@ -374,39 +274,23 @@
         border-left-color: var(--primary-light);
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-
-
-/* =======================================
-   Timestamp Styling
-   =======================================*/
-   
-       /* Line Components */
+    
+    
+    /* =======================================
+    Timestamp Styling
+    =======================================*/
     .line-meta {
-  display: flex;
-  align-items: center;      /* vertical center */
-  justify-content: flex-start; /* left side */
-  margin-right: 12px;
-  margin-top: 4px;
-  height: 100%;
-}
+        display: flex; align-items: center; justify-content: flex-start;
+        margin-right: 12px; margin-top: 4px; height: 100%;
+    }
 
    /* --- NEW TIMESTAMP STYLES --- */
     .timestamp-group {
-        display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: center;
-        gap: 2px;
-        font-family: monospace;
-        background: rgba(0, 0, 0, 0.1);
-        padding: 8px 6px;
-        border-radius: 4px;
-        border: 1px solid transparent;
+        display: flex; align-items: center; justify-content: center; align-self: center;
+        gap: 2px; font-family: monospace; background: rgba(0, 0, 0, 0.1); padding: 8px 6px; border-radius: 4px; border: 1px solid transparent;
     }
     
-    .timestamp-group:hover {
-        border-color: var(--primary-light);
-    }
+    .timestamp-group:hover { border-color: var(--primary-light); }
 
     .ts-digit {
         background: transparent;
@@ -867,7 +751,7 @@
         }
 
         .sidebar.active { transform: translateY(0); }
-        .sidebar-tabs { padding: 10px 10px 0 10px; }
+        .sidebar-tabs { padding: 10px 10px 0 10px; margin: 0 10px 0 10px;}
         .sidebar-inner { padding: 1.5rem; overflow-y: auto; padding-bottom: 100px; }
         #mobile-close-sidebar { display: none; }
 
@@ -901,7 +785,7 @@
             box-sizing: border-box; z-index: 100;
             box-shadow: 0 0px 150px rgba(0, 0, 0, 0.315);
         }
-        
+
         .dock-row-slider { padding: 0px 20px; gap: 0px; margin-bottom: -8px; }
         .seek-slider { flex: 1; width: 100%; height: 12px; border-radius: 50px; }
         .seek-slider::-webkit-slider-thumb { height: 40px; width: 13px; border-radius: 50px; margin-top: -17px; box-shadow: none; border: 4px solid #171e30; }
@@ -960,6 +844,58 @@
 
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.178); width: 2px; }
     }
+
+    .hotkey-container {
+        background: rgb(0, 0, 0, 0.1);
+        border-radius: 25px;
+        padding: 20px;
+        
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        justify-items: left; 
+        text-align: left;
+
+        max-height: 295px;       /* 👈 controls scroll size */
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
+
+    .hotkey-text, 
+    .hotkey-pill {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 0.8rem;
+    white-space: nowrap;
+
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;       /* 👈 tighter */
+    }
+
+    .hotkey-text {
+    opacity: 0.5;
+    justify-content: flex-start;
+}
+
+    .hotkey-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-weight: 500;
+    justify-content: center;
+}
+
+.hotkey-sep {
+    opacity: 0.4;
+    font-size: 0.75rem;
+}
+
+.hotkey-pill-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 </style>
 </head>
 <body>
@@ -995,42 +931,98 @@
                 </div>
                 <button class="btn btn-secondary" style="height:45px;" onclick="saveProject()">💾 Save</button>
             </div>
+            <div class="section-title">Controls</div>
+            <div class="hotkey-container">
+                <div class="hotkey-text" style="background: transparent; border: 1px transparent;">
+                    Set Timestamp
+                </div>
+                <div class="hotkey-pill">
+                    Enter
+                </div>
+
+                <div class="hotkey-text" style="background: transparent; border: 1px transparent;">
+                    Pause / Play
+                </div>
+                <div class="hotkey-pill">
+                    Space
+                </div>
+                
+                <div class="hotkey-text">
+                    Previous / Next Line
+                </div>
+                <div class="hotkey-pill-group">
+                    <span class="hotkey-pill">⇐</span>
+                    <span class="hotkey-sep"> : </span>
+                    <span class="hotkey-pill">⇒</span>
+                </div>
+                
+                <div class="hotkey-text">
+                    Seek ±5 Seconds
+                </div>
+                <div class="hotkey-pill-group">
+                    <span class="hotkey-pill">A</span>
+                    <span class="hotkey-sep"> : </span>
+                    <span class="hotkey-pill">D</span>
+                </div>
+
+                 <div class="hotkey-text" style="background: transparent; border: 1px transparent;">
+                    Add line below
+                </div>
+                <div class="hotkey-pill">
+                    E
+                </div>
+
+                <div class="hotkey-text" style="background: transparent; border: 1px transparent;">
+                    Set Sync Logic to Hold
+                </div>
+                <div class="hotkey-pill">
+                    Shift (Hold)
+                </div>
+
+                <div class="hotkey-text" style="background: transparent; border: 1px transparent;">
+                    Delete Line
+                </div>
+                <div class="hotkey-pill">
+                    Del
+                </div>
+            </div>
         </div>
 
             <div id="tab-session" class="tab-content">
+                <div class="section-title">Input Lyrics</div>
                 <div class="input-group">
-                    <div class="section-title">Input Lyrics</div>
                     <textarea id="raw-lyrics" placeholder="Paste your lyrics here...&#10;Line 1&#10;Line 2"></textarea>
                 </div>
-
+                
+                <div class="section-title">Sync Mode</div>
                 <div class="input-group">
-    <div class="section-title">Sync Mode</div>
-    <div class="mode-toggle">
-        <input type="radio" id="mode-line" name="mode" value="line">
-        <label for="mode-line">Line</label>
-        <input type="radio" id="mode-word" name="mode" value="word" checked>
-        <label for="mode-word">Word</label>
-    </div>
-</div>
+                    <div class="mode-toggle">
+                        <input type="radio" id="mode-line" name="mode" value="line">
+                        <label for="mode-line">Line</label>
+                        <input type="radio" id="mode-word" name="mode" value="word" checked>
+                        <label for="mode-word">Word</label>
+                    </div>
+                </div>
                 
                 <button class="btn" onclick="initializeEditor()">▶ Create New Editor</button>
             </div>
 
             <div id="tab-output" class="tab-content">
+                <div class="section-title">Offset (MS)</div>
                 <div class="input-group">
-                    <div class="section-title">Offset (MS)</div>
                     <input type="number" id="offset-val" value="-200" step="50">
                 </div>
-
+            
+                <div class="section-title">Format</div>
                 <div class="input-group">
-    <div class="section-title">Format</div>
-    <div class="mode-toggle">
-        <input type="radio" id="fmt-adv-sidebar" name="lrc-fmt" value="advanced" onchange="setLRCFormat('advanced')">
-        <label for="fmt-adv-sidebar">Advanced</label>
-        <input type="radio" id="fmt-pro-sidebar" name="lrc-fmt" value="pro" checked onchange="setLRCFormat('pro')">
-        <label for="fmt-pro-sidebar">Pro</label>
-    </div>
-</div>
+                    <div class="mode-toggle">
+                        <input type="radio" id="fmt-adv-sidebar" name="lrc-fmt" value="advanced"
+                            onchange="setLRCFormat('advanced')">
+                        <label for="fmt-adv-sidebar">Advanced</label>
+                        <input type="radio" id="fmt-pro-sidebar" name="lrc-fmt" value="pro" checked onchange="setLRCFormat('pro')">
+                        <label for="fmt-pro-sidebar">Pro</label>
+                    </div>
+                </div>
 
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); width:100%;">
 
@@ -1042,7 +1034,7 @@
                      <button class="btn btn-secondary" onclick="copyLRC()">Copy Text</button>
                 </div>
                 
-                <div class="label-row2" style="margin-top:10px;"><label>File Operations</label></div>
+                <div class="section-title">File Operations</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
                     <input type="file" id="lrc-file-input" accept=".lrc,.txt" style="display:none;" onchange="handleLRCFile(this)">
                     <button class="btn btn-secondary" onclick="document.getElementById('lrc-file-input').click()">📂 Open</button>
@@ -1454,33 +1446,36 @@ let state = {
 // 2. CORE LOGIC (MODEL)
 // =========================================
 
-    // Initialize a new editor from a raw text
     function initializeEditor() {
-        const rawText = rawLyricsInput.value;
-        if (!rawText.trim()) return alert("Please enter lyrics first.");
-        
-        toggleSettings(false);
-        
-        // --- FIX START: Force Default Sync Mode ---
-        setSyncInputMode('auto');
-        // --- FIX END ---
+    const rawText = rawLyricsInput.value;
+    if (!rawText.trim()) return alert("Please enter lyrics first.");
+    
+    toggleSettings(false);
+    
+    // 1. UPDATE STATE MODE FIRST
+    // We must update the mode (Line/Word) before setting sync behavior
+    state.mode = document.querySelector('input[name="mode"]:checked').value;
 
-        state.mode = document.querySelector('input[name="mode"]:checked').value;
-        state.currentIndex = 0;
-        state.currentWordIndex = 0;
-        state.isEditMode = false;
-        state.isPreviewMode = false;
-        
-        resetEditUI();
+    // 2. FORCE DEFAULT SYNC MODE
+    // Now that state.mode is correct, this won't fail validation
+    setSyncInputMode('auto');
 
-        const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-        state.lyrics = lines.map(lineText => {
-            return { text: lineText, time: null, words: parseWords(lineText) };
-        });
+    // 3. RESET & PARSE
+    state.currentIndex = 0;
+    state.currentWordIndex = 0;
+    state.isEditMode = false;
+    state.isPreviewMode = false;
+    
+    resetEditUI();
 
-        renderEditor();
-        updateWordContextUI();
-    }
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
+    state.lyrics = lines.map(lineText => {
+        return { text: lineText, time: null, words: parseWords(lineText) };
+    });
+
+    renderEditor();
+    updateWordContextUI();
+}
 
 
     // --- UI/UX Helpers ---
@@ -2858,22 +2853,105 @@ function updateWordContextUI() {
     }
 
     // --- Keyboard Control ---
+    // --- KEYBOARD CONTROLS (Updated) ---
+    let preShiftSyncMode = 'auto'; // Stores mode before Shift was held
+
     document.addEventListener('keydown', (e) => {
-        if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
+        // 1. Ignore if typing in an input box
+        if(e.target.isContentEditable || 
+           e.target.tagName === 'TEXTAREA' || 
+           (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'file' && e.target.type !== 'radio')) return;
         
-        // SPACE: Toggle Play
-        if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
+        // 2. LEFT SHIFT (Hold for Hold Mode)
+        if(e.code === 'ShiftLeft' && !e.repeat) {
+            preShiftSyncMode = state.syncInputMode; // Save current mode
+            setSyncInputMode('hold');
+            updateSyncUI();
+        }
+
+        // 3. SPACE: Toggle Play
+        if(e.code === 'Space') { 
+            e.preventDefault(); 
+            togglePlay(); 
+        }
         
-        // ENTER: Trigger Sync
+        // 4. ENTER: Trigger Sync
         if(e.code === 'Enter') { 
             e.preventDefault(); 
-            // FIX: Block repeats for Enter key
             if(e.repeat) return;
             handleSyncDown(e);
         }
-        
-        if(e.code === 'ArrowLeft') { e.preventDefault(); seekAudio(-5); }
-        if(e.code === 'ArrowRight') { e.preventDefault(); seekAudio(5); }
+
+        // 5. SEEKING (A / D)
+        if(e.code === 'KeyA') { seekAudio(-5); }
+        if(e.code === 'KeyD') { seekAudio(5); }
+
+        // 6. EDITING (E / Del)
+        if(e.code === 'KeyE') { 
+            e.preventDefault();
+            addLine(state.currentIndex); 
+        }
+        if(e.code === 'Delete') { 
+            e.preventDefault();
+            if(confirm("Delete current line?")) deleteLine(state.currentIndex);
+        }
+
+        // 7. NAVIGATION & EDITING (Arrows)
+        // Moves selection and modifies timestamps based on mode
+        if (e.code === 'ArrowLeft') {
+            e.preventDefault();
+            if (state.mode === 'word') {   
+                // Move PREVIOUS
+                if (state.currentWordIndex > 0) {
+                    state.currentWordIndex--;
+                } else if (state.currentIndex > 0) {
+                    state.currentIndex--;
+                    state.currentWordIndex = state.lyrics[state.currentIndex].words.length - 1;
+                }
+            } else {
+                // Line Mode
+                if (state.lyrics[state.currentIndex]) state.lyrics[state.currentIndex].time = null;
+                if (state.currentIndex > 0) state.currentIndex--;
+            }
+            updateVisuals();
+            scrollToActive();
+            generateLRC(); // Update output immediately
+        }
+
+        if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            // SKIP (Just move next, don't delete)
+            if (state.mode === 'word') {
+                const line = state.lyrics[state.currentIndex];
+                if (state.currentWordIndex < line.words.length - 1) {
+                    state.currentWordIndex++;
+                } else if (state.currentIndex < state.lyrics.length - 1) {
+                    state.currentIndex++;
+                    state.currentWordIndex = 0;
+                }
+            } else {
+                // Line Mode
+                if (state.currentIndex < state.lyrics.length - 1) state.currentIndex++;
+            }
+            updateVisuals();
+            scrollToActive();
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+         if(e.target.isContentEditable || e.target.tagName === 'TEXTAREA') return;
+         
+         // Release Enter
+         if(e.code === 'Enter') {
+             e.preventDefault();
+             handleSyncUp(e);
+         }
+
+         // Release Shift -> Revert to previous mode
+         if(e.code === 'ShiftLeft') {
+             setSyncInputMode(preShiftSyncMode);
+             updateSyncUI();
+         }
     });
 
     document.addEventListener('keyup', (e) => {
@@ -3347,6 +3425,18 @@ function makeSep(char) {
         s.className = 'ts-sep';
         s.textContent = char;
         return s;
+}
+
+function updateSyncUI() {
+    // Updates the main button text based on the current Sync Mode
+    const label = state.syncInputMode === 'hold' ? "HOLD" : "TAP";
+    
+    if (mainSyncBtnText) mainSyncBtnText.textContent = label;
+    
+    if (mobileModeIndicator) {
+        // Capitalize first letter (e.g., "Tap" or "Hold")
+        mobileModeIndicator.textContent = label.charAt(0) + label.slice(1).toLowerCase();
+    }
 }
 </script>
 </body>
