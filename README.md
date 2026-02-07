@@ -4,64 +4,36 @@ Voxen is a **fast, lightweight, and no-install** tool for creating **synced lyri
 
 Just drop in your **MP3**, paste your lyrics, and start syncing. Simple as that.
 
----
-
 ## 🌐 Try It Online
 
 If you don’t want to download the HTML file, you can use the web version instead:
 
 🔗 **[Voxen Sync Online](https://raqhael-ux.github.io/Voxen-LRC-Editor/)**
 
-> 📱 **Mobile note:** On Chrome mobile, the header UI may get cut off during editing. For a smoother experience, consider using a web-wrapper app like **Weblo**.
-
----
-
-## Screenshots :
-
 <div style="display: flex; gap: 10px;">
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456953559663902884/Screenshot_20260103-1812282.png?ex=695a3d3d&is=6958ebbd&hm=81445e244075e2be7cd4600e0c6aa4cb09351c7c6b1ff43b9a510ad8b044ed35" alt="Android" width="150"/>
-  <img src="https://cdn.discordapp.com/attachments/1344634704946528287/1456949499695202418/image.png?ex=695a3975&is=6958e7f5&hm=2a365b9f2e80dfded3d4d393b10d925aaad3808c3b626189d86055bfa85b4153" alt="Windows" width="560"/>
+<img width="700" height="438" alt="image" src="https://github.com/user-attachments/assets/063db70e-ab1f-4200-a1ae-a6e54209de81" />
+<img width="200" height="438" alt="image" src="https://github.com/user-attachments/assets/ba57efdd-9b79-4778-992e-9abed45df163" />
 </div>
 
----
+## 💖 V2 is coming :
+- [ ] Duet Support
+- [ ] UI Overhaul
+- [x] Background Lyrics Support
+- [x] Change export type (Advanced or Pro)
+- [ ] (Unsure) Preview slide animation
+- [ ] Wiki
 
-## ❤️ Planned for V2!
-* Duet Support
-* UI Overhaul
-* ✅ Background Lyrics Support
-* ✅ Change export type (Advanced or Pro)
-* (Unsure) Preview slide animation
-* Wiki
----
+## ✨ Features :
 
-## 🎊 V6 Is Here!
-* 🖌️ Website design overhaul!
-* 📱 Made mobile view look like an app
-* 👁️ Implemetned Preview mode (w/ Glow Animations)
-* ⚙️ A lot of tweaks!
-
----
-
-## ✨ Features
-
-* 🎯 **Word-level lyric timing** (perfect for karaoke-style effects)
-* 📝 **Line-by-line syncing mode**
-* ➕ Add, remove, or modify lyric lines
-* 🌍 Runs **fully in the browser**
-* 💾 Works **locally** (no internet required after loading)
-* 📤 **Export to LRC** format
-* 📁 **Import & export projects** as JSON
-* ⏱️ **Reaction Offset** support for timing adjustments
-* 👁️ **Preview Mode** Preview your LRC File
-
----
-
-## 🚧 Planned Features
-
-* ~~Bulk offset modification~~
-* ~~Improved lyrics text editor~~
-* ~~Import LRC~~
-* ~~Built-in preview mode (maybe)~~
+* **Word-level lyric timing** (perfect for karaoke-style effects)
+* **Line-by-line syncing mode**
+* Add, remove, or modify lyric lines
+* Runs **fully in the browser**
+* Works **locally** (no internet required after loading)
+* **Export to LRC** format
+* **Import & export projects** as JSON
+* **Reaction Offset** support for timing adjustments
+* **Preview Mode** Preview your LRC File
 
 ---
 
@@ -83,15 +55,19 @@ Syncs lyrics **line-by-line**.
 
 Syncs lyrics **word-by-word** for precise timing.
 
+Advanced (For Metrolist)
 ```
 <for:ss.xx:ss.xx|you:ss.xx:ss.xx|I'd:ss.xx:ss.xx|bleed:ss.xx:ss.xx|myself:ss.xx:ss.xx|dry:ss.xx:ss.xx>
 ```
 
-4. Click **Create New Editor**.
-5. Play the audio, then press the **Sync** button to time the currently highlighted word or line.
-6. Export your synced lyrics as an **LRC file**.
-
----
+Pro (Default for most Apps)
+```
+[01:28.866]v1:<01:28.866>Your <01:29.565>skin, <01:31.332>oh <01:31.669>yeah, <01:32.017>your <01:32.338>skin, <01:32.702>and <01:33.122>bones<01:33.874>
+```
+```
+[bg:<01:33.778>Ooh-<01:36.594>oo-<01:37.947>ooh<01:39.035>]
+```
+Note: You can convert Pro format to Advanced format by just changing the format in the sidebar.
 
 ## ⌨️ Controls
 
@@ -99,7 +75,6 @@ Syncs lyrics **word-by-word** for precise timing.
 * **Left Arrow** — Seek **5 seconds backward**
 * **Right Arrow** — Seek **5 seconds forward**
 
----
 
 ## Demo :
 <video src="https://github.com/user-attachments/assets/f709faf8-92d8-4de0-995d-fc0000465591" 
@@ -108,8 +83,3 @@ Syncs lyrics **word-by-word** for precise timing.
 </video>
 
 App Used: [Metrolist](https://github.com/mostafaalagamy/Metrolist)
-
-## 💡 Notes
-
-* Designed to be minimal, fast, and distraction-free
-* Ideal for karaoke lyrics, music players, or custom lyric visualizers
