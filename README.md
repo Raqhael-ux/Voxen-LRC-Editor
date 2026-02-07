@@ -75,11 +75,35 @@ Note: You can convert Pro format to Advanced format by just changing the format 
 * **Left Arrow** — Seek **5 seconds backward**
 * **Right Arrow** — Seek **5 seconds forward**
 
+## Music App with Advanced LRC Support
+| App Name     | Word-by-Word | BG Vocals      | Syllable-by-Syllable | Duet Support |
+|-------------|--------------|----------------|---------------------|--------------|
+| [Metrolist](https://github.com/mostafaalagamy/Metrolist)   | ✅ Yes       | ❓ Unsure       | ❓ Unsure            | ❓ Unsure     |
+| [Gramophone](https://github.com/FoedusProgramme/Gramophone)  | ✅ Yes       | ✅ Yes         | ✅ Yes               | ✅ Yes       |
+| [Oto Music](https://play.google.com/store/apps/details?id=com.piyush.music&hl=en)   | ✅ Yes       | ❌ No          | ✅ Yes               | ❌ No        |
 
-## Demo :
-<video src="https://github.com/user-attachments/assets/f709faf8-92d8-4de0-995d-fc0000465591" 
-       controls 
-       width="200">
-</video>
+## Demo:
 
-App Used: [Metrolist](https://github.com/mostafaalagamy/Metrolist)
+<table>
+  <tr>
+    <td align="center">
+      <b>App Used: <a href="https://github.com/FoedusProgramme/Gramophone">Gramophone</a></b><br>
+      <video 
+        src="https://github.com/user-attachments/assets/70a79040-3e19-44d8-8c99-af0754a72df0" 
+        controls 
+        width="200" 
+        height="150">
+      </video>
+    </td>
+       <td align="center">
+      <b>App Used: <a href="https://github.com/mostafaalagamy/Metrolist">Metrolist</a></b><br>
+      <video 
+        src="https://github.com/user-attachments/assets/f709faf8-92d8-4de0-995d-fc0000465591" 
+        controls 
+        width="200" 
+        height="150">
+      </video>
+    </td>
+  </tr>
+</table>
+
