@@ -21,7 +21,8 @@ If you don’t want to download the HTML file, you can use the web version inste
 - [x] Background Lyrics Support
 - [x] Change export type (Advanced or Pro)
 - [ ] (Unsure) Preview slide animation
-- [ ] Wiki
+- [ ] Wiki (How To Use)
+- [ ] Flexible LRC Output (Multiple App Support)
 
 ## ✨ Features :
 
@@ -78,7 +79,7 @@ Note: You can convert Pro format to Advanced format by just changing the format 
 ## Music App with Advanced LRC Support
 | App Name     | Word-by-Word | BG Vocals      | Syllable-by-Syllable | Duet Support |
 |-------------|--------------|----------------|---------------------|--------------|
-| [Metrolist](https://github.com/mostafaalagamy/Metrolist)   | ✅ Yes       | ❓ Unsure       | ❓ Unsure            | ❓ Unsure     |
+| [Metrolist](https://github.com/mostafaalagamy/Metrolist)   | ✅ Yes       | ✅ Yes       | ✅ Yes            | ✅ Yes     |
 | [Gramophone](https://github.com/FoedusProgramme/Gramophone)  | ✅ Yes       | ✅ Yes         | ✅ Yes               | ✅ Yes       |
 | [Oto Music](https://play.google.com/store/apps/details?id=com.piyush.music&hl=en)   | ✅ Yes       | ❌ No          | ✅ Yes               | ❌ No        |
 
