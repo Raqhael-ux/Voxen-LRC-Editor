@@ -94,6 +94,21 @@
             position: relative;
         }
 
+        .app-container.view-main .lyric-line.is-bg-vocal {
+            display: none !important;
+        }
+
+        .app-container.view-bg .lyric-line:not(.is-bg-vocal) {
+            display: none !important;
+        }
+
+        .app-container.view-main .lyric-line.add-new-line-btn,
+        .app-container.view-bg .lyric-line.add-new-line-btn {
+            display: flex !important;
+            opacity: 0.7;
+            pointer-events: auto;
+        }
+
         /* =========================================
        4. SIDEBAR (SETTINGS)
        ========================================= */
@@ -211,12 +226,12 @@
         .sidebar-tabs {
             display: flex;
             gap: 5px;
-            padding: 15px 15px 0 15px;
+            padding: 20px;
         }
 
         .tab-btn {
             flex: 1;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0);
             border: none;
             color: var(--text-muted);
             padding: 12px;
@@ -236,6 +251,7 @@
 
         .tab-btn.active {
             color: var(--primary-light);
+            background: rgba(80, 112, 255, 0.185);
         }
 
         .tab-content {
@@ -554,13 +570,13 @@
             left: 0px;
             width: 100%;
             height: 80px;
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(10px);
+            background: rgba(30, 41, 59, 0.8);
             padding: 0.5rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 50;
+            background: linear-gradient(to bottom, #232c41, #232c41e1);
         }
 
         .time-display {
@@ -812,14 +828,13 @@
             bottom: 200px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(15, 23, 42, 0.534);
+            background: rgba(15, 23, 42, 0.774);
             padding: 10px 20px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             gap: 15px;
             opacity: 0;
-            backdrop-filter: blur(16px);
             pointer-events: none;
             transition: var(--trans);
             z-index: 90;
@@ -904,6 +919,10 @@
             color: var(--text-muted);
             min-width: 40px;
             text-align: center;
+        }
+
+        .mobile-sidebar-close {
+            display: none;
         }
 
         #dur-time-lbl {
@@ -1425,14 +1444,6 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
 
-        .app-container.view-main .lyric-line.is-bg-vocal {
-            display: none !important;
-        }
-
-        .app-container.view-bg .lyric-line:not(.is-bg-vocal) {
-            display: none !important;
-        }
-
         /* =========================================
        Welcome Container & Add New Line
        ========================================= */
@@ -1497,6 +1508,7 @@
 
         /* "Add New Line" Dashed Button */
         .lyric-line.add-new-line-btn {
+            display: flex !important;
             border: 2px dashed rgba(255, 255, 255, 0.15);
             background: transparent !important;
             justify-content: center;
@@ -1631,6 +1643,29 @@
 
             .brand {
                 order: 1;
+                justify-content: center !important;
+                display: none;
+            }
+
+            .brand .expand-btn {
+                display: none;
+            }
+
+            .mobile-sidebar-close {
+                display: flex;
+                justify-content: flex-end;
+                padding: 0 25px 10px 0;
+            }
+
+            .mobile-sidebar-close button {
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                color: var(--text-muted);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                font-size: 1.2rem;
+                cursor: pointer;
             }
 
             .modal-overlay {
@@ -1652,8 +1687,7 @@
 
             .sidebar-tabs {
                 order: 3;
-                padding: 15px 10px 25px 10px;
-                margin: 0 10px 0 10px;
+                padding: 15px 0 15px 10px;
                 gap: 10px;
             }
 
@@ -2028,7 +2062,7 @@
                 width: 100%;
                 background: #1c2436;
                 border-radius: 24px 24px 0 0;
-                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.226);
                 z-index: 250;
                 transform: translateY(110%);
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2070,7 +2104,7 @@
                 width: 100%;
                 height: 100px;
                 background: rgba(23, 30, 48, 0.95);
-                backdrop-filter: blur(10px);
+                backdrop-filter: none;
                 border-top: 1px solid rgba(255, 255, 255, 0);
                 display: flex;
                 align-items: center;
@@ -2303,12 +2337,16 @@
                     onclick="toggleSettings(false)">✕</button>
             </div>
 
-            <div class="sidebar-tabs">
+            <div class="sidebar-tabs" style="margin: 0px">
                 <button id="tab-btn-media" class="tab-btn active" onclick="switchTab('media')">Media</button>
                 <button id="tab-btn-controls" class="tab-btn" onclick="switchTab('controls')">Controls</button>
                 <button id="tab-btn-session" class="tab-btn disabled-area"
                     onclick="switchTab('session')">Session</button>
                 <button id="tab-btn-output" class="tab-btn disabled-area" onclick="switchTab('output')">Output</button>
+                <div class="mobile-sidebar-close" style="padding-top: 5px;">
+                    <button style="background: #ffffff; color: black; font-weight: bold;"
+                        onclick="toggleSettings(false)">✕</button>
+                </div>
             </div>
 
             <div class="sidebar-container">
@@ -2436,6 +2474,12 @@
 
                             <div class="hotkey-text">Delete Line</div>
                             <div class="hotkey-pill" id="kb-del" onclick="rebindKey('del')">Delete</div>
+
+                            <div class="hotkey-text">Toggle Preview</div>
+                            <div class="hotkey-pill" id="kb-togglePreview" onclick="rebindKey('togglePreview')">V</div>
+
+                            <div class="hotkey-text">Arrange Lines</div>
+                            <div class="hotkey-pill" id="kb-arrange" onclick="rebindKey('arrange')">R</div>
                         </div>
 
                         <button class="btn btn-secondary" style="margin-top: 20px;" onclick="resetKeybinds()">Reset
@@ -2478,6 +2522,13 @@
                 </div>
 
                 <div class="top-right-controls">
+                    <button class="header-btn" onclick="arrangeLines()" title="Sort by Time"
+                        style="margin-right: 8px; padding: 0 25px 0 25px; background: #ffffff1e;">
+                        <span class="btn-text"
+                            style="font-size: 15px; display: flex; align-items: center; gap: 6px; color: #ffffff;">
+                            ⇅
+                        </span>
+                    </button>
                     <button class="header-btn" id="export-btn" onclick="openExportModal()" title="Export">
                         <span class="btn-text"
                             style="font-size: 17px; display: flex; align-items: center; gap: 6px; display: block; line-height: 1;">
@@ -2518,7 +2569,7 @@
                     </div>
                     <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.5;">
                         <p>Load an audio file to enable LRC features.</p>
-                        <a href="#" style="color: inherit; text-decoration: underline;">v8.1.1</a>
+                        <a href="#" style="color: inherit; text-decoration: underline;">v9.1 Beta</a>
                     </div>
                 </div>
             </div>
@@ -2782,9 +2833,9 @@
     </div>
     <div class="tools-overlay" id="tools-overlay" onclick="toggleTools(false)"></div>
     <div class="tools-sidebar" id="tools-sidebar">
-        <div style="padding: 20px 25px 0 25px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:800; font-size:1.1rem;">Toolkit</span>
-            <button class="expand-btn" onclick="toggleTools(false)">✕</button>
+        <div style="padding: 20px 25px 0 25px; display:flex; align-items:center; justify-content: center;">
+            <span style="font-weight:800; font-size:1.1rem;">TOOLS</span>
+            <button class="expand-btn" style="display: none;" onclick="toggleTools(false)">✕</button>
         </div>
 
         <div class="tools-content-wrapper">
@@ -2805,6 +2856,14 @@
 
             <div class="tools-category-label">Editor</div>
             <div class="tools-row-grid">
+                <button id="edit-mode-toggle-mobile" class="tool-item-btn"
+                    onclick="toggleEditMode(); toggleTools(false);">
+                    <span>✎</span> Edit
+                </button>
+                <button id="mobile-preview-btn" class="tool-item-btn"
+                    onclick="togglePreviewMode(); toggleTools(false);">
+                    <span>▷</span> Preview
+                </button>
                 <button id="edit-offset-btn" class="tool-item-btn" onclick="openOffsetModal()">
                     <span>⏱</span> Offset
                 </button>
@@ -2814,23 +2873,30 @@
                 <button class="tool-item-btn" onclick="openViewModal()">
                     <span>👁</span> Singers
                 </button>
+                <button class="tool-item-btn" onclick="arrangeLines()">
+                    <span>⇅</span> Arrange
+                </button>
             </div>
 
         </div>
 
         <div class="tools-footer">
             <div class="footer-left">
-                <button id="edit-mode-toggle-mobile" class="tool-item-btn footer-btn" onclick="toggleEditMode()">
-                    <span>✎</span> &nbsp;Edit
-                </button>
-                <button id="mobile-preview-btn" class="tool-item-btn footer-btn" onclick="togglePreviewMode()">
-                    <span>▷</span> &nbsp;Preview
+                <button class="btn-export-footer" onclick="openExportModal()"
+                    style="width: 140px; font-size: 1rem; border-radius: 50px; height: 45px;">
+                    <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M9.163 2.819C9 3.139 9 3.559 9 4.4V11H7.803c-.883 0-1.325 0-1.534.176a.75.75 0 0 0-.266.62c.017.274.322.593.931 1.232l4.198 4.401c.302.318.453.476.63.535a.749.749 0 0 0 .476 0c.177-.059.328-.217.63-.535l4.198-4.4c.61-.64.914-.96.93-1.233a.75.75 0 0 0-.265-.62C17.522 11 17.081 11 16.197 11H15V4.4c0-.84 0-1.26-.164-1.581a1.5 1.5 0 0 0-.655-.656C13.861 2 13.441 2 12.6 2h-1.2c-.84 0-1.26 0-1.581.163a1.5 1.5 0 0 0-.656.656zM5 21a1 1 0 0 0 1 1h12a1 1 0 1 0 0-2H6a1 1 0 0 0-1 1z"
+                            fill="#000000" />
+                    </svg>
+                    Export
                 </button>
             </div>
 
             <div class="footer-right">
-                <button class="btn-export-footer" onclick="openExportModal()">
-                    <span>⭳ </span>Export
+                <button class="tool-item-btn footer-btn" onclick="toggleTools(false)"
+                    style="background: rgba(255, 255, 255, 0.1); width: 100px; height: 45px; border-radius: 25px; justify-content: center;">
+                    <span style="font-size: 1.0rem; font-weight: bold;">Close</span>
                 </button>
             </div>
         </div>
@@ -2839,7 +2905,7 @@
         // --- State ---
         let state = {
             lyrics: [],
-            mode: 'word',         
+            mode: 'word',
             currentIndex: 0,
             currentWordIndex: 0,
             isPlaying: false,
@@ -2848,7 +2914,7 @@
             currentSpeed: 1.0,
             syncInputMode: 'hybrid',
             glowMode: 'auto',
-            lrcFormat: 'pro',     
+            lrcFormat: 'pro',
             viewMode: 'all'
         };
 
@@ -2925,8 +2991,8 @@
         const defaultKeyMap = {
             prevLine: 'KeyW',
             nextLine: 'KeyS',
-            prevWord: 'KeyA', 
-            nextWord: 'KeyD', 
+            prevWord: 'KeyA',
+            nextWord: 'KeyD',
             seekBack: 'ArrowLeft',
             seekFwd: 'ArrowRight',
             play: 'Space',
@@ -2934,7 +3000,9 @@
             add: 'KeyC',
             editLine: 'KeyE',
             toggleBg: 'Digit1',
-            del: 'Delete'
+            del: 'Delete',
+            togglePreview: 'KeyV',
+            arrange: 'KeyR'
         };
 
         let keyMap = { ...defaultKeyMap };
@@ -3227,6 +3295,7 @@
             isDraggingSlider = false;
             if (audioPlayer.paused) timeDisplay.textContent = formatTimeDisplay(audioPlayer.currentTime);
             updateRangeFill(seekSlider);
+            seekSlider.blur();
         });
 
         function formatSimpleTime(s) {
@@ -3499,7 +3568,7 @@
                         const wordParts = rawData.split('|');
                         const lastLine = newLyrics[newLyrics.length - 1];
 
-                        if (lastLine && !lastLine.isBg) {
+                        if (lastLine) {
                             const newWords = wordParts.map(part => {
                                 const lastColon = part.lastIndexOf(':');
                                 const secondLastColon = part.lastIndexOf(':', lastColon - 1);
@@ -3512,7 +3581,7 @@
 
                                 return {
                                     text: wText,
-                                    start: wStart ? parseFloat(wStart) : null,
+                                    start: wStart ? parseFloat(wStart) : null, // parseFloat handles full length automatically
                                     end: wEnd ? parseFloat(wEnd) : null
                                 };
                             }).filter(w => w);
@@ -3528,13 +3597,27 @@
                         if (timeMatch) {
                             const min = parseInt(timeMatch[1]);
                             const sec = parseFloat(timeMatch[2]);
-                            const text = timeMatch[3].trim();
+                            let textContent = timeMatch[3].trim(); // Get text
                             const totalTime = (min * 60) + sec;
+
+                            // --- Updated Tag Detection ---
+                            let isBgLine = false;
+
+                            if (textContent.startsWith('{bg}')) {
+                                isBgLine = true;
+                                textContent = textContent.replace('{bg}', '').trim();
+                            }
+                            else if (textContent.startsWith('{agent:v1}')) {
+                                isBgLine = false;
+                                textContent = textContent.replace('{agent:v1}', '').trim();
+                            }
+                            // -----------------------------
+
                             newLyrics.push({
-                                text: text,
+                                text: textContent,
                                 time: totalTime,
-                                words: parseWords(text),
-                                isBg: false
+                                words: parseWords(textContent),
+                                isBg: isBgLine // Set the property based on the tag
                             });
                         } else if (!mainContent.startsWith('[') && !mainContent.startsWith('<')) {
                             // Plain text fallback
@@ -3627,7 +3710,7 @@
                 </div>
                 <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.5;">
                     <p>Load an audio file to enable LRC features.</p>
-                    <a href="#" style="color: inherit; text-decoration: underline;">v8.1.1</a>
+                    <a href="#" style="color: inherit; text-decoration: underline;">v9.1 Beta</a>
                 </div>
             `;
 
@@ -3728,6 +3811,19 @@
                         span.onclick = (e) => {
                             e.stopPropagation();
                             if (state.isPreviewMode || state.isEditMode) return;
+
+                            // --- Seek Audio to Word Timestamp ---
+                            if (word.start !== null) {
+                                audioPlayer.currentTime = word.start;
+                                seekSlider.value = word.start; // Move the visual slider thumb
+                                updateRangeFill(seekSlider);   // Update the color fill
+
+                                // Update the time display immediately if paused
+                                if (audioPlayer.paused) {
+                                    timeDisplay.textContent = formatTimeDisplay(word.start);
+                                }
+                            }
+
                             state.currentIndex = index;
                             state.currentWordIndex = wIdx;
                             updateVisuals();
@@ -3805,8 +3901,21 @@
             state.lyrics.unshift(newItem); state.currentIndex++; renderEditor();
         }
         function addLine(index) {
-            const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
-            state.lyrics.splice(index + 1, 0, newItem); renderEditor();
+            const currentLine = state.lyrics[index];
+            // Check if we are in BG view mode OR targeting an existing BG line
+            const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+
+            const textToUse = isBgContext ? "New Background Line" : "New Line";
+
+            const newItem = {
+                text: textToUse,
+                time: null,
+                words: parseWords(textToUse),
+                isBg: isBgContext
+            };
+
+            state.lyrics.splice(index + 1, 0, newItem);
+            renderEditor();
         }
         function deleteLine(index) {
             state.lyrics.splice(index, 1);
@@ -3903,7 +4012,7 @@
         function startHoldAction(time) {
             holdActive = true;
 
-            // Task 3: Activate Dock Glow
+            // Activate Dock Glow
             controlDock.classList.add('active-hold-glow');
 
             syncWordStart(state.currentIndex, state.currentWordIndex, time);
@@ -3933,8 +4042,21 @@
                 updateVisuals();
             }
         }
+
         function syncLine(idx, time) {
             if (!state.lyrics[idx]) return;
+
+            // If in Advanced Mode and this is a BG line, try to inherit time from the closest Normal line above
+            if (state.lrcFormat === 'advanced' && state.lyrics[idx].isBg) {
+                for (let i = idx - 1; i >= 0; i--) {
+                    // Find first line that is NOT background and has a valid time
+                    if (!state.lyrics[i].isBg && state.lyrics[i].time !== null) {
+                        time = state.lyrics[i].time;
+                        break;
+                    }
+                }
+            }
+
             state.lyrics[idx].time = time;
 
             // Update the 3 inputs
@@ -3955,6 +4077,7 @@
             }
             generateLRC();
         }
+
         // Classic Tap: Sets start, auto sets prev end, advances
         function syncWordTap(lIdx, wIdx, time) {
             const line = state.lyrics[lIdx];
@@ -4250,29 +4373,24 @@
                 if (l.time === null && !l.isBg) return;
 
                 if (state.lrcFormat === 'pro') {
-
-                    // 1. Build Content
+                    // --- PRO FORMAT LOGIC ---
                     let lineContent = "";
                     if (l.words && l.words.length > 0) {
                         l.words.forEach((w, idx) => {
                             if (w.start !== null) lineContent += `<${formatTimePro(w.start)}>`;
                             lineContent += w.text;
-
-                            // Space Logic: Add space if not last word AND not ending in dash
                             if (idx < l.words.length - 1) {
                                 if (!w.text.endsWith('-')) {
                                     lineContent += " ";
                                 }
                             }
                         });
-
                         const lastWord = l.words[l.words.length - 1];
                         if (lastWord && lastWord.end !== null) lineContent += `<${formatTimePro(lastWord.end)}>`;
                     } else {
                         lineContent += l.text;
                     }
 
-                    // 2. Output Logic
                     if (l.isBg) {
                         out += `[bg:${lineContent}]\n`;
                     } else {
@@ -4280,13 +4398,19 @@
                     }
                 }
                 else {
-                    // Advanced/Standard Mode (Ignores BG special formatting)
+                    // Advanced Format
                     if (l.time !== null) {
-                        out += `[${formatTimeLRC(l.time)}]${l.text}\n`;
+                        // Use {bg} for background vocals, {agent:v1} for main vocals
+                        const lineTag = l.isBg ? "{bg}" : "{agent:v1}";
+                        out += `[${formatTimeLRC(l.time)}]${lineTag}${l.text}\n`;
+
                         if (l.words && l.words.some(w => w.start !== null)) {
                             const tags = l.words.map(w => {
-                                const s = w.start ? w.start.toFixed(2) : "";
-                                const e = w.end ? w.end.toFixed(2) : "";
+                                // Use .toString() to keep full precision (e.g., 211.85399999999998)
+                                const s = w.start !== null ? w.start.toString() : "";
+                                const e = w.end !== null ? w.end.toString() : "";
+
+                                // Format: Word:Start:End
                                 return `${w.text}:${s}:${e}`;
                             }).join('|');
                             out += `<${tags}>\n`;
@@ -4334,8 +4458,8 @@
                 handleSyncDown(e);
             }
 
-            if (code === keyMap.seekBack) { seekAudio(-10); }
-            if (code === keyMap.seekFwd) { seekAudio(10); }
+            if (code === keyMap.seekBack) { seekAudio(-5); }
+            if (code === keyMap.seekFwd) { seekAudio(5); }
 
             if (code === keyMap.add) {
                 e.preventDefault();
@@ -4380,6 +4504,16 @@
                 scrollToActive();
             }
 
+            if (code === keyMap.togglePreview) {
+                e.preventDefault();
+                togglePreviewMode();
+            }
+
+            if (code === keyMap.arrange) {
+                e.preventDefault();
+                arrangeLines();
+            }
+
             // --- Navigation: WORDS (A/D) ---
             if (code === keyMap.prevWord) {
                 e.preventDefault();
@@ -4387,9 +4521,12 @@
                 if (state.currentWordIndex > 0) {
                     state.currentWordIndex--;
                 } else if (state.currentIndex > 0) {
-                    // Wrap to previous line
-                    state.currentIndex--;
-                    state.currentWordIndex = state.lyrics[state.currentIndex].words.length - 1;
+                    const prevLineIdx = getPrevValidLineIndex(state.currentIndex - 1);
+
+                    if (prevLineIdx !== -1) {
+                        state.currentIndex = prevLineIdx;
+                        state.currentWordIndex = state.lyrics[state.currentIndex].words.length - 1;
+                    }
                 }
                 updateVisuals();
                 scrollToActive();
@@ -4401,10 +4538,13 @@
                 // Move word forward
                 if (state.currentWordIndex < line.words.length - 1) {
                     state.currentWordIndex++;
-                } else if (state.currentIndex < state.lyrics.length - 1) {
-                    // Wrap to next line
-                    state.currentIndex++;
-                    state.currentWordIndex = 0;
+                } else {
+                    const nextLineIdx = getNextValidLineIndex(state.currentIndex + 1);
+
+                    if (nextLineIdx < state.lyrics.length) {
+                        state.currentIndex = nextLineIdx;
+                        state.currentWordIndex = 0;
+                    }
                 }
                 updateVisuals();
                 scrollToActive();
@@ -4544,7 +4684,7 @@
             const modal = document.getElementById('single-line-edit-modal');
             const textArea = document.getElementById('single-line-text');
 
-            // FIX: Explicitly get the checkbox by ID
+            // Explicitly get the checkbox by ID
             const bgCheckbox = document.getElementById('edit-line-bg');
 
             // 1. Setup Text
@@ -4622,7 +4762,18 @@
         }
 
         function addLineFromModal() {
-            addLine(editingLineIndex); // Uses existing add function
+            const currentLine = state.lyrics[editingLineIndex];
+            const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+
+            const newItem = {
+                text: isBgContext ? "New Background Line" : "New Line",
+                time: null,
+                words: parseWords(isBgContext ? "New Background Line" : "New Line"),
+                isBg: isBgContext // Set true if we are in BG view or editing a BG line
+            };
+            state.lyrics.splice(editingLineIndex + 1, 0, newItem);
+
+            renderEditor();
             closeSingleLineEditModal();
         }
 
@@ -4704,6 +4855,21 @@
 
             // 3. Last Resort: Arbitrary duration (3 seconds)
             return (line.time || 0) + 3.0;
+        }
+
+        function getPrevValidLineIndex(startIndex) {
+            let i = startIndex;
+            while (i >= 0) {
+                const line = state.lyrics[i];
+                const isBg = !!line.isBg;
+
+                // Skip lines that are hidden in the current view
+                if (state.viewMode === 'main' && isBg) { i--; continue; }
+                if (state.viewMode === 'bg' && !isBg) { i--; continue; }
+
+                return i;
+            }
+            return -1; // No valid previous line found
         }
 
         // Helper: Applies glow to words within a specific line
@@ -4855,6 +5021,7 @@
             state.mode = document.querySelector('input[name="mode"]:checked').value;
             renderEditor();
             toggleSettings(false);
+            setSyncInputMode('auto')
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -4978,13 +5145,47 @@
                 document.getElementById('raw-lyrics').value = "";
                 document.getElementById('export-output').value = "";
 
-                // Return to default state
                 renderEditor();
                 updateVisuals();
                 toggleTools(false); // Close modal
             }
         }
+
+        function arrangeLines() {
+            if (state.lyrics.length < 2) return;
+
+            // Sort lyrics based on time. 
+            state.lyrics.sort((a, b) => {
+                if (a.time === null && b.time === null) return 0;
+                if (a.time === null) return 1;
+                if (b.time === null) return -1;
+
+                // If timestamps are essentially equal, prioritize Normal lines over BG lines
+                if (Math.abs(a.time - b.time) < 0.001) {
+                    if (!a.isBg && b.isBg) return -1; // Normal goes first (top)
+                    if (a.isBg && !b.isBg) return 1;  // BG goes second (bottom)
+                    return 0;
+                }
+
+                return a.time - b.time;
+            });
+
+            // Reset editor state
+            state.currentIndex = 0;
+            state.currentWordIndex = 0;
+
+            renderEditor();
+            updateVisuals();
+            generateLRC();
+
+            // Visual feedback
+            const btnText = document.querySelector('#arrange-btn .btn-text');
+            if (btnText) {
+                const originalText = btnText.innerHTML;
+                btnText.innerHTML = "Done ✓";
+                setTimeout(() => btnText.innerHTML = originalText, 1000);
+            }
+        }
     </script>
 </body>
 </html>
-
