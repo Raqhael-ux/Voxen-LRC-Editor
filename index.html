@@ -102,6 +102,10 @@
             display: none !important;
         }
 
+        .app-container.view-main .lyric-line.is-v2 {
+    display: none !important;
+}
+
         .app-container.view-main .lyric-line.add-new-line-btn,
         .app-container.view-bg .lyric-line.add-new-line-btn {
             display: flex !important;
@@ -1410,6 +1414,14 @@
             z-index: 5;
         }
 
+        .app-container.is-preview .lyric-line.active-v2-preview {
+            opacity: 1 !important;
+            transform: scale(1.02);
+            background: rgba(99, 102, 241, 0.2);
+            border-left: 4px solid var(--primary-light);
+            z-index: 8;
+        }
+
         /* Edit State Overrides */
         .app-container.is-editing .lyric-line {
             border-left-color: var(--warning);
@@ -1443,6 +1455,37 @@
             font-weight: bold;
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
+
+        .lyric-line.is-v2 .line-content-wrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.lyric-line.is-v2 .line-text {
+    text-align: right;
+    margin-right: 100px;
+}
+
+.app-container.view-main .lyric-line.is-v2,
+.app-container.view-main .lyric-line.is-v3 {
+    display: none !important;
+}
+
+/* Updated View State Rules for v1/v2/v3 */
+.app-container.view-v1 .lyric-line:not(.is-v1):not(.add-new-line-btn),
+.app-container.view-v2 .lyric-line:not(.is-v2):not(.add-new-line-btn),
+.app-container.view-v3 .lyric-line:not(.is-v3):not(.add-new-line-btn) {
+    display: none !important;
+}
+
+.lyric-line.is-v3 .line-content-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.lyric-line.is-v3 .line-text {
+    text-align: center;
+}
 
         /* =========================================
        Welcome Container & Add New Line
@@ -1608,6 +1651,11 @@
             .app-container.is-preview .lyric-line.active {
                 left: 5px;
             }
+
+            .lyric-line.is-v2 .line-text {
+    text-align: right;
+    margin-right: 0;
+}
 
             .app-container.is-editing .line-actions {
                 display: flex;
@@ -2396,6 +2444,16 @@
                             <input type="number" id="offset-val" value="-200" step="50">
                         </div>
 
+                        <div class="section-title">Third Singer Label</div>
+                        <div class="input-group">
+                            <div class="mode-toggle">
+                                <input type="radio" id="lbl-v3" name="third-singer-lbl" value="v3" onchange="setThirdSingerLabel('v3')">
+                                <label for="lbl-v3">v3</label>
+                                <input type="radio" id="lbl-v1000" name="third-singer-lbl" value="v1000" checked onchange="setThirdSingerLabel('v1000')">
+                                <label for="lbl-v1000">v1000</label>
+                            </div>
+                        </div>
+                        
                         <div class="section-title">Format</div>
                         <div class="input-group">
                             <div class="mode-toggle">
@@ -2569,7 +2627,7 @@
                     </div>
                     <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.5;">
                         <p>Load an audio file to enable LRC features.</p>
-                        <a href="#" style="color: inherit; text-decoration: underline;">v9.1 Beta</a>
+                        <a href="#" style="color: inherit; text-decoration: underline;">v9.2 Beta</a>
                     </div>
                 </div>
             </div>
@@ -2692,55 +2750,55 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <button class="btn btn-secondary" onclick="closeSyncSettings()">Close</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="offset-modal">
-        <div class="base-modal offset-modal">
-            <div class="modal-title">Bulk Offset Timestamp</div>
-            <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top:-10px;">
-                Shift all synced lines forward (positive) or backward (negative).
-            </p>
-            <div class="offset-grid">
-                <div class="offset-col"><label>Min</label><input type="number" id="off-min" value="0" placeholder="0">
                 </div>
-                <div class="offset-col"><label>Sec</label><input type="number" id="off-sec" value="0" placeholder="0">
+                
+                <button class="btn btn-secondary" onclick="closeSyncSettings()">Close</button>
                 </div>
-                <div class="offset-col"><label>Ms</label><input type="number" id="off-ms" value="0" placeholder="0">
                 </div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-secondary" onclick="closeOffsetModal()">Cancel</button>
-                <button class="btn" onclick="applyOffset()">Apply Offset</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="expand-modal">
-        <div class="base-modal expanded-text-modal">
-            <div class="modal-title" id="expand-modal-title">Edit</div>
-            <textarea id="expand-textarea" class="expanded-textarea" spellcheck="false"></textarea>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-secondary" style="flex:0.5" onclick="closeExpandModal()">Cancel</button>
-                <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="single-line-edit-modal">
-        <div class="base-modal" style="width: 500px; max-width: 95%;">
+                
+                <div class="modal-overlay" id="offset-modal">
+                    <div class="base-modal offset-modal">
+                        <div class="modal-title">Bulk Offset Timestamp</div>
+                        <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top:-10px;">
+                            Shift all synced lines forward (positive) or backward (negative).
+                        </p>
+                        <div class="offset-grid">
+                            <div class="offset-col"><label>Min</label><input type="number" id="off-min" value="0" placeholder="0">
+                            </div>
+                            <div class="offset-col"><label>Sec</label><input type="number" id="off-sec" value="0" placeholder="0">
+                            </div>
+                            <div class="offset-col"><label>Ms</label><input type="number" id="off-ms" value="0" placeholder="0">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-secondary" onclick="closeOffsetModal()">Cancel</button>
+                            <button class="btn" onclick="applyOffset()">Apply Offset</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-overlay" id="expand-modal">
+                    <div class="base-modal expanded-text-modal">
+                        <div class="modal-title" id="expand-modal-title">Edit</div>
+                        <textarea id="expand-textarea" class="expanded-textarea" spellcheck="false"></textarea>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-secondary" style="flex:0.5" onclick="closeExpandModal()">Cancel</button>
+                            <div id="expand-modal-actions" style="display:flex; gap:10px; flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-overlay" id="single-line-edit-modal">
+        <div class="base-modal" style="width: 450px; max-width: 95%;">
             <div class="modal-title">Edit Line</div>
 
             <div class="input-group">
-                <div class="label-row2"><label>Lyric Text</label></div>
+                <label style="margin-bottom: 5px;">Lyric Text</label>
                 <textarea id="single-line-text" style="height: 80px; font-size: 1rem;"></textarea>
             </div>
 
             <div class="input-group" style="margin-top: 15px;">
-                <div class="label-row2"><label>Start Time</label></div>
+                <label style="margin-bottom: 5px;">Start Time</label>
                 <div class="offset-grid" style="margin-bottom: 0;">
                     <div class="offset-col">
                         <label>Min</label>
@@ -2757,41 +2815,80 @@
                 </div>
             </div>
 
-            <div class="input-group" style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="edit-line-bg" style="width: auto; height: 18px; width: 18px;">
-                <label for="edit-line-bg" style="margin: 0; cursor: pointer; color: var(--text-main);">Background Vocal
-                    (Pro Mode)</label>
+            <div class="input-group" style="margin-top: 15px;">
+                <label style="margin-bottom: 5px;">Line Type</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
+                    <button id="edit-type-bg" class="btn btn-secondary" onclick="setLineType('bg')">
+                        BG
+                    </button>
+                    <button id="edit-type-v1" class="btn btn-secondary" onclick="setLineType('v1')">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"><path d="M3 10H16M3 14H21M3 18H16M3 6H21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button id="edit-type-v3" class="btn btn-secondary" onclick="setLineType('v3')" style="font-weight:bold; font-size: 1.1rem;">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"><path d="M3 6H21M3 14H21M17 10H7M17 18H7" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button id="edit-type-v2" class="btn btn-secondary" onclick="setLineType('v2')">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"><path d="M8 10H21M3 14H21M8 18H21M3 6H21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
             </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap;">
-                <button class="btn btn-secondary" style="flex: 1; background: var(--danger);"
-                    onclick="deleteLineFromModal()">Remove Line</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="addLineFromModal()">+ Add Below</button>
+            <div style="display: flex; gap: 8px; margin-top: 25px;">
+                <button class="btn btn-outline" style="flex: 1; color: var(--danger);" onclick="deleteLineFromModal()">🗑 Remove Line</button>
+                <button class="btn btn-outline" style="flex: 1;" onclick="addLineFromModal()">+ Add Below</button>
             </div>
-            <hr style="border: 0; margin: 15px 0;">
-            <div style="display: flex; gap: 8px;">
+            
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
                 <button class="btn btn-secondary" style="flex: 1;" onclick="closeSingleLineEditModal()">Cancel</button>
-                <button class="btn" style="flex: 1;" onclick="applySingleLineChanges()">Apply Changes</button>
+                <button class="btn" style="flex: 2;" onclick="applySingleLineChanges()">Apply Changes</button>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="view-modal">
-        <div class="base-modal" style="width: 300px; text-align: center;">
-            <div class="modal-title">Select Editor View</div>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">
-                Choose which lines to display and sync.
-            </p>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button id="view-btn-all" class="btn view-btn active" onclick="setViewMode('all')">All
-                    (Default)</button>
-                <button id="view-btn-main" class="btn btn-outline view-btn" onclick="setViewMode('main')">Main</button>
-                <button id="view-btn-bg" class="btn btn-secondary view-btn"
-                    onclick="setViewMode('bg')">Background</button>
+    <div class="modal-overlay" id="add-line-modal">
+        <div class="base-modal" style="width: 400px; max-width: 95%;">
+            <div class="modal-title">Add New Line Below</div>
+            
+            <div class="input-group">
+                <label style="margin-bottom: 5px;">Lyric Text</label>
+                <textarea id="add-line-text" style="height: 80px; font-size: 1rem;" placeholder="Type new line here..."></textarea>
             </div>
-            <div style="margin-top:20px;">
-                <button class="btn btn-secondary"
-                    onclick="document.getElementById('view-modal').classList.remove('active')">Cancel</button>
+            
+            <div style="display: flex; gap: 8px; margin-top: 20px;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeAddLineModal()">Cancel</button>
+                <button class="btn" style="flex: 1;" onclick="confirmAddLine()">Add Line</button>
+            </div>
+        </div>
+    </div>
+                
+                <div class="modal-overlay" id="view-modal">
+                    <div class="base-modal" style="width: 300px; text-align: center;">
+                        <div class="modal-title">Select Editor View</div>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">
+                            Choose which lines to display and sync.
+                        </p>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <button id="view-btn-all" class="btn view-btn active" onclick="setViewMode('all')">All</button>
+                            <button id="view-btn-main" class="btn btn-outline view-btn" onclick="setViewMode('main')">
+                                 <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"><path d="M3 10H16M3 14H21M3 18H16M3 6H21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                              <button id="view-btn-v3" class="btn btn-outline view-btn" onclick="setViewMode('v3')" style="font-weight:bold;">
+                                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
+<path d="M3 6H21M3 14H21M17 10H7M17 18H7" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+                            </button>
+                            <button id="view-btn-v2" class="btn btn-outline view-btn" onclick="setViewMode('v2')">
+                                       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
+<path d="M8 10H21M3 14H21M8 18H21M3 6H21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+                            </button>
+                            <button id="view-btn-bg" class="btn btn-secondary view-btn" onclick="setViewMode('bg')">
+                                        Background
+                            </button>
+                        </div>
+                        <div style="margin-top:20px;">
+                            <button class="btn btn-secondary"
+                                onclick="document.getElementById('view-modal').classList.remove('active')">Cancel</button>
             </div>
         </div>
     </div>
@@ -2915,7 +3012,8 @@
             syncInputMode: 'hybrid',
             glowMode: 'auto',
             lrcFormat: 'pro',
-            viewMode: 'all'
+            viewMode: 'all',
+            thirdSingerLabel: 'v1000'
         };
 
         let currentFileName = "lyrics";
@@ -3076,6 +3174,11 @@
             if (!state.isEditMode) updateVisuals();
         }
 
+        function setThirdSingerLabel(label) {
+            state.thirdSingerLabel = label;
+            generateLRC();
+        }
+
         function togglePreviewMode() {
             if (state.isEditMode) toggleEditMode();
 
@@ -3223,14 +3326,13 @@
             }
         });
 
-        // --- UPDATED PREVIEW ANIMATION LOOP ---
-        function animatePreviewFrame() {
+       function animatePreviewFrame() {
             if (!state.isPreviewMode) return;
 
             if (state.lyrics.length > 0) {
                 const curTime = audioPlayer.currentTime;
 
-                // --- 1. Identify Active MAIN Line ---
+                // --- 1. Identify Active MAIN Line (for scrolling focus) ---
                 let activeMainIdx = -1;
                 for (let i = 0; i < state.lyrics.length; i++) {
                     const l = state.lyrics[i];
@@ -3241,7 +3343,7 @@
                     }
                 }
 
-                // Update Main Line Focus
+                // Update Main Line Focus & Scroll
                 if (activeMainIdx !== -1 && activeMainIdx !== state.currentIndex) {
                     state.currentIndex = activeMainIdx;
                     state.currentWordIndex = 0;
@@ -3254,22 +3356,22 @@
                     const row = document.getElementById(`line-${idx}`);
                     if (!row) return;
 
-                    // BACKGROUND VOCALS
-                    if (l.isBg) {
+                    // MULTI-LINE SUPPORT: Background Vocals AND V2 (Singer 2)
+                    if (l.isBg || l.singer === 'v2') {
                         const endTime = getLineEndTime(idx);
                         const isActive = (curTime >= l.time && curTime < endTime);
 
                         if (isActive) {
-                            row.classList.add('active-bg-preview');
+                            row.classList.add(l.isBg ? 'active-bg-preview' : 'active-v2-preview');
                             animateWordGlow(idx, curTime);
                         } else {
-                            row.classList.remove('active-bg-preview');
+                            row.classList.remove('active-bg-preview', 'active-v2-preview');
                             if (l.time !== null && curTime < l.time) {
                                 cleanupLineGlow(idx);
                             }
                         }
                     }
-                    // MAIN LINES
+                    // SINGLE-LINE SUPPORT: Main Lines (v1)
                     else {
                         if (idx === activeMainIdx) {
                             animateWordGlow(idx, curTime);
@@ -3512,7 +3614,7 @@
 
             // Regex Definitions
             const standardTimeRegex = /\[(\d{2}):(\d{2}(?:\.\d+)?)\](.*)/;
-            const proLineRegex = /^\[(\d{2}):(\d{2}(?:\.\d+)?)\]<(\d{2}):(\d{2}(?:\.\d+)?)>(.*)/;
+            const proLineRegex = /^\[(\d{2}):(\d{2}(?:\.\d+)?)\](?:(v1|v2|v3|v1000):)?<(\d{2}):(\d{2}(?:\.\d+)?)>(.*)/;
             const bgTagRegex = /\[bg:(.*?)\]/;
             const advancedWordDataRegex = /^<(.+:.+:.+)>/;
 
@@ -3539,30 +3641,34 @@
                     const advWordMatch = mainContent.match(advancedWordDataRegex); // Check for advanced data line
 
                     if (proMatch) {
-                        // --- Case A: Pro Mode Line ---
-                        detectedFormat = 'pro';
-                        hasWordData = true;
+    // --- Case A: Pro Mode Line ---
+    detectedFormat = 'pro';
+    hasWordData = true;
 
-                        const lineMin = parseInt(proMatch[1]);
-                        const lineSec = parseFloat(proMatch[2]);
-                        const lineTime = (lineMin * 60) + lineSec;
+    const lineMin = parseInt(proMatch[1]);
+    const lineSec = parseFloat(proMatch[2]);
+    const lineTime = (lineMin * 60) + lineSec;
+    let singerOpt = proMatch[3] || 'v1'; 
+    if (singerOpt === 'v1000') singerOpt = 'v3'; // Map internally to v3
 
-                        const rawContent = mainContent.replace(/^\[.*?\]/, '');
-                        const words = parseProWords(rawContent);
+    // Strip out the initial tag and optional v1/v2 prefix
+    const rawContent = mainContent.replace(/^\[.*?\](?:v1:|v2:|v3:|v1000:)?/, '');
+    const words = parseProWords(rawContent);
 
-                        // Reconstruct text
-                        const reconstructedText = words.map((w, i) => {
-                            if (i === words.length - 1 || w.text.endsWith('-')) return w.text;
-                            return w.text + " ";
-                        }).join('');
+    // Reconstruct text
+    const reconstructedText = words.map((w, i) => {
+        if (i === words.length - 1 || w.text.endsWith('-')) return w.text;
+        return w.text + " ";
+    }).join('');
 
-                        newLyrics.push({
-                            text: reconstructedText,
-                            time: lineTime,
-                            words: words,
-                            isBg: false
-                        });
-                    }
+    newLyrics.push({
+        text: reconstructedText,
+        time: lineTime,
+        words: words,
+        isBg: false,
+        singer: singerOpt
+    });
+}
                     else if (advWordMatch && newLyrics.length > 0) {
                         const rawData = advWordMatch[1];
                         const wordParts = rawData.split('|');
@@ -3601,24 +3707,37 @@
                             const totalTime = (min * 60) + sec;
 
                             // --- Updated Tag Detection ---
-                            let isBgLine = false;
+                           let isBgLine = false;
+let singerOpt = 'v1'; // Default
 
-                            if (textContent.startsWith('{bg}')) {
-                                isBgLine = true;
-                                textContent = textContent.replace('{bg}', '').trim();
-                            }
-                            else if (textContent.startsWith('{agent:v1}')) {
-                                isBgLine = false;
-                                textContent = textContent.replace('{agent:v1}', '').trim();
-                            }
+if (textContent.startsWith('{bg}')) {
+    isBgLine = true;
+    textContent = textContent.replace('{bg}', '').trim();
+}
+else if (textContent.startsWith('{agent:v2}')) {
+    singerOpt = 'v2';
+    textContent = textContent.replace('{agent:v2}', '').trim();
+}
+else if (textContent.startsWith('{agent:v3}')) {
+    singerOpt = 'v3';
+    textContent = textContent.replace('{agent:v3}', '').trim();
+}
+else if (textContent.startsWith('{agent:v1000}')) {
+    singerOpt = 'v3'; // Map internally
+    textContent = textContent.replace('{agent:v1000}', '').trim();
+}
+else if (textContent.startsWith('{agent:v1}')) {
+    textContent = textContent.replace('{agent:v1}', '').trim();
+}
                             // -----------------------------
 
                             newLyrics.push({
-                                text: textContent,
-                                time: totalTime,
-                                words: parseWords(textContent),
-                                isBg: isBgLine // Set the property based on the tag
-                            });
+    text: textContent,
+    time: totalTime,
+    words: parseWords(textContent),
+    isBg: isBgLine,
+    singer: singerOpt
+});
                         } else if (!mainContent.startsWith('[') && !mainContent.startsWith('<')) {
                             // Plain text fallback
                             newLyrics.push({
@@ -3728,7 +3847,8 @@
             // 2. Render Lines
             state.lyrics.forEach((item, index) => {
                 const row = document.createElement('div');
-                row.className = `lyric-line ${index === state.currentIndex && !state.isEditMode ? 'active' : ''} ${item.isBg ? 'is-bg-vocal' : ''}`;
+                const singerClass = (item.singer === 'v2') ? 'is-v2' : (item.singer === 'v3' ? 'is-v3' : 'is-v1');
+                row.className = `lyric-line ${index === state.currentIndex && !state.isEditMode ? 'active' : ''} ${item.isBg ? 'is-bg-vocal' : ''} ${singerClass}`;
                 row.id = `line-${index}`;
 
                 const meta = document.createElement('div');
@@ -3877,16 +3997,31 @@
             const addBtn = document.createElement('div');
             addBtn.className = 'lyric-line add-new-line-btn';
             addBtn.innerHTML = '+ Add New Line';
-            addBtn.onclick = () => {
+          addBtn.onclick = () => {
                 if (state.isPreviewMode) return;
                 const isBgMode = (state.viewMode === 'bg');
+                const isV2Mode = (state.viewMode === 'v2');
+                const isV3Mode = (state.viewMode === 'v3');
 
-                // Create new line with correct isBg property
+                let textToUse = "New Line";
+                let singerType = 'v1';
+
+                if (isV3Mode) {
+                    textToUse = "New Singer 3 Line";
+                    singerType = 'v3';
+                } else if (isV2Mode) {
+                    textToUse = "New Singer 2 Line";
+                    singerType = 'v2';
+                } else if (isBgMode) {
+                    textToUse = "New Background Line";
+                }
+
                 const newItem = {
-                    text: "New Line",
+                    text: textToUse,
                     time: null,
-                    words: parseWords("New Line"),
-                    isBg: isBgMode // true if in BG view, false otherwise
+                    words: parseWords(textToUse),
+                    isBg: isBgMode,
+                    singer: singerType
                 };
 
                 state.lyrics.push(newItem);
@@ -3897,26 +4032,67 @@
         }
 
         function addLineAtTop() {
-            const newItem = { text: "New Line", time: null, words: parseWords("New Line") };
-            state.lyrics.unshift(newItem); state.currentIndex++; renderEditor();
-        }
-        function addLine(index) {
-            const currentLine = state.lyrics[index];
-            // Check if we are in BG view mode OR targeting an existing BG line
-            const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+            const isBgContext = (state.viewMode === 'bg');
+            const isV2Context = (state.viewMode === 'v2');
+            const isV3Context = (state.viewMode === 'v3');
+            
+            let textToUse = "New Line";
+            let singerType = 'v1';
 
-            const textToUse = isBgContext ? "New Background Line" : "New Line";
+            if (isV3Context) {
+                textToUse = "New Singer 3 Line";
+                singerType = 'v3';
+            } else if (isV2Context) {
+                textToUse = "New Singer 2 Line";
+                singerType = 'v2';
+            } else if (isBgContext) {
+                textToUse = "New Background Line";
+            }
+            
+            const newItem = { 
+                text: textToUse, 
+                time: null, 
+                words: parseWords(textToUse),
+                isBg: isBgContext,
+                singer: singerType
+            };
+            
+            state.lyrics.unshift(newItem); 
+            state.currentIndex++; 
+            renderEditor();
+        }
+
+       function addLine(index) {
+            const currentLine = state.lyrics[index];
+            const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+            const isV2Context = (state.viewMode === 'v2') || (currentLine && currentLine.singer === 'v2');
+            const isV3Context = (state.viewMode === 'v3') || (currentLine && currentLine.singer === 'v3');
+
+            let textToUse = "New Line";
+            let singerType = 'v1';
+
+            if (isV3Context) {
+                textToUse = "New Singer 3 Line";
+                singerType = 'v3';
+            } else if (isV2Context) {
+                textToUse = "New Singer 2 Line";
+                singerType = 'v2';
+            } else if (isBgContext) {
+                textToUse = "New Background Line";
+            }
 
             const newItem = {
                 text: textToUse,
                 time: null,
                 words: parseWords(textToUse),
-                isBg: isBgContext
+                isBg: isBgContext,
+                singer: singerType
             };
 
             state.lyrics.splice(index + 1, 0, newItem);
             renderEditor();
         }
+        
         function deleteLine(index) {
             state.lyrics.splice(index, 1);
             if (state.currentIndex >= state.lyrics.length) state.currentIndex = Math.max(0, state.lyrics.length - 1);
@@ -4392,16 +4568,19 @@
                     }
 
                     if (l.isBg) {
-                        out += `[bg:${lineContent}]\n`;
-                    } else {
-                        out += `[${formatTimePro(l.time)}]${lineContent}\n`;
-                    }
+                    out += `[bg:${lineContent}]\n`;
+                } else {
+                    let prefix = 'v1:';
+                    if (l.singer === 'v2') prefix = 'v2:';
+                    else if (l.singer === 'v3') prefix = `${state.thirdSingerLabel}:`;
+                    out += `[${formatTimePro(l.time)}]${prefix}${lineContent}\n`;
                 }
-                else {
+                }
+               else {
                     // Advanced Format
                     if (l.time !== null) {
-                        // Use {bg} for background vocals, {agent:v1} for main vocals
-                        const lineTag = l.isBg ? "{bg}" : "{agent:v1}";
+                        // Use {bg} for background vocals, {agent:v1} for main vocals, and handle v3
+                        const lineTag = l.isBg ? "{bg}" : (l.singer === 'v2' ? "{agent:v2}" : (l.singer === 'v3' ? `{agent:${state.thirdSingerLabel}}` : "{agent:v1}"));
                         out += `[${formatTimeLRC(l.time)}]${lineTag}${l.text}\n`;
 
                         if (l.words && l.words.some(w => w.start !== null)) {
@@ -4596,16 +4775,6 @@
             handleGesture('up');
         }, { passive: true });
 
-        // 2. Swipe Down on Sidebar -> Close Settings
-        sidebarEl.addEventListener('touchstart', (e) => {
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        sidebarEl.addEventListener('touchend', (e) => {
-            touchEndY = e.changedTouches[0].screenY;
-            handleGesture('down');
-        }, { passive: true });
-
         function handleGesture(direction) {
             const swipeDistance = touchStartY - touchEndY;
             const threshold = 50; // Minimum pixels to count as a swipe
@@ -4613,14 +4782,7 @@
             if (direction === 'up') {
                 // Swipe Up (positive distance) on Dock
                 if (swipeDistance > threshold) {
-                    toggleSettings(true);
-                }
-            }
-            else if (direction === 'down') {
-                // Swipe Down (negative distance) on Sidebar
-                // Only close if we are scrolled to the very top to avoid conflict with internal scrolling
-                if (sidebarEl.scrollTop === 0 && swipeDistance < -threshold) {
-                    toggleSettings(false);
+                    toggleTools(true);
                 }
             }
         }
@@ -4676,7 +4838,23 @@
             return `${m.toString().padStart(2, '0')}:${sec.toFixed(3).padStart(6, '0')}`;
         }
 
-        // --- SINGLE LINE EDIT MODAL LOGIC ---
+       // --- SINGLE LINE EDIT MODAL LOGIC ---
+        let currentEditLineType = 'v1';
+
+        function setLineType(type) {
+            currentEditLineType = type;
+            const btnBg = document.getElementById('edit-type-bg');
+            const btnV1 = document.getElementById('edit-type-v1');
+            const btnV2 = document.getElementById('edit-type-v2');
+            const btnV3 = document.getElementById('edit-type-v3');
+
+            btnBg.className = 'btn btn-secondary';
+            btnV1.className = 'btn btn-secondary';
+            btnV2.className = 'btn btn-secondary';
+            if(btnV3) btnV3.className = 'btn btn-secondary';
+
+            document.getElementById(`edit-type-${type}`).className = 'btn';
+        }
 
         function openSingleLineEditModal(index) {
             editingLineIndex = index;
@@ -4684,13 +4862,10 @@
             const modal = document.getElementById('single-line-edit-modal');
             const textArea = document.getElementById('single-line-text');
 
-            // Explicitly get the checkbox by ID
-            const bgCheckbox = document.getElementById('edit-line-bg');
-
             // 1. Setup Text
             textArea.value = line.text;
 
-            // 2. Setup Time (Split logic)
+            // 2. Setup Time 
             let startTime = line.time;
             if (startTime === null && line.words && line.words.length > 0) {
                 const firstSynced = line.words.find(w => w.start !== null);
@@ -4707,9 +4882,15 @@
                 document.getElementById('edit-line-ms').value = "";
             }
 
-            // 3. Setup BG
-            if (bgCheckbox) {
-                bgCheckbox.checked = (line.isBg === true);
+            // 3. Setup Line Type (Buttons)
+            if (line.isBg) {
+                setLineType('bg');
+            } else if (line.singer === 'v2') {
+                setLineType('v2');
+            } else if (line.singer === 'v3') {
+                setLineType('v3');
+            } else {
+                setLineType('v1');
             }
 
             modal.classList.add('active');
@@ -4724,9 +4905,7 @@
             if (editingLineIndex === -1) return;
 
             const newText = document.getElementById('single-line-text').value.trim();
-            const isBg = document.getElementById('edit-line-bg').checked;
 
-            // ... (Time calculation logic remains the same) ...
             const m = parseInt(document.getElementById('edit-line-min').value) || 0;
             const s = parseInt(document.getElementById('edit-line-sec').value) || 0;
             const ms = parseInt(document.getElementById('edit-line-ms').value) || 0;
@@ -4746,8 +4925,13 @@
                 lineObj.words[0].start = newTime;
             }
 
-            // Apply the checkbox state to the object
-            lineObj.isBg = isBg;
+            // Apply line type from the active button state
+            if (currentEditLineType === 'bg') {
+                lineObj.isBg = true;
+            } else {
+                lineObj.isBg = false;
+                lineObj.singer = currentEditLineType;
+            }
 
             renderEditor();
             generateLRC();
@@ -4756,25 +4940,68 @@
 
         function deleteLineFromModal() {
             if (confirm("Delete this line?")) {
-                deleteLine(editingLineIndex); // Uses existing delete function
+                deleteLine(editingLineIndex); 
                 closeSingleLineEditModal();
             }
         }
 
-        function addLineFromModal() {
+        // --- DEDICATED ADD LINE MODAL LOGIC ---
+     function addLineFromModal() {
             const currentLine = state.lyrics[editingLineIndex];
             const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+            const isV2Context = (state.viewMode === 'v2') || (currentLine && currentLine.singer === 'v2');
+            const isV3Context = (state.viewMode === 'v3') || (currentLine && currentLine.singer === 'v3');
+
+            let textToUse = "New Line";
+            let singerType = 'v1';
+
+            if (isV3Context) {
+                textToUse = "New Singer 3 Line";
+                singerType = 'v3';
+            } else if (isV2Context) {
+                textToUse = "New Singer 2 Line";
+                singerType = 'v2';
+            } else if (isBgContext) {
+                textToUse = "New Background Line";
+            }
 
             const newItem = {
-                text: isBgContext ? "New Background Line" : "New Line",
+                text: textToUse,
                 time: null,
-                words: parseWords(isBgContext ? "New Background Line" : "New Line"),
-                isBg: isBgContext // Set true if we are in BG view or editing a BG line
+                words: parseWords(textToUse),
+                isBg: isBgContext,
+                singer: singerType
             };
+            
             state.lyrics.splice(editingLineIndex + 1, 0, newItem);
 
             renderEditor();
             closeSingleLineEditModal();
+        }
+
+        function closeAddLineModal() {
+            document.getElementById('add-line-modal').classList.remove('active');
+            editingLineIndex = -1;
+        }
+
+        function confirmAddLine() {
+            if (editingLineIndex === -1) return;
+            
+            const text = document.getElementById('add-line-text').value.trim() || "New Line";
+            const currentLine = state.lyrics[editingLineIndex];
+            const isBgContext = (state.viewMode === 'bg') || (currentLine && currentLine.isBg);
+
+            const newItem = {
+                text: text,
+                time: null,
+                words: parseWords(text),
+                isBg: isBgContext 
+            };
+            
+            state.lyrics.splice(editingLineIndex + 1, 0, newItem);
+
+            renderEditor();
+            closeAddLineModal();
         }
 
         function openViewModal() {
@@ -4798,10 +5025,14 @@
                 activeBtn.classList.remove('btn-outline'); // Remove outline to show full fill
             }
 
-            // 2. Handle Editor Visibility
-            appContainer.classList.remove('view-main', 'view-bg');
+// 2. Handle Editor Visibility
+            appContainer.classList.remove('view-main', 'view-bg', 'view-v1', 'view-v2', 'view-v3');
             if (mode === 'main') appContainer.classList.add('view-main');
             if (mode === 'bg') appContainer.classList.add('view-bg');
+            if (mode === 'v1') appContainer.classList.add('view-v1');
+            if (mode === 'v2') appContainer.classList.add('view-v2');
+            if (mode === 'v3') appContainer.classList.add('view-v3');
+
 
             // 3. Close Modal
             document.getElementById('view-modal').classList.remove('active');
@@ -4820,16 +5051,16 @@
             let i = startIndex;
             while (i < state.lyrics.length) {
                 const line = state.lyrics[i];
-                const isBg = !!line.isBg; // ensure boolean
+const isBg = !!line.isBg;
+const singer = line.singer || 'v1';
 
-                // If Mode is Main, skip BG lines
-                if (state.viewMode === 'main' && isBg) { i++; continue; }
+if (state.viewMode === 'main' && isBg) { i++; continue; }
+if (state.viewMode === 'bg' && !isBg) { i++; continue; }
+if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i++; continue; }
+if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i++; continue; }
+if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i++; continue; }
 
-                // If Mode is BG, skip non-BG lines
-                if (state.viewMode === 'bg' && !isBg) { i++; continue; }
-
-                // If we get here, the line is valid for the current view
-                return i;
+return i;
             }
             return state.lyrics.length; // End of song
         }
@@ -4845,10 +5076,13 @@
                 if (lastWord.end !== null) return lastWord.end;
             }
 
-            // 2. Fallback: Estimate based on start of the NEXT line of the SAME type
+            // 2. Fallback: Estimate based on start of the NEXT line of the SAME type AND Singer
             for (let i = index + 1; i < state.lyrics.length; i++) {
                 const next = state.lyrics[i];
-                if (!!next.isBg === !!line.isBg && next.time !== null) {
+                const sameBg = !!next.isBg === !!line.isBg;
+                const sameSinger = (next.singer || 'v1') === (line.singer || 'v1');
+                
+                if (sameBg && sameSinger && next.time !== null) {
                     return next.time;
                 }
             }
@@ -4861,13 +5095,16 @@
             let i = startIndex;
             while (i >= 0) {
                 const line = state.lyrics[i];
-                const isBg = !!line.isBg;
+const isBg = !!line.isBg;
+const singer = line.singer || 'v1';
 
-                // Skip lines that are hidden in the current view
-                if (state.viewMode === 'main' && isBg) { i--; continue; }
-                if (state.viewMode === 'bg' && !isBg) { i--; continue; }
+if (state.viewMode === 'main' && isBg) { i--; continue; }
+if (state.viewMode === 'bg' && !isBg) { i--; continue; }
+if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i--; continue; }
+if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i--; continue; }
+if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i--; continue; }
 
-                return i;
+return i;
             }
             return -1; // No valid previous line found
         }
