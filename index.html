@@ -832,7 +832,7 @@
             bottom: 200px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(15, 23, 42, 0.774);
+            background: rgb(19, 29, 54);
             padding: 10px 20px;
             border-radius: 12px;
             display: flex;
@@ -1764,7 +1764,7 @@
                 background: transparent;
                 pointer-events: none;
                 backdrop-filter: none;
-                background: linear-gradient(to bottom, #232c41, rgba(0, 0, 0, 0));
+                background: #232c41;
             }
 
             .top-left-controls {
@@ -2527,8 +2527,17 @@
                             <div class="hotkey-text">Edit Line Modal</div>
                             <div class="hotkey-pill" id="kb-editLine" onclick="rebindKey('editLine')">E</div>
 
+                            <div class="hotkey-text">Set Type: V1</div>
+                            <div class="hotkey-pill" id="kb-setV1" onclick="rebindKey('setV1')">1</div>
+
+                            <div class="hotkey-text">Set Type: V2</div>
+                            <div class="hotkey-pill" id="kb-setV2" onclick="rebindKey('setV2')">2</div>
+
+                            <div class="hotkey-text">Set Type: V3</div>
+                            <div class="hotkey-pill" id="kb-setV3" onclick="rebindKey('setV3')">3</div>
+
                             <div class="hotkey-text">Toggle BG Vocal</div>
-                            <div class="hotkey-pill" id="kb-toggleBg" onclick="rebindKey('toggleBg')">1</div>
+                            <div class="hotkey-pill" id="kb-toggleBg" onclick="rebindKey('toggleBg')">4</div>
 
                             <div class="hotkey-text">Delete Line</div>
                             <div class="hotkey-pill" id="kb-del" onclick="rebindKey('del')">Delete</div>
@@ -2627,7 +2636,7 @@
                     </div>
                     <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.5;">
                         <p>Load an audio file to enable LRC features.</p>
-                        <a href="#" style="color: inherit; text-decoration: underline;">v9.2 Beta</a>
+                        <a href="#" style="color: inherit; text-decoration: underline;">v9.2b</a>
                     </div>
                 </div>
             </div>
@@ -3097,7 +3106,10 @@
             sync: 'Enter',
             add: 'KeyC',
             editLine: 'KeyE',
-            toggleBg: 'Digit1',
+            setV1: 'Digit1',
+            setV2: 'Digit2',
+            setV3: 'Digit3',
+            toggleBg: 'Digit4',
             del: 'Delete',
             togglePreview: 'KeyV',
             arrange: 'KeyR'
@@ -3829,7 +3841,7 @@ else if (textContent.startsWith('{agent:v1}')) {
                 </div>
                 <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.5;">
                     <p>Load an audio file to enable LRC features.</p>
-                    <a href="#" style="color: inherit; text-decoration: underline;">v9.1 Beta</a>
+                    <a href="#" style="color: inherit; text-decoration: underline;">v9.2b</a>
                 </div>
             `;
 
@@ -4254,7 +4266,7 @@ else if (textContent.startsWith('{agent:v1}')) {
             generateLRC();
         }
 
-        // Classic Tap: Sets start, auto sets prev end, advances
+       // Classic Tap: Sets start, auto sets prev end, advances
         function syncWordTap(lIdx, wIdx, time) {
             const line = state.lyrics[lIdx];
             if (!line) return;
@@ -4267,22 +4279,27 @@ else if (textContent.startsWith('{agent:v1}')) {
                 line.words[wIdx - 1].end = time;
             }
             else if (lIdx > 0) {
-                const prev = state.lyrics[lIdx - 1];
-                if (prev.words.length) {
-                    const prevWord = prev.words[prev.words.length - 1];
-                    if (state.syncInputMode === 'auto') {
-                        if (prevWord.end === null) prevWord.end = time;
-                    } else {
-                        prevWord.end = time;
+                // Fix: Find the actual valid previous line based on View Context
+                const prevIdx = getPrevValidLineIndex(lIdx - 1);
+                if (prevIdx !== -1) {
+                    const prev = state.lyrics[prevIdx];
+                    if (prev.words.length) {
+                        const prevWord = prev.words[prev.words.length - 1];
+                        if (state.syncInputMode === 'auto') {
+                            if (prevWord.end === null) prevWord.end = time;
+                        } else {
+                            prevWord.end = time;
+                        }
                     }
                 }
-            }
+            } // <-- CLOSING BRACKET MOVED HERE
 
             // Auto-close very last word of song if in Tap mode
             if (state.syncInputMode === 'tap' && lIdx === state.lyrics.length - 1 && wIdx === line.words.length - 1) {
                 if (audioPlayer.duration) word.end = audioPlayer.duration;
             }
 
+            // THESE NOW RUN FOR EVERY WORD
             if (wIdx === 0) syncLine(lIdx, time);
             advanceWordCursor();
             generateLRC();
@@ -4502,15 +4519,20 @@ else if (textContent.startsWith('{agent:v1}')) {
                 if (state.currentWordIndex < currentLine.words.length - 1) {
                     nextWordText = currentLine.words[state.currentWordIndex + 1].text;
                 }
-                // Or check first word of next line
-                else if (state.currentIndex < state.lyrics.length - 1) {
-                    const nextLine = state.lyrics[state.currentIndex + 1];
+              // Or check first word of next line
+            else if (state.currentIndex < state.lyrics.length - 1) {
+                const nextLineIdx = getNextValidLineIndex(state.currentIndex + 1);
+                if (nextLineIdx < state.lyrics.length) {
+                    const nextLine = state.lyrics[nextLineIdx];
                     if (nextLine.words.length > 0) {
                         nextWordText = nextLine.words[0].text;
                     }
                 } else {
                     nextWordText = "End of Song";
                 }
+            } else {
+                nextWordText = "End of Song";
+            }
 
                 ctxNext.textContent = nextWordText;
 
@@ -4518,14 +4540,17 @@ else if (textContent.startsWith('{agent:v1}')) {
                 // STANDARD TAP / AUTO LAYOUT (Default behavior)
                 wordContextUI.classList.remove('mode-hold');
 
-                // LEFT SIDE: Previous Word
-                let prevWordText = "...";
-                if (state.currentWordIndex > 0) prevWordText = currentLine.words[state.currentWordIndex - 1].text;
-                else if (state.currentIndex > 0) {
-                    const prevLine = state.lyrics[state.currentIndex - 1];
+             // LEFT SIDE: Previous Word
+            let prevWordText = "...";
+            if (state.currentWordIndex > 0) prevWordText = currentLine.words[state.currentWordIndex - 1].text;
+            else if (state.currentIndex > 0) {
+                const prevLineIdx = getPrevValidLineIndex(state.currentIndex - 1);
+                if (prevLineIdx !== -1) {
+                    const prevLine = state.lyrics[prevLineIdx];
                     if (prevLine && prevLine.words.length > 0) prevWordText = prevLine.words[prevLine.words.length - 1].text;
                 }
-                ctxPrev.textContent = prevWordText;
+            }
+            ctxPrev.textContent = prevWordText;
 
                 // RIGHT SIDE: Current Word (Target)
                 ctxNext.textContent = currentWord ? currentWord.text : "End";
@@ -4648,6 +4673,18 @@ else if (textContent.startsWith('{agent:v1}')) {
                 e.preventDefault();
                 openSingleLineEditModal(state.currentIndex);
             }
+            if (code === keyMap.setV1) {
+                e.preventDefault();
+                hotkeySetLineType('v1');
+            }
+            if (code === keyMap.setV2) {
+                e.preventDefault();
+                hotkeySetLineType('v2');
+            }
+            if (code === keyMap.setV3) {
+                e.preventDefault();
+                hotkeySetLineType('v3');
+            }
             if (code === keyMap.toggleBg) {
                 e.preventDefault();
                 toggleBgVocal();
@@ -4657,31 +4694,35 @@ else if (textContent.startsWith('{agent:v1}')) {
                 if (confirm("Delete current line?")) deleteLine(state.currentIndex);
             }
 
-            // --- Navigation: LINES (W/S) ---
-            if (code === keyMap.prevLine) {
-                e.preventDefault();
-                if (state.lyrics[state.currentIndex]) state.lyrics[state.currentIndex].time = null;
-                if (state.currentIndex > 0) {
-                    state.currentIndex--;
-                    // Reset word index to end of previous line for continuity
-                    if (state.lyrics[state.currentIndex]) {
-                        state.currentWordIndex = state.lyrics[state.currentIndex].words.length - 1;
-                    }
+           // --- Navigation: LINES (W/S) ---
+        if (code === keyMap.prevLine) {
+            e.preventDefault();
+            if (state.lyrics[state.currentIndex]) state.lyrics[state.currentIndex].time = null;
+            
+            const prevIdx = getPrevValidLineIndex(state.currentIndex - 1);
+            if (prevIdx !== -1) {
+                state.currentIndex = prevIdx;
+                // Reset word index to end of previous line for continuity
+                if (state.lyrics[state.currentIndex]) {
+                    state.currentWordIndex = state.lyrics[state.currentIndex].words.length - 1;
                 }
-                updateVisuals();
-                scrollToActive();
-                generateLRC();
             }
+            
+            updateVisuals();
+            scrollToActive();
+            generateLRC();
+        }
 
-            if (code === keyMap.nextLine) {
-                e.preventDefault();
-                if (state.currentIndex < state.lyrics.length - 1) {
-                    state.currentIndex++;
-                    state.currentWordIndex = 0;
-                }
-                updateVisuals();
-                scrollToActive();
+           if (code === keyMap.nextLine) {
+            e.preventDefault();
+            const nextIdx = getNextValidLineIndex(state.currentIndex + 1);
+            if (nextIdx < state.lyrics.length) {
+                state.currentIndex = nextIdx;
+                state.currentWordIndex = 0;
             }
+            updateVisuals();
+            scrollToActive();
+        }
 
             if (code === keyMap.togglePreview) {
                 e.preventDefault();
@@ -5048,22 +5089,23 @@ else if (textContent.startsWith('{agent:v1}')) {
         }
 
         function getNextValidLineIndex(startIndex) {
-            let i = startIndex;
-            while (i < state.lyrics.length) {
-                const line = state.lyrics[i];
-const isBg = !!line.isBg;
-const singer = line.singer || 'v1';
+    let i = startIndex;
+    while (i < state.lyrics.length) {
+        const line = state.lyrics[i];
+        const isBg = !!line.isBg;
+        const singer = line.singer || 'v1';
 
-if (state.viewMode === 'main' && isBg) { i++; continue; }
-if (state.viewMode === 'bg' && !isBg) { i++; continue; }
-if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i++; continue; }
-if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i++; continue; }
-if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i++; continue; }
+        // Fix: 'main' view must skip isBg AND any singer that isn't 'v1'
+        if (state.viewMode === 'main' && (isBg || singer !== 'v1')) { i++; continue; }
+        if (state.viewMode === 'bg' && !isBg) { i++; continue; }
+        if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i++; continue; }
+        if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i++; continue; }
+        if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i++; continue; }
 
-return i;
-            }
-            return state.lyrics.length; // End of song
-        }
+        return i;
+    }
+    return state.lyrics.length; // End of song
+}
 
         // Calculate End Time for a line
         function getLineEndTime(index) {
@@ -5092,22 +5134,22 @@ return i;
         }
 
         function getPrevValidLineIndex(startIndex) {
-            let i = startIndex;
-            while (i >= 0) {
-                const line = state.lyrics[i];
-const isBg = !!line.isBg;
-const singer = line.singer || 'v1';
+    let i = startIndex;
+    while (i >= 0) {
+        const line = state.lyrics[i];
+        const isBg = !!line.isBg;
+        const singer = line.singer || 'v1';
 
-if (state.viewMode === 'main' && isBg) { i--; continue; }
-if (state.viewMode === 'bg' && !isBg) { i--; continue; }
-if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i--; continue; }
-if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i--; continue; }
-if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i--; continue; }
+        if (state.viewMode === 'main' && (isBg || singer !== 'v1')) { i--; continue; }
+        if (state.viewMode === 'bg' && !isBg) { i--; continue; }
+        if (state.viewMode === 'v1' && (isBg || singer !== 'v1')) { i--; continue; }
+        if (state.viewMode === 'v2' && (isBg || singer !== 'v2')) { i--; continue; }
+        if (state.viewMode === 'v3' && (isBg || singer !== 'v3')) { i--; continue; }
 
-return i;
-            }
-            return -1; // No valid previous line found
-        }
+        return i;
+    }
+    return -1; // No valid previous line found
+}
 
         // Helper: Applies glow to words within a specific line
         function animateWordGlow(lineIdx, curTime) {
@@ -5371,6 +5413,18 @@ return i;
                 toolsOverlay.classList.remove('active');
                 toolsBtn.classList.remove('active');
             }
+        }
+
+        function hotkeySetLineType(type) {
+            if (state.currentIndex < 0 || state.currentIndex >= state.lyrics.length) return;
+
+            const line = state.lyrics[state.currentIndex];
+            line.isBg = false; // Reset BG status if switching to a main singer
+            line.singer = type;
+
+            renderEditor();
+            updateVisuals();
+            generateLRC(); // update output text immediately
         }
 
         function resetProjectWithConfirm() {
