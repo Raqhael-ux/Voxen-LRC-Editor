@@ -23,6 +23,7 @@ If you don’t want to download the HTML file, you can use the web version inste
 - [ ] Slide Animation
 - [ ] Wiki (How To Use)
 - [ ] Flexible LRC Output (Multiple App Support)
+- [X] Fix Lag
 
 **Concept :**
 <img width="1920" height="1080" alt="EXPORT" src="https://github.com/user-attachments/assets/556b2e26-86a3-4956-9dc4-6ce2f69819ae" />
