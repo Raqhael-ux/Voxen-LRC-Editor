@@ -1140,6 +1140,32 @@
             color: white;
         }
 
+        .pitch-toggle-btn {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: auto;
+            padding: 0 8px;
+            white-space: nowrap;
+        }
+
+        .pitch-toggle-btn.shifted {
+            color: var(--primary);
+        }
+
+        .pitch-popup {
+            width: 132px;
+            max-height: 210px;
+            overflow-y: auto;
+        }
+
+        .pitch-popup .pitch-reset {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4px;
+            padding-top: 6px;
+            font-size: 0.75rem;
+        }
+
         .vol-slider {
             width: 100px;
             height: 6px;
@@ -2673,6 +2699,27 @@
                         </div>
                     </div>
 
+                    <div class="popup-wrapper">
+                        <button class="control-btn pitch-toggle-btn" id="pitch-btn"
+                            onclick="togglePitchMenu()" title="Pitch adjustment (key change)">♪ 0</button>
+                        <div class="dock-popup pitch-popup" id="pitch-popup">
+                            <button class="speed-option" onclick="setPitch(6)">+6</button>
+                            <button class="speed-option" onclick="setPitch(5)">+5</button>
+                            <button class="speed-option" onclick="setPitch(4)">+4</button>
+                            <button class="speed-option" onclick="setPitch(3)">+3</button>
+                            <button class="speed-option" onclick="setPitch(2)">+2</button>
+                            <button class="speed-option" onclick="setPitch(1)">+1</button>
+                            <button class="speed-option selected" onclick="setPitch(0)">0</button>
+                            <button class="speed-option" onclick="setPitch(-1)">-1</button>
+                            <button class="speed-option" onclick="setPitch(-2)">-2</button>
+                            <button class="speed-option" onclick="setPitch(-3)">-3</button>
+                            <button class="speed-option" onclick="setPitch(-4)">-4</button>
+                            <button class="speed-option" onclick="setPitch(-5)">-5</button>
+                            <button class="speed-option" onclick="setPitch(-6)">-6</button>
+                            <button class="speed-option pitch-reset" onclick="setPitch(0)">Reset</button>
+                        </div>
+                    </div>
+
                     <button class="control-btn" onclick="seekAudio(-5)">↺</button>
                     <button class="control-btn play-btn" id="play-pause-btn" onclick="togglePlay()">▶</button>
                     <button class="control-btn" onclick="seekAudio(5)">↻</button>
@@ -3017,6 +3064,7 @@
             isEditMode: false,
             isPreviewMode: false,
             currentSpeed: 1.0,
+            currentPitch: 0,
             syncInputMode: 'hybrid',
             glowMode: 'auto',
             lrcFormat: 'pro',
@@ -3043,6 +3091,8 @@
         // Popups
         const speedBtn = document.getElementById('speed-btn');
         const speedPopup = document.getElementById('speed-popup');
+        const pitchBtn = document.getElementById('pitch-btn');
+        const pitchPopup = document.getElementById('pitch-popup');
         const volumePopup = document.getElementById('volume-popup');
         const volumeSlider = document.getElementById('volume-slider');
         const glowPopup = document.getElementById('glow-popup');
@@ -3268,11 +3318,13 @@
         function toggleSpeedMenu() {
             speedPopup.classList.toggle('active');
             volumePopup.classList.remove('active');
+            pitchPopup.classList.remove('active');
         }
 
         function toggleVolumeMenu() {
             volumePopup.classList.toggle('active');
             speedPopup.classList.remove('active');
+            pitchPopup.classList.remove('active');
         }
 
         function updateVolume(val) {
@@ -3285,11 +3337,223 @@
             audioPlayer.playbackRate = val;
             speedBtn.textContent = val + "x";
 
-            document.querySelectorAll('.speed-option').forEach(btn => {
+            // Keep the browser from "correcting" pitch while we are shifting it
+            // ourselves, otherwise the two fight and the result warbles.
+            applyBrowserPitchPreservation();
+
+            document.querySelectorAll('#speed-popup .speed-option').forEach(btn => {
                 btn.classList.remove('selected');
                 if (parseFloat(btn.innerText) === val) btn.classList.add('selected');
             });
             speedPopup.classList.remove('active');
+        }
+
+        /* =========================================
+           PITCH ADJUSTMENT (key change)
+           -----------------------------------------
+           Shifts the song's key without changing its tempo, so synced lyric
+           timings stay valid. Singers use this to move a track into their own
+           vocal range.
+
+           playbackRate alone is not usable here: it changes pitch AND speed
+           together, which would desync every timestamp in the project.
+
+           Implementation is a granular overlap-add shifter built on plain Web
+           Audio, so it stays dependency free and keeps Voxen a single portable
+           HTML file. Two ScriptProcessor-free AudioBufferSourceNodes would not
+           work on a live <audio> element, so we resample short overlapping
+           grains from a delay line instead:
+
+             - Audio is tapped once via createMediaElementSource.
+             - Two grain paths read the signal through DelayNodes whose delay
+               ramps linearly, which resamples (and therefore transposes) it.
+             - The two paths crossfade so grain boundaries are not audible.
+
+           At 0 semitones the whole chain is bypassed and audio runs through the
+           original clean path, so the default experience is bit identical to
+           before this feature existed.
+           ========================================= */
+        const PITCH_GRAIN_SIZE = 0.10;   // seconds per grain
+        const PITCH_MAX_DELAY = 1.0;     // DelayNode ceiling
+
+        let audioCtx = null;
+        let mediaSourceNode = null;
+        let pitchInputGain = null;       // fan-out point after the media source
+        let pitchDryGain = null;         // clean path, used at 0 semitones
+        let pitchWetGain = null;         // shifted path
+        let pitchOutputGain = null;      // final node into the destination
+        let pitchGrains = [];            // [{ delay, gain }, ...]
+        let pitchSchedulerId = null;
+        let pitchGraphReady = false;
+
+        function semitonesToRatio(semitones) {
+            return Math.pow(2, semitones / 12);
+        }
+
+        /*
+         * The browser's own pitch preservation must be ON for plain speed
+         * changes (so 1.5x does not chipmunk), but OFF while our shifter is
+         * engaged, otherwise the browser fights the transposition.
+         */
+        function applyBrowserPitchPreservation() {
+            const preserve = state.currentPitch === 0;
+            audioPlayer.preservesPitch = preserve;
+            audioPlayer.mozPreservesPitch = preserve;
+            audioPlayer.webkitPreservesPitch = preserve;
+        }
+
+        function ensurePitchGraph() {
+            if (pitchGraphReady) return true;
+
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return false;
+
+            try {
+                audioCtx = new Ctx();
+                // createMediaElementSource can only ever be called once per element.
+                mediaSourceNode = audioCtx.createMediaElementSource(audioPlayer);
+
+                pitchInputGain = audioCtx.createGain();
+                pitchDryGain = audioCtx.createGain();
+                pitchWetGain = audioCtx.createGain();
+                pitchOutputGain = audioCtx.createGain();
+
+                pitchDryGain.gain.value = 1;   // start bypassed
+                pitchWetGain.gain.value = 0;
+
+                mediaSourceNode.connect(pitchInputGain);
+                pitchInputGain.connect(pitchDryGain);
+                pitchDryGain.connect(pitchOutputGain);
+
+                pitchGrains = [0, 1].map(() => {
+                    const delay = audioCtx.createDelay(PITCH_MAX_DELAY);
+                    const gain = audioCtx.createGain();
+                    gain.gain.value = 0;
+                    pitchInputGain.connect(delay);
+                    delay.connect(gain);
+                    gain.connect(pitchWetGain);
+                    return { delay, gain };
+                });
+
+                pitchWetGain.connect(pitchOutputGain);
+                pitchOutputGain.connect(audioCtx.destination);
+
+                pitchGraphReady = true;
+                return true;
+            } catch (err) {
+                console.warn('Pitch engine unavailable:', err);
+                pitchGraphReady = false;
+                return false;
+            }
+        }
+
+        /*
+         * Schedules one grain window. Ramping a DelayNode linearly resamples the
+         * signal passing through it: a delay that shrinks over time plays the
+         * audio slightly fast (pitch up), one that grows plays it slightly slow
+         * (pitch down). Each grain is faded in and out so the seams are masked.
+         */
+        function schedulePitchGrain(grain, startTime, ratio) {
+            const drift = (ratio - 1) * PITCH_GRAIN_SIZE;
+            const endTime = startTime + PITCH_GRAIN_SIZE;
+
+            // Positive drift (pitch up) must start further back in the delay line
+            // so the ramp always stays >= 0.
+            const startDelay = drift > 0 ? drift : 0;
+            const endDelay = startDelay - drift;
+
+            grain.delay.delayTime.setValueAtTime(startDelay, startTime);
+            grain.delay.delayTime.linearRampToValueAtTime(endDelay, endTime);
+
+            const fade = PITCH_GRAIN_SIZE / 2;
+            grain.gain.gain.setValueAtTime(0, startTime);
+            grain.gain.gain.linearRampToValueAtTime(1, startTime + fade);
+            grain.gain.gain.linearRampToValueAtTime(0, endTime);
+        }
+
+        function startPitchScheduler(ratio) {
+            stopPitchScheduler();
+
+            // Stagger the two grain paths by half a window so one is always at
+            // full gain while the other crossfades.
+            let nextTime = audioCtx.currentTime + 0.05;
+            let which = 0;
+
+            const pump = () => {
+                const horizon = audioCtx.currentTime + 0.25;
+                while (nextTime < horizon) {
+                    schedulePitchGrain(pitchGrains[which], nextTime, ratio);
+                    which = 1 - which;
+                    nextTime += PITCH_GRAIN_SIZE / 2;
+                }
+            };
+
+            pump();
+            pitchSchedulerId = setInterval(pump, 50);
+        }
+
+        function stopPitchScheduler() {
+            if (pitchSchedulerId !== null) {
+                clearInterval(pitchSchedulerId);
+                pitchSchedulerId = null;
+            }
+            if (!pitchGraphReady) return;
+            const now = audioCtx.currentTime;
+            pitchGrains.forEach(g => {
+                g.gain.gain.cancelScheduledValues(now);
+                g.gain.gain.setValueAtTime(0, now);
+                g.delay.delayTime.cancelScheduledValues(now);
+            });
+        }
+
+        function setPitch(semitones) {
+            const value = Math.max(-6, Math.min(6, Math.round(semitones)));
+
+            // Only build the AudioContext once the user actually asks for a
+            // shift, so a plain playback session never pays for it.
+            if (value !== 0 && !ensurePitchGraph()) {
+                alert('Pitch adjustment is not supported by this browser.');
+                return;
+            }
+
+            state.currentPitch = value;
+            applyBrowserPitchPreservation();
+
+            if (pitchGraphReady) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                if (value === 0) {
+                    stopPitchScheduler();
+                    pitchDryGain.gain.setTargetAtTime(1, now, 0.01);
+                    pitchWetGain.gain.setTargetAtTime(0, now, 0.01);
+                } else {
+                    pitchDryGain.gain.setTargetAtTime(0, now, 0.01);
+                    pitchWetGain.gain.setTargetAtTime(1, now, 0.01);
+                    startPitchScheduler(semitonesToRatio(value));
+                }
+            }
+
+            updatePitchUI();
+            pitchPopup.classList.remove('active');
+        }
+
+        function updatePitchUI() {
+            const value = state.currentPitch;
+            pitchBtn.textContent = value > 0 ? `\u266a +${value}` : `\u266a ${value}`;
+            pitchBtn.classList.toggle('shifted', value !== 0);
+
+            document.querySelectorAll('#pitch-popup .speed-option').forEach(btn => {
+                const label = btn.innerText.trim();
+                btn.classList.toggle('selected',
+                    label !== 'Reset' && parseInt(label, 10) === value);
+            });
+        }
+
+        function togglePitchMenu() {
+            pitchPopup.classList.toggle('active');
+            speedPopup.classList.remove('active');
+            volumePopup.classList.remove('active');
         }
 
         document.addEventListener('click', (e) => {
@@ -3297,6 +3561,7 @@
                 speedPopup.classList.remove('active');
                 volumePopup.classList.remove('active');
                 glowPopup.classList.remove('active');
+                pitchPopup.classList.remove('active');
             }
         });
 
@@ -3472,7 +3737,8 @@
                 timestamp: Date.now(),
                 mode: state.mode,
                 lyrics: state.lyrics,
-                currentIndex: state.currentIndex
+                currentIndex: state.currentIndex,
+                pitch: state.currentPitch
             };
             const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -3498,6 +3764,9 @@
                     state.mode = data.mode;
                     state.currentIndex = 0;
                     state.currentWordIndex = 0;
+
+                    // Older .vxn files predate pitch, so fall back to 0.
+                    setPitch(typeof data.pitch === 'number' ? data.pitch : 0);
 
                     if (state.mode === 'line') document.getElementById('mode-line').checked = true;
                     else document.getElementById('mode-word').checked = true;

@@ -33,6 +33,7 @@ If you don’t want to download the HTML file, you can use the web version inste
 
 * **Word-level lyric timing** (perfect for karaoke-style effects)
 * **Line-by-line syncing mode**
+* **Pitch adjustment** (transpose the song up or down 6 semitones without changing tempo, so synced timings stay valid)
 * Add, remove, or modify lyric lines
 * Runs **fully in the browser**
 * Works **locally** (no internet required after loading)
@@ -80,6 +81,15 @@ Note: You can convert Pro format to Advanced format by just changing the format 
 * **Enter** — Sync current word / line
 * **Left Arrow** — Seek **5 seconds backward**
 * **Right Arrow** — Seek **5 seconds forward**
+
+## 🎚️ Pitch Adjustment
+
+The **♪** button in the player dock transposes the loaded track by up to **±6 semitones** so you can sync (or sing along to) a song in a comfortable key.
+
+* **Tempo is not affected**, so every timestamp you have already synced stays correct. This is the reason it is not implemented with `playbackRate`, which would change speed and pitch together and desync the whole project.
+* Built on plain **Web Audio** (a granular overlap-add shifter), so Voxen stays a **single dependency-free HTML file**.
+* At **0** semitones the effect chain is fully bypassed, so default playback is unchanged.
+* The chosen pitch is **saved into the `.vxn` project file** and restored on load. Older project files without a pitch value default to 0.
 
 ## Music App with Advanced LRC Support
 | App Name     | Word-by-Word | BG Vocals      | Syllable-by-Syllable | Duet Support |
